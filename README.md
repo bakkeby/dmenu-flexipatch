@@ -5,11 +5,17 @@ For example to include the `border` patch then you would only need to flip this 
 #define BORDER_PATCH 1
 ```
 
+Once you have found out what works for you and what doesn't then you should be in a better position to choose patches should you want to start patching from scratch.
+
+Alternatively if you have found the patches you want, but don't want the rest of the flexipatch entanglement on your plate then you may want to have a look at [flexipatch-finalizer](https://github.com/bakkeby/flexipatch-finalizer); a custom pre-processor tool that removes all the unused flexipatch code leaving you with a build that contains the patches you selected.
+
 Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) for details on dmenu, how to install it and how it works.
 
 ---
 
 ### Changelog:
+
+2019-10-16 - Introduced [flexipatch-finalizer](https://github.com/bakkeby/flexipatch-finalizer)
 
 2019-09-18 - Added border, center, fuzzymatch, incremental, initialtext, instant, line-height, mouse-support, navhistory, non-blocking-stdin, password, pipeout, printinputtext, rejectnomatch, scroll, vertfull, wmtype and xyw patches
 
