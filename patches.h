@@ -103,6 +103,17 @@
  */
 #define WMTYPE_PATCH 0
 
+/* This patch adds the ability to configure dmenu via Xresources. At startup, dmenu will read and
+ * apply the resources named below:
+ *    dmenu.font          : font or font set
+ *    dmenu.background    : normal background color
+ *    dmenu.foreground    : normal foreground color
+ *    dmenu.selbackground : selected background color
+ *    dmenu.selforeground : selected foreground color
+ * https://tools.suckless.org/dmenu/patches/xresources/
+ */
+#define XRESOURCES_PATCH 0
+
 /* This patch adds options for specifying dmenu window position and width.
  * The center patch takes precedence over the XYW patch if enabled.
  * https://tools.suckless.org/dmenu/patches/xyw/

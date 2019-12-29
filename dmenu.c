@@ -1186,7 +1186,11 @@ main(int argc, char *argv[])
 	if (!XGetWindowAttributes(dpy, parentwin, &wa))
 		die("could not get embedding window attributes: 0x%lx",
 		    parentwin);
+
 	drw = drw_create(dpy, screen, root, wa.width, wa.height);
+	#if XRESOURCES_PATCH
+	read_Xresources();
+	#endif // XRESOURCES_PATCH
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;

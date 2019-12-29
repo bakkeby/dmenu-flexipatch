@@ -13,3 +13,6 @@
 #if NON_BLOCKING_STDIN_PATCH
 #include "nonblockingstdin.c"
 #endif
+#if XRESOURCES_PATCH
+#include "xresources.c"
+#endif

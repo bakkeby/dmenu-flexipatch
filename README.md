@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2019-12-29 - Added xresources patch
+
 2019-10-16 - Introduced [flexipatch-finalizer](https://github.com/bakkeby/flexipatch-finalizer)
 
 2019-09-18 - Added border, center, fuzzymatch, incremental, initialtext, instant, line-height, mouse-support, navhistory, non-blocking-stdin, password, pipeout, printinputtext, rejectnomatch, scroll, vertfull, wmtype and xyw patches
@@ -81,6 +83,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [wmtype](https://github.com/Baitinq/dmenu/blob/master/patches/dmenu-wm_type.diff)
       - adds extended window manager hints such as \_NET_WM_WINDOW_TYPE and \_NET_WM_WINDOW_TYPE_DOCK
+
+   - [xresources](https://tools.suckless.org/dmenu/patches/xresources/)
+      - allows dmenu to read font and colors from Xresources
+      - note that with this patch the Xresources settings takes precedence over command line arguments
 
    - [xyw](https://tools.suckless.org/dmenu/patches/xyw/)
       - adds options for specifying dmenu window position and width
