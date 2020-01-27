@@ -880,8 +880,7 @@ setup(void)
 	lines = MAX(lines, 0);
 	mh = (lines + 1) * bh;
 	#if CENTER_PATCH
-	if (center)
-		promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
+	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 	#endif // CENTER_PATCH
 #ifdef XINERAMA
 	i = 0;
@@ -911,7 +910,7 @@ setup(void)
 
 		#if CENTER_PATCH
 		if (center) {
-			mw = MIN(MAX(max_textw() + promptw, 100), info[i].width);
+			mw = MIN(MAX(max_textw() + promptw, min_width), info[i].width);
 			x = info[i].x_org + ((info[i].width  - mw) / 2);
 			y = info[i].y_org + ((info[i].height - mh) / 2);
 		} else {
@@ -943,7 +942,7 @@ setup(void)
 			    parentwin);
 		#if CENTER_PATCH
 		if (center) {
-			mw = MIN(MAX(max_textw() + promptw, 100), wa.width);
+			mw = MIN(MAX(max_textw() + promptw, min_width), wa.width);
 			x = (wa.width  - mw) / 2;
 			y = (wa.height - mh) / 2;
 		} else {
@@ -967,9 +966,8 @@ setup(void)
 		mw = wa.width;
 		#endif // CENTER_PATCH / XYW_PATCH
 	}
-	#if CENTER_PATCH
-	if (!center)
-		promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
+	#if !CENTER_PATCH
+	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 	#endif // CENTER_PATCH
 	inputw = MIN(inputw, mw/3);
 	match();
