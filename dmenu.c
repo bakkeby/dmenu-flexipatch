@@ -988,7 +988,8 @@ setup(void)
 	                    CopyFromParent, CopyFromParent, CopyFromParent,
 	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
 	#if BORDER_PATCH
-	XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
+	if (border_width)
+		XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
 	#endif // BORDER_PATCH
 	XSetClassHint(dpy, win, &ch);
 	#if WMTYPE_PATCH
@@ -1051,9 +1052,12 @@ usage(void)
 		#endif // REJECTNOMATCH_PATCH
 		"] [-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if INITIALTEXT_PATCH || LINE_HEIGHT_PATCH
+		#if BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
 		"\n            "
 		#endif
+		#if BORDER_PATCH
+		" [-bw width]"
+		#endif // BORDER_PATCH
 		#if INITIALTEXT_PATCH
 		" [-it text]"
 		#endif // INITIALTEXT_PATCH
@@ -1164,6 +1168,10 @@ main(int argc, char *argv[])
 			colors[SchemeSel][ColFg] = argv[++i];
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		#if BORDER_PATCH
+		else if (!strcmp(argv[i], "-bw"))  /* border width around dmenu */
+			border_width = atoi(argv[++i]);
+		#endif // BORDER_PATCH
 		#if INITIALTEXT_PATCH
 		else if (!strcmp(argv[i], "-it")) {   /* adds initial text */
 			const char * text = argv[++i];
