@@ -16,11 +16,21 @@ static int center = 1;                      /* -c  option; if 0, dmenu won't be 
 static int min_width = 500;                 /* minimum width when centered */
 #endif // CENTER_PATCH
 /* -fn option overrides fonts[0]; default X11 font or font set */
-static const char *fonts[] = {
+#if XRESOURCES_PATCH
+static char *fonts[] =
+#else
+static const char *fonts[] =
+#endif // XRESOURCES_PATCH
+{
 	"monospace:size=10"
 };
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
-static const char *colors[][2] = {
+#if XRESOURCES_PATCH
+static char *colors[][2] =
+#else
+static const char *colors[][2] =
+#endif // XRESOURCES_PATCH
+{
 	/*               fg         bg       */
 	[SchemeNorm] = { "#bbbbbb", "#222222" },
 	[SchemeSel]  = { "#eeeeee", "#005577" },

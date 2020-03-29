@@ -1,26 +1,36 @@
 #include <X11/Xresource.h>
 
 void
-read_Xresources(void)
+readxresources(void)
 {
 	XrmInitialize();
 
-	char* xrm = XResourceManagerString(drw->dpy);
-	if (xrm) {
+	char* xrm;
+	if ((xrm = XResourceManagerString(drw->dpy))) {
 		char *type;
 		XrmDatabase xdb = XrmGetStringDatabase(xrm);
 		XrmValue xval;
 
-		if (XrmGetResource(xdb, "dmenu.font", "*", &type, &xval) == True) /* font or font set */
+		if (XrmGetResource(xdb, "dmenu.font", "*", &type, &xval))
 			fonts[0] = strdup(xval.addr);
-		if (XrmGetResource(xdb, "dmenu.background", "*", &type, &xval) == True)  /* normal background color */
-			colors[SchemeSel][ColBg] = strdup(xval.addr);
-		if (XrmGetResource(xdb, "dmenu.foreground", "*", &type, &xval) == True)  /* normal foreground color */
+		else
+			fonts[0] = strdup(fonts[0]);
+		if (XrmGetResource(xdb, "dmenu.background", "*", &type, &xval))
+			colors[SchemeNorm][ColBg] = strdup(xval.addr);
+		else
+			colors[SchemeNorm][ColBg] = strdup(colors[SchemeNorm][ColBg]);
+		if (XrmGetResource(xdb, "dmenu.foreground", "*", &type, &xval))
 			colors[SchemeNorm][ColFg] = strdup(xval.addr);
-		if (XrmGetResource(xdb, "dmenu.selbackground", "*", &type, &xval) == True)  /* selected background color */
+		else
+			colors[SchemeNorm][ColFg] = strdup(colors[SchemeNorm][ColFg]);
+		if (XrmGetResource(xdb, "dmenu.selbackground", "*", &type, &xval))
 			colors[SchemeSel][ColBg] = strdup(xval.addr);
-		if (XrmGetResource(xdb, "dmenu.selforeground", "*", &type, &xval) == True)  /* selected foreground color */
+		else
+			colors[SchemeSel][ColBg] = strdup(colors[SchemeSel][ColBg]);
+		if (XrmGetResource(xdb, "dmenu.selforeground", "*", &type, &xval))
 			colors[SchemeSel][ColFg] = strdup(xval.addr);
+		else
+			colors[SchemeSel][ColFg] = strdup(colors[SchemeSel][ColFg]);
 
 		XrmDestroyDatabase(xdb);
 	}

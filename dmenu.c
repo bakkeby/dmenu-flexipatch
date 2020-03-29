@@ -862,8 +862,16 @@ setup(void)
 	int a, di, n, area = 0;
 #endif
 	/* init appearance */
+	#if XRESOURCES_PATCH
+	for (j = 0; j < SchemeLast; j++)
+		scheme[j] = drw_scm_create(drw, (const char**)colors[j], 2);
+	for (j = 0; j < SchemeOut; ++j)
+		for (i = 0; i < 2; ++i)
+			free(colors[j][i]);
+	#else
 	for (j = 0; j < SchemeLast; j++)
 		scheme[j] = drw_scm_create(drw, colors[j], 2);
+	#endif // XRESOURCES_PATCH
 
 	clip = XInternAtom(dpy, "CLIPBOARD",   False);
 	utf8 = XInternAtom(dpy, "UTF8_STRING", False);
@@ -1195,10 +1203,15 @@ main(int argc, char *argv[])
 
 	drw = drw_create(dpy, screen, root, wa.width, wa.height);
 	#if XRESOURCES_PATCH
-	read_Xresources();
-	#endif // XRESOURCES_PATCH
+	readxresources();
+	if (!drw_fontset_create(drw, (const char**)fonts, LENGTH(fonts)))
+		die("no fonts could be loaded.");
+
+	free(fonts[0]);
+	#else
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
+	#endif // XRESOURCES_PATCH
 	lrpad = drw->fonts->h;
 
 #ifdef __OpenBSD__
