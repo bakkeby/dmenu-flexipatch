@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-04-05 - Added fuzzyhighlight patch
+
 2020-02-09 - Added revised border patch (adding command line parameter for setting border width)
 
 2019-12-29 - Added xresources patch
@@ -30,6 +32,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [center](https://tools.suckless.org/dmenu/patches/center/)
       - this patch centers dmenu in the middle of the screen
+
+   - [fuzzyhighlight](https://tools.suckless.org/dmenu/patches/fuzzyhighlight/)
+      - intended to be combined with the fuzzymatch patch, this makes it so that fuzzy matches are highlighted
 
    - [fuzzymatch](https://tools.suckless.org/dmenu/patches/fuzzymatch/)
       - adds support for fuzzy-matching to dmenu, allowing users to type non-consecutive portions of the string to be matched

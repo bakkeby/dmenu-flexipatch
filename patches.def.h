@@ -11,6 +11,12 @@
  */
 #define CENTER_PATCH 0
 
+/* This patch make it so that fuzzy matches gets highlighted and is therefore meant
+ * to be used together with the fuzzymatch patch.
+ * https://tools.suckless.org/dmenu/patches/fuzzyhighlight/
+ */
+#define FUZZYHIGHLIGHT_PATCH 0
+
 /* This patch adds support for fuzzy-matching to dmenu, allowing users to type non-consecutive
  * portions of the string to be matched.
  * https://tools.suckless.org/dmenu/patches/fuzzymatch/
