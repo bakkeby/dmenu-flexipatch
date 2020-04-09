@@ -12,7 +12,12 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 	                   ? SchemeSelHighlight
 	                   : SchemeNormHighlight]);
 	for (i = 0, highlight = item->text; *highlight && text[i];) {
-		if (*highlight == text[i]) {
+		#if FUZZYMATCH_PATCH
+		if (!fstrncmp(&(*highlight), &text[i], 1))
+		#else
+		if (*highlight == text[i])
+		#endif // FUZZYMATCH_PATCH
+		{
 			/* get indentation */
 			c = *highlight;
 			*highlight = '\0';
