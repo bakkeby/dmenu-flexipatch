@@ -17,6 +17,14 @@
  */
 #define CENTER_PATCH 0
 
+/* This patch enables color emoji in dmenu by removing a workaround for a BadLength error
+ * in the Xft library when color glyphs are used.
+ * To enable this you will need an updated Xft library that can handle color glyphs otherwise
+ * the program will crash on encountering such characters. Note that you will also need a font
+ * that provides color emojis for this to work.
+ */
+#define COLOR_EMOJI_PATCH 0
+
 /* This patch make it so that fuzzy matches gets highlighted and is therefore meant
  * to be used together with the fuzzymatch patch.
  * https://tools.suckless.org/dmenu/patches/fuzzyhighlight/

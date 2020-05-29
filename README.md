@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-05-29 - Added the alpha patch (derived from Baitinq's [build](https://github.com/Baitinq/dmenu))
+2020-05-29 - Added the alpha patch (derived from Baitinq's [build](https://github.com/Baitinq/dmenu)) and the color emoji patch
 
 2020-04-05 - Added fuzzyhighlight patch
 
@@ -37,6 +37,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [center](https://tools.suckless.org/dmenu/patches/center/)
       - this patch centers dmenu in the middle of the screen
+
+   - color_emoji
+      - enables color emoji in dmenu by removing a workaround for a BadLength error in the Xft library when color glyphs are used
+      - enabling this will crash dmenu on encountering such glyphs unless you also have an updated Xft library that can handle them
 
    - [fuzzyhighlight](https://tools.suckless.org/dmenu/patches/fuzzyhighlight/)
       - intended to be combined with the fuzzymatch patch, this makes it so that fuzzy matches are highlighted
