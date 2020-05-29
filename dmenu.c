@@ -82,9 +82,9 @@ static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
 
 static Atom clip, utf8;
-#if WMTYPE_PATCH || ALPHA_PATCH
+#if WMTYPE_PATCH
 static Atom type, dock;
-#endif // WMTYPE_PATCH | ALPHA_PATCH
+#endif // WMTYPE_PATCH
 static Display *dpy;
 static Window root, parentwin, win;
 static XIC xic;
@@ -954,7 +954,7 @@ setup(void)
 
 	clip = XInternAtom(dpy, "CLIPBOARD",   False);
 	utf8 = XInternAtom(dpy, "UTF8_STRING", False);
-	#if WMTYPE_PATCH || ALPHA_PATCH
+	#if WMTYPE_PATCH
 	type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	dock = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", False);
 	#endif // WMTYPE_PATCH
