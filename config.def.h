@@ -2,6 +2,9 @@
 /* Default settings; can be overriden by command line. */
 
 static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom */
+#if ALPHA_PATCH
+static double opacity = 1.0;                /* -o  option; defines alpha translucency */
+#endif // ALPHA_PATCH
 #if FUZZYMATCH_PATCH
 static int fuzzy = 1;                       /* -F  option; if 0, dmenu doesn't use fuzzy matching */
 #endif // FUZZYMATCH_PATCH
@@ -25,6 +28,17 @@ static const char *fonts[] =
 	"monospace:size=10"
 };
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
+
+#if ALPHA_PATCH
+static const unsigned int baralpha = 0xd0;
+static const unsigned int borderalpha = OPAQUE;
+static const unsigned int alphas[][3]      = {
+	/*               fg      bg        border     */
+	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+};
+#endif // ALPHA_PATCH
+
 #if XRESOURCES_PATCH
 static char *colors[][2] =
 #else

@@ -1,8 +1,8 @@
 Similar to [dwm-flexipatch](https://github.com/bakkeby/dwm-flexipatch) this dmenu 4.9 (750b30, 2019-03-03) project has a different take on patching. It uses preprocessor directives to decide whether or not to include a patch during build time. Essentially this means that this build, for better or worse, contains both the patched _and_ the original code. The aim being that you can select which patches to include and the build will contain that code and nothing more.
 
-For example to include the `border` patch then you would only need to flip this setting from 0 to 1 in [patches.h](https://github.com/bakkeby/dmenu-flexipatch/blob/master/patches.def.h):
+For example to include the `alpha` patch then you would only need to flip this setting from 0 to 1 in [patches.h](https://github.com/bakkeby/dmenu-flexipatch/blob/master/patches.def.h):
 ```c
-#define BORDER_PATCH 1
+#define ALPHA_PATCH 1
 ```
 
 Once you have found out what works for you and what doesn't then you should be in a better position to choose patches should you want to start patching from scratch.
@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-05-29 - Added the alpha patch
+
 2020-04-05 - Added fuzzyhighlight patch
 
 2020-02-09 - Added revised border patch (adding command line parameter for setting border width)
@@ -26,6 +28,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 2019-09-18 - Added border, center, fuzzymatch, incremental, initialtext, instant, line-height, mouse-support, navhistory, non-blocking-stdin, password, pipeout, printinputtext, rejectnomatch, scroll, vertfull, wmtype and xyw patches
 
 ### Patches included:
+
+   - [alpha](https://github.com/bakkeby/patches/blob/master/dmenu/dmenu-alpha-4.9_20190303_190303.diff)
+      - adds transparency for the dmenu window
 
    - [border](http://tools.suckless.org/dmenu/patches/border/)
       - adds a border around the dmenu window

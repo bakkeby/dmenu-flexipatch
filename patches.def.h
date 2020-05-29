@@ -1,5 +1,11 @@
 /* Patches */
 
+/* The alpha patch adds transparency for the dmenu window.
+ * You need to uncomment the corresponding line in config.mk to use the -lXrender library
+ * when including this patch.
+ */
+#define ALPHA_PATCH 0
+
 /* This patch adds a border around the dmenu window. It is intended to be used with the center
  * or xyw patches, to make the menu stand out from similarly coloured windows.
  * http://tools.suckless.org/dmenu/patches/border/

@@ -25,6 +25,10 @@
                              * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
 #define LENGTH(X)             (sizeof X / sizeof X[0])
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
+#if ALPHA_PATCH
+#define OPAQUE                0xffU
+#define OPACITY               "_NET_WM_WINDOW_OPACITY"
+#endif // ALPHA_PATCH
 
 /* enums */
 enum {
@@ -78,12 +82,19 @@ static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
 
 static Atom clip, utf8;
-#if WMTYPE_PATCH
+#if WMTYPE_PATCH || ALPHA_PATCH
 static Atom type, dock;
-#endif // WMTYPE_PATCH
+#endif // WMTYPE_PATCH | ALPHA_PATCH
 static Display *dpy;
 static Window root, parentwin, win;
 static XIC xic;
+
+#if ALPHA_PATCH
+static int useargb = 0;
+static Visual *visual;
+static int depth;
+static Colormap cmap;
+#endif // ALPHA_PATCH
 
 static Drw *drw;
 static Clr *scheme[SchemeLast];
@@ -109,6 +120,9 @@ static size_t nextrune(int inc);
 static void movewordedge(int dir);
 static void keypress(XKeyEvent *ev);
 static void paste(void);
+#if ALPHA_PATCH
+static void xinitvisual(void);
+#endif // ALPHA_PATCH
 static void readstdin(void);
 static void run(void);
 static void setup(void);
@@ -779,6 +793,45 @@ paste(void)
 	drawmenu();
 }
 
+#if ALPHA_PATCH
+static void
+xinitvisual()
+{
+	XVisualInfo *infos;
+	XRenderPictFormat *fmt;
+	int nitems;
+	int i;
+
+	XVisualInfo tpl = {
+		.screen = screen,
+		.depth = 32,
+		.class = TrueColor
+	};
+	long masks = VisualScreenMask | VisualDepthMask | VisualClassMask;
+
+	infos = XGetVisualInfo(dpy, masks, &tpl, &nitems);
+	visual = NULL;
+	for(i = 0; i < nitems; i ++) {
+		fmt = XRenderFindVisualFormat(dpy, infos[i].visual);
+		if (fmt->type == PictTypeDirect && fmt->direct.alphaMask) {
+			visual = infos[i].visual;
+			depth = infos[i].depth;
+			cmap = XCreateColormap(dpy, root, visual, AllocNone);
+			useargb = 1;
+			break;
+		}
+	}
+
+	XFree(infos);
+
+	if (! visual) {
+		visual = DefaultVisual(dpy, screen);
+		depth = DefaultDepth(dpy, screen);
+		cmap = DefaultColormap(dpy, screen);
+	}
+}
+#endif // ALPHA_PATCH
+
 #if !NON_BLOCKING_STDIN_PATCH
 static void
 readstdin(void)
@@ -882,18 +935,26 @@ setup(void)
 	/* init appearance */
 	#if XRESOURCES_PATCH
 	for (j = 0; j < SchemeLast; j++)
+		#if ALPHA_PATCH
+		scheme[j] = drw_scm_create(drw, (const char**)colors[j], alphas[j], 2);
+		#else
 		scheme[j] = drw_scm_create(drw, (const char**)colors[j], 2);
+		#endif // ALPHA_PATCH
 	for (j = 0; j < SchemeOut; ++j)
 		for (i = 0; i < 2; ++i)
 			free(colors[j][i]);
 	#else
 	for (j = 0; j < SchemeLast; j++)
+		#if ALPHA_PATCH
+		scheme[j] = drw_scm_create(drw, colors[j], alphas[j], 2);
+		#else
 		scheme[j] = drw_scm_create(drw, colors[j], 2);
+		#endif // ALPHA_PATCH
 	#endif // XRESOURCES_PATCH
 
 	clip = XInternAtom(dpy, "CLIPBOARD",   False);
 	utf8 = XInternAtom(dpy, "UTF8_STRING", False);
-	#if WMTYPE_PATCH
+	#if WMTYPE_PATCH || ALPHA_PATCH
 	type = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	dock = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", False);
 	#endif // WMTYPE_PATCH
@@ -1000,7 +1061,12 @@ setup(void)
 
 	/* create menu window */
 	swa.override_redirect = True;
+	#if ALPHA_PATCH
+	swa.background_pixel = 0;
+	swa.colormap = cmap;
+	#else
 	swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
+	#endif // ALPHA_PATCH
 	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask
 	#if MOUSE_SUPPORT_PATCH
 	| ButtonPressMask
@@ -1011,8 +1077,14 @@ setup(void)
 	#else
 	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, 0,
 	#endif // BORDER_PATCH
+						#if ALPHA_PATCH
+	                    depth, InputOutput, visual,
+	                    CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa
+						#else
 	                    CopyFromParent, CopyFromParent, CopyFromParent,
-	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
+	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa
+						#endif // ALPHA_PATCH
+	);
 	#if BORDER_PATCH
 	if (border_width)
 		XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
@@ -1078,9 +1150,12 @@ usage(void)
 		#endif // REJECTNOMATCH_PATCH
 		"] [-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
 		"\n            "
 		#endif
+		#if ALPHA_PATCH
+		" [ -o opacity]"
+		#endif // ALPHA_PATCH
 		#if BORDER_PATCH
 		" [-bw width]"
 		#endif // BORDER_PATCH
@@ -1177,6 +1252,10 @@ main(int argc, char *argv[])
 		#endif // XYW_PATCH
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);
+		#if ALPHA_PATCH
+		else if (!strcmp(argv[i], "-o"))  /* opacity */
+			opacity = atof(argv[++i]);
+		#endif // ALPHA_PATCH
 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
 			prompt = argv[++i];
 		else if (!strcmp(argv[i], "-fn"))  /* font or font set */
@@ -1232,7 +1311,12 @@ main(int argc, char *argv[])
 		die("could not get embedding window attributes: 0x%lx",
 		    parentwin);
 
+	#if ALPHA_PATCH
+	xinitvisual();
+	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
+	#else
 	drw = drw_create(dpy, screen, root, wa.width, wa.height);
+	#endif // ALPHA_PATCH
 	#if XRESOURCES_PATCH
 	readxresources();
 	if (!drw_fontset_create(drw, (const char**)fonts, LENGTH(fonts)))
