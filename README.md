@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-05-29 - Added the alpha patch
+2020-05-29 - Added the alpha patch (derived from Baitinq's [build](https://github.com/Baitinq/dmenu))
 
 2020-04-05 - Added fuzzyhighlight patch
 
