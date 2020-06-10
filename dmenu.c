@@ -103,8 +103,14 @@ static Clr *scheme[SchemeLast];
 
 #include "config.h"
 
+#if CASEINSENSITIVE_PATCH
+static char * cistrstr(const char *s, const char *sub);
+static int (*fstrncmp)(const char *, const char *, size_t) = strncasecmp;
+static char *(*fstrstr)(const char *, const char *) = cistrstr;
+#else
 static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
 static char *(*fstrstr)(const char *, const char *) = strstr;
+#endif // CASEINSENSITIVE_PATCH
 
 static void appenditem(struct item *item, struct item **list, struct item **last);
 static void calcoffsets(void);
@@ -1120,16 +1126,21 @@ setup(void)
 static void
 usage(void)
 {
-	fputs("usage: dmenu [-bfv"
+	fputs("usage: dmenu [-bv"
 		#if CENTER_PATCH
 		"c"
 		#endif
 		#if !NON_BLOCKING_STDIN_PATCH
-		"i"
+		"f"
 		#endif // NON_BLOCKING_STDIN_PATCH
 		#if INCREMENTAL_PATCH
 		"r"
 		#endif // INCREMENTAL_PATCH
+		#if CASEINSENSITIVE_PATCH
+		"s"
+		#else
+		"i"
+		#endif // CASEINSENSITIVE_PATCH
 		#if INSTANT_PATCH
 		"n"
 		#endif // INSTANT_PATCH
@@ -1206,9 +1217,15 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-r")) { /* incremental */
 			incremental = !incremental;
 		#endif // INCREMENTAL_PATCH
+		#if CASEINSENSITIVE_PATCH
+		} else if (!strcmp(argv[i], "-s")) { /* case-sensitive item matching */
+			fstrncmp = strncmp;
+			fstrstr = strstr;
+		#else
 		} else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
+		#endif // CASEINSENSITIVE_PATCH
 		#if INSTANT_PATCH
 		} else if (!strcmp(argv[i], "-n")) { /* instant select only match */
 			instant = !instant;

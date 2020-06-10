@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-06-10 - Added the case-insensitive patch
+
 2020-05-29 - Added the alpha patch (derived from Baitinq's [build](https://github.com/Baitinq/dmenu)) and the color emoji patch
 
 2020-04-05 - Added fuzzyhighlight patch
@@ -34,6 +36,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [border](http://tools.suckless.org/dmenu/patches/border/)
       - adds a border around the dmenu window
+
+   - [case-insensitive](http://tools.suckless.org/dmenu/patches/case-insensitive/)
+      - makes dmenu case-insensitive by default, replacing the case-insensitive \-i option with a case sensitive \-s option
 
    - [center](https://tools.suckless.org/dmenu/patches/center/)
       - this patch centers dmenu in the middle of the screen
