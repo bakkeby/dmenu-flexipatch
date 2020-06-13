@@ -19,6 +19,9 @@ static int center = 1;                      /* -c  option; if 0, dmenu won't be 
 static int min_width = 500;                 /* minimum width when centered */
 #endif // CENTER_PATCH
 /* -fn option overrides fonts[0]; default X11 font or font set */
+#if PANGO_PATCH
+static char font[] = "monospace 10";
+#else
 #if XRESOURCES_PATCH
 static char *fonts[] =
 #else
@@ -27,6 +30,7 @@ static const char *fonts[] =
 {
 	"monospace:size=10"
 };
+#endif // PANGO_PATCH
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
 
 #if ALPHA_PATCH

@@ -33,6 +33,9 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 				y,
 				MIN(maxw - indent, TEXTW(highlight) - lrpad),
 				bh, 0, highlight, 0
+				#if PANGO_PATCH
+				, True
+				#endif // PANGO_PATCH
 			);
 			highlight[1] = c;
 			i++;

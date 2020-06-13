@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-06-13 - Added the pango patch
+
 2020-06-10 - Added the case-insensitive patch
 
 2020-05-29 - Added the alpha patch (derived from Baitinq's [build](https://github.com/Baitinq/dmenu)) and the color emoji patch
@@ -76,6 +78,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
       - this is a patch to have dmenu read stdin in a non blocking way, making it wait for input both from stdin and from X
       - this means that you can continue feeding dmenu while you type
       - the patch is meant to be used along with the incremental patch in order to use stdout to feed stdin
+
+   - [pango](https://github.com/StillANixRookie/dmenu-pango/)
+      - adds simple markup for dmenu using pango markup
 
    - [password](https://tools.suckless.org/dmenu/patches/password/)
       - with this patch dmenu will not directly display the keyboard input, but instead replace it with dots

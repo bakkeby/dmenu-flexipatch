@@ -83,6 +83,29 @@
  */
 #define NON_BLOCKING_STDIN_PATCH 0
 
+/* This patch adds simple markup for dmenu using pango markup.
+ * This depends on the pango library v1.44 or greater.
+ * You need to uncomment the corresponding lines in config.mk to use the pango libraries
+ * when including this patch.
+ *
+ * Note that the pango patch is incompatible with the scroll patch and will result in
+ * compilation errors if both are enabled.
+ *
+ * Note that the pango patch does not protect against the BadLength error from Xft
+ * when color glyphs are used, which means that dmenu will crash if color emoji is used.
+ *
+ * If you need color emoji then you may want to install this patched library from the AUR:
+ * https://aur.archlinux.org/packages/libxft-bgra/
+ *
+ * A long term fix for the libXft library is pending approval of this pull request:
+ * https://gitlab.freedesktop.org/xorg/lib/libxft/-/merge_requests/1
+ *
+ * Also see:
+ * https://developer.gnome.org/pygtk/stable/pango-markup-language.html
+ * https://github.com/StillANixRookie/dmenu-pango
+ */
+#define PANGO_PATCH 0
+
 /* With this patch dmenu will not directly display the keyboard input, but instead replace
  * it with dots. All data from stdin will be ignored.
  * https://tools.suckless.org/dmenu/patches/password/

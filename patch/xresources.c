@@ -12,9 +12,15 @@ readxresources(void)
 		XrmValue xval;
 
 		if (XrmGetResource(xdb, "dmenu.font", "*", &type, &xval))
+			#if PANGO_PATCH
+			strcpy(font, xval.addr);
+			#else
 			fonts[0] = strdup(xval.addr);
+			#endif // PANGO_PATCH
+		#if !PANGO_PATCH
 		else
 			fonts[0] = strdup(fonts[0]);
+		#endif // PANGO_PATCH
 		if (XrmGetResource(xdb, "dmenu.background", "*", &type, &xval))
 			colors[SchemeNorm][ColBg] = strdup(xval.addr);
 		else

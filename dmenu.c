@@ -24,7 +24,12 @@
 #define INTERSECT(x,y,w,h,r)  (MAX(0, MIN((x)+(w),(r).x_org+(r).width)  - MAX((x),(r).x_org)) \
                              * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
 #define LENGTH(X)             (sizeof X / sizeof X[0])
+#if PANGO_PATCH
+#define TEXTW(X)              (drw_font_getwidth(drw, (X), False) + lrpad)
+#define TEXTWM(X)             (drw_font_getwidth(drw, (X), True) + lrpad)
+#else
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
+#endif // PANGO_PATCH
 #if ALPHA_PATCH
 #define OPAQUE                0xffU
 #define OPACITY               "_NET_WM_WINDOW_OPACITY"
@@ -160,10 +165,18 @@ calcoffsets(void)
 		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">"));
 	/* calculate which items will begin the next page and previous page */
 	for (i = 0, next = curr; next; next = next->right)
+		#if PANGO_PATCH
+		if ((i += (lines > 0) ? bh : MIN(TEXTWM(next->text), n)) > n)
+		#else
 		if ((i += (lines > 0) ? bh : MIN(TEXTW(next->text), n)) > n)
+		#endif // PANGO_PATCH
 			break;
 	for (i = 0, prev = curr; prev && prev->left; prev = prev->left)
+		#if PANGO_PATCH
+		if ((i += (lines > 0) ? bh : MIN(TEXTWM(prev->left->text), n)) > n)
+		#else
 		if ((i += (lines > 0) ? bh : MIN(TEXTW(prev->left->text), n)) > n)
+		#endif // PANGO_PATCH
 			break;
 }
 
@@ -205,9 +218,15 @@ drawitem(struct item *item, int x, int y, int w)
 		drw_setscheme(drw, scheme[SchemeNorm]);
 
 	#if FUZZYHIGHLIGHT_PATCH
+	#if PANGO_PATCH
+	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0, True);
+	#else
 	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
+	#endif // PANGO_PATCH
 	drawhighlights(item, x, y, w);
 	return r;
+	#elif PANGO_PATCH
+	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0, True);
 	#else
 	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
 	#endif // FUZZYHIGHLIGHT_PATCH
@@ -224,7 +243,9 @@ drawmenu(void)
 	#endif // SCROLL_PATCH
 	struct item *item;
 	int x = 0, y = 0, w;
-	#if LINE_HEIGHT_PATCH
+	#if LINE_HEIGHT_PATCH && PANGO_PATCH
+	int fh = drw->font->h;
+	#elif LINE_HEIGHT_PATCH
 	int fh = drw->fonts->h;
 	#endif // LINE_HEIGHT_PATCH
 	#if PASSWORD_PATCH
@@ -236,7 +257,11 @@ drawmenu(void)
 
 	if (prompt && *prompt) {
 		drw_setscheme(drw, scheme[SchemeSel]);
+		#if PANGO_PATCH
+		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0, True);
+		#else
 		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0);
+		#endif // PANGO_PATCH
 	}
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
@@ -279,10 +304,20 @@ drawmenu(void)
 	if (passwd) {
 		censort = ecalloc(1, sizeof(text));
 		memset(censort, '.', strlen(text));
+		#if PANGO_PATCH
+		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0, False);
+		#else
 		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0);
+		#endif // PANGO_PATCH
 		free(censort);
 	} else
+		#if PANGO_PATCH
+		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0, False);
+		#else
 		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
+		#endif // PANGO_PATCH
+	#elif PANGO_PATCH
+	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0, False);
 	#else
 	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
 	#endif // PASSWORD_PATCH
@@ -312,15 +347,27 @@ drawmenu(void)
 		w = TEXTW("<");
 		if (curr->left) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
+			#if PANGO_PATCH
+			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0, True);
+			#else
 			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0);
+			#endif // PANGO_PATCH
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right)
+			#if PANGO_PATCH
+			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(">")));
+			#else
 			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">")));
+			#endif // PANGO_PATCH
 		if (next) {
 			w = TEXTW(">");
 			drw_setscheme(drw, scheme[SchemeNorm]);
+			#if PANGO_PATCH
+			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, ">", 0, True);
+			#else
 			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, ">", 0);
+			#endif // PANGO_PATCH
 		}
 	}
 	drw_map(drw, win, 0, 0, mw, mh);
@@ -863,7 +910,11 @@ readstdin(void)
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		items[i].out = 0;
+		#if PANGO_PATCH
+		drw_font_getexts(drw->font, buf, strlen(buf), &tmpmax, NULL, True);
+		#else
 		drw_font_getexts(drw->fonts, buf, strlen(buf), &tmpmax, NULL);
+		#endif // PANGO_PATCH
 		if (tmpmax > inputw) {
 			inputw = tmpmax;
 			imax = i;
@@ -871,7 +922,11 @@ readstdin(void)
 	}
 	if (items)
 		items[i].text = NULL;
+	#if PANGO_PATCH
+	inputw = items ? TEXTWM(items[imax].text) : 0;
+	#else
 	inputw = items ? TEXTW(items[imax].text) : 0;
+	#endif // PANGO_PATCH
 	lines = MIN(lines, i);
 }
 #endif // NON_BLOCKING_STDIN_PATCH
@@ -966,13 +1021,19 @@ setup(void)
 	#endif // WMTYPE_PATCH
 
 	/* calculate menu geometry */
+	#if PANGO_PATCH
+	bh = drw->font->h + 2;
+	#else
 	bh = drw->fonts->h + 2;
+	#endif // PANGO_PATCH
 	#if LINE_HEIGHT_PATCH
 	bh = MAX(bh,lineheight);	/* make a menu line AT LEAST 'lineheight' tall */
 	#endif // LINE_HEIGHT_PATCH
 	lines = MAX(lines, 0);
 	mh = (lines + 1) * bh;
-	#if CENTER_PATCH
+	#if CENTER_PATCH && PANGO_PATCH
+	promptw = (prompt && *prompt) ? TEXTWM(prompt) - lrpad / 4 : 0;
+	#elif CENTER_PATCH
 	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 	#endif // CENTER_PATCH
 #ifdef XINERAMA
@@ -1060,7 +1121,11 @@ setup(void)
 		#endif // CENTER_PATCH / XYW_PATCH
 	}
 	#if !CENTER_PATCH
+	#if PANGO_PATCH
+	promptw = (prompt && *prompt) ? TEXTWM(prompt) - lrpad / 4 : 0;
+	#else
 	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
+	#endif // PANGO_PATCH
 	#endif // CENTER_PATCH
 	inputw = MIN(inputw, mw/3);
 	match();
@@ -1276,7 +1341,11 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
 			prompt = argv[++i];
 		else if (!strcmp(argv[i], "-fn"))  /* font or font set */
+			#if PANGO_PATCH
+			strcpy(font, argv[++i]);
+			#else
 			fonts[0] = argv[++i];
+			#endif // PANGO_PATCH
 		#if LINE_HEIGHT_PATCH
 		else if(!strcmp(argv[i], "-h")) { /* minimum height of one menu line */
 			lineheight = atoi(argv[++i]);
@@ -1336,15 +1405,27 @@ main(int argc, char *argv[])
 	#endif // ALPHA_PATCH
 	#if XRESOURCES_PATCH
 	readxresources();
+	#if PANGO_PATCH
+	if (!drw_font_create(drw, font))
+		die("no fonts could be loaded.");
+	#else
 	if (!drw_fontset_create(drw, (const char**)fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 
 	free(fonts[0]);
+	#endif // PANGO_PATCH
+	#elif PANGO_PATCH
+	if (!drw_font_create(drw, font))
+		die("no fonts could be loaded.");
 	#else
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
-	#endif // XRESOURCES_PATCH
+	#endif // XRESOURCES_PATCH | PANGO_PATCH
+	#if PANGO_PATCH
+	lrpad = drw->font->h;
+	#else
 	lrpad = drw->fonts->h;
+	#endif // PANGO_PATCH
 
 #ifdef __OpenBSD__
 	if (pledge("stdio rpath", NULL) == -1)
