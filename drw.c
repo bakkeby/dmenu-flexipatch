@@ -114,6 +114,11 @@ drw_free(Drw *drw)
 {
 	XFreePixmap(drw->dpy, drw->drawable);
 	XFreeGC(drw->dpy, drw->gc);
+	#if PANGO_PATCH
+	drw_font_free(drw->font);
+	#else
+	drw_fontset_free(drw->fonts);
+	#endif // PANGO_PATCH
 	free(drw);
 }
 
