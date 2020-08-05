@@ -44,6 +44,9 @@ enum {
 	SchemeNormHighlight,
 	SchemeSelHighlight,
 	#endif // HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if HIGHPRIORITY_PATCH
+	SchemeHp,
+	#endif // HIGHPRIORITY_PATCH
 	SchemeLast,
 }; /* color schemes */
 
@@ -54,6 +57,9 @@ struct item {
 	struct item *next;
 	#endif // NON_BLOCKING_STDIN_PATCH
 	int out;
+	#if HIGHPRIORITY_PATCH
+	int hp;
+	#endif // HIGHPRIORITY_PATCH
 	#if FUZZYMATCH_PATCH
 	double distance;
 	#endif // FUZZYMATCH_PATCH
@@ -217,6 +223,10 @@ drawitem(struct item *item, int x, int y, int w)
 	int r;
 	if (item == sel)
 		drw_setscheme(drw, scheme[SchemeSel]);
+	#if HIGHPRIORITY_PATCH
+	else if (item->hp)
+		drw_setscheme(drw, scheme[SchemeHp]);
+	#endif // HIGHPRIORITY_PATCH
 	else if (item->out)
 		drw_setscheme(drw, scheme[SchemeOut]);
 	else
@@ -470,6 +480,9 @@ match(void)
 	int i, tokc = 0;
 	size_t len, textsize;
 	struct item *item, *lprefix, *lsubstr, *prefixend, *substrend;
+	#if HIGHPRIORITY_PATCH
+	struct item *lhpprefix, *hpprefixend;
+	#endif // HIGHPRIORITY_PATCH
 	#if NON_BLOCKING_STDIN_PATCH
 	int preserve = 0;
 	#endif // NON_BLOCKING_STDIN_PATCH
@@ -493,6 +506,9 @@ match(void)
 	matches = lprefix = lsubstr = matchend = prefixend = substrend = NULL;
 	textsize = strlen(text) + 1;
 	#endif // PREFIXCOMPLETION_PATCH
+	#if HIGHPRIORITY_PATCH
+	lhpprefix = hpprefixend = NULL;
+	#endif // HIGHPRIORITY_PATCH
 	#if NON_BLOCKING_STDIN_PATCH
 	for (item = items; item; item = item->next)
 	#else
@@ -509,9 +525,17 @@ match(void)
 		if (i != tokc) /* not all tokens match */
 			continue;
 		#endif // DYNAMIC_OPTIONS_PATCH
+		#if HIGHPRIORITY_PATCH
+		/* exact matches go first, then prefixes with high priority, then prefixes, then substrings */
+		#else
 		/* exact matches go first, then prefixes, then substrings */
+		#endif // HIGHPRIORITY_PATCH
 		if (!tokc || !fstrncmp(text, item->text, textsize))
 			appenditem(item, &matches, &matchend);
+		#if HIGHPRIORITY_PATCH
+		else if (item->hp && !fstrncmp(tokv[0], item->text, len))
+			appenditem(item, &lhpprefix, &hpprefixend);
+		#endif // HIGHPRIORITY_PATCH
 		else if (!fstrncmp(tokv[0], item->text, len))
 			appenditem(item, &lprefix, &prefixend);
 		#if PREFIXCOMPLETION_PATCH
@@ -525,6 +549,16 @@ match(void)
 			preserve = 1;
 		#endif // NON_BLOCKING_STDIN_PATCH
 	}
+	#if HIGHPRIORITY_PATCH
+	if (lhpprefix) {
+		if (matches) {
+			matchend->right = lhpprefix;
+			lhpprefix->left = matchend;
+		} else
+			matches = lhpprefix;
+		matchend = hpprefixend;
+	}
+	#endif // HIGHPRIORITY_PATCH
 	if (lprefix) {
 		if (matches) {
 			matchend->right = lprefix;
@@ -958,6 +992,9 @@ readstdin(void)
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		items[i].out = 0;
+		#if HIGHPRIORITY_PATCH
+		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
+		#endif // HIGHPRIORITY_PATCH
 		#if PANGO_PATCH
 		drw_font_getexts(drw->font, buf, strlen(buf), &tmpmax, NULL, True);
 		#else
@@ -1278,7 +1315,7 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH
 		"\n            "
 		#endif
 		#if DYNAMIC_OPTIONS_PATCH
@@ -1290,6 +1327,9 @@ usage(void)
 		#if BORDER_PATCH
 		" [-bw width]"
 		#endif // BORDER_PATCH
+		#if HIGHPRIORITY_PATCH
+		" [-hb color] [-hf color] [-hp items]"
+		#endif // HIGHPRIORITY_PATCH
 		#if INITIALTEXT_PATCH
 		" [-it text]"
 		#endif // INITIALTEXT_PATCH
@@ -1422,6 +1462,14 @@ main(int argc, char *argv[])
 			colors[SchemeSel][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-sf"))  /* selected foreground color */
 			colors[SchemeSel][ColFg] = argv[++i];
+		#if HIGHPRIORITY_PATCH
+		else if (!strcmp(argv[i], "-hb"))  /* high priority background color */
+			colors[SchemeHp][ColBg] = argv[++i];
+		else if (!strcmp(argv[i], "-hf")) /* low priority background color */
+			colors[SchemeHp][ColFg] = argv[++i];
+		else if (!strcmp(argv[i], "-hp"))
+			hpitems = tokenize(argv[++i], ",", &hplength);
+ 		#endif // HIGHPRIORITY_PATCH
 		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-nhb")) /* normal hi background color */
 			colors[SchemeNormHighlight][ColBg] = argv[++i];

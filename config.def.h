@@ -60,6 +60,9 @@ static const char *colors[][2] =
 	[SchemeSelHighlight]  = { "#ffc978", "#005577" },
 	[SchemeNormHighlight] = { "#ffc978", "#222222" },
 	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+	#if HIGHPRIORITY_PATCH
+	[SchemeHp]   = { "#bbbbbb", "#333333" },
+	#endif // HIGHPRIORITY_PATCH
 };
 /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
 static unsigned int lines      = 0;

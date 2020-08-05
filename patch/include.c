@@ -12,6 +12,9 @@
 #if FUZZYMATCH_PATCH
 #include "fuzzymatch.c"
 #endif
+#if HIGHPRIORITY_PATCH
+#include "highpriority.c"
+#endif
 #if MOUSE_SUPPORT_PATCH
 #include "mousesupport.c"
 #endif

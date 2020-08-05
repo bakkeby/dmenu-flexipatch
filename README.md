@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-05 - Added the grid, highlight, dynamic options and numbers patches
+2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
 2020-06-13 - Added the pango patch
 
@@ -66,6 +66,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [highlight](https://tools.suckless.org/dmenu/patches/highlight/)
       - this patch highlights the individual characters of matched text for each dmenu list entry
+
+   - [highpriority](https://tools.suckless.org/dmenu/patches/highpriority/)
+      - this patch will automatically sort the search result so that high priority items are shown first
 
    - [incremental](https://tools.suckless.org/dmenu/patches/incremental/)
       - this patch causes dmenu to print out the current text each time a key is pressed

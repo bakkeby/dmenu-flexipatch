@@ -34,6 +34,9 @@ readstream(FILE* stream)
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		items[i].out = 0;
+		#if HIGHPRIORITY_PATCH
+		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
+		#endif // HIGHPRIORITY_PATCH
 		#if PANGO_PATCH
 		drw_font_getexts(drw->font, buf, strlen(buf), &tmpmax, NULL, True);
 		#else
