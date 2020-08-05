@@ -40,10 +40,10 @@ enum {
 	SchemeNorm,
 	SchemeSel,
 	SchemeOut,
-	#if FUZZYHIGHLIGHT_PATCH
+	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 	SchemeNormHighlight,
 	SchemeSelHighlight,
-	#endif // FUZZYHIGHLIGHT_PATCH
+	#endif // HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 	SchemeLast,
 }; /* color schemes */
 
@@ -214,9 +214,7 @@ cistrstr(const char *s, const char *sub)
 static int
 drawitem(struct item *item, int x, int y, int w)
 {
-	#if FUZZYHIGHLIGHT_PATCH
 	int r;
-	#endif // FUZZYHIGHLIGHT_PATCH
 	if (item == sel)
 		drw_setscheme(drw, scheme[SchemeSel]);
 	else if (item->out)
@@ -224,19 +222,15 @@ drawitem(struct item *item, int x, int y, int w)
 	else
 		drw_setscheme(drw, scheme[SchemeNorm]);
 
-	#if FUZZYHIGHLIGHT_PATCH
 	#if PANGO_PATCH
 	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0, True);
 	#else
 	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
 	#endif // PANGO_PATCH
+	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 	drawhighlights(item, x, y, w);
+	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 	return r;
-	#elif PANGO_PATCH
-	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0, True);
-	#else
-	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
-	#endif // FUZZYHIGHLIGHT_PATCH
 }
 
 static void
@@ -1308,9 +1302,9 @@ usage(void)
 		#if XYW_PATCH
 		" [-X xoffset] [-Y yoffset] [-W width]" // (arguments made upper case due to conflicts)
 		#endif // XYW_PATCH
-		#if FUZZYHIGHLIGHT_PATCH
+		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 		"\n [-nhb color] [-nhf color] [-shb color] [-shf color]" // highlight colors
-		#endif // FUZZYHIGHLIGHT_PATCH
+		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 		"\n", stderr);
 	exit(1);
 }
@@ -1428,7 +1422,7 @@ main(int argc, char *argv[])
 			colors[SchemeSel][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-sf"))  /* selected foreground color */
 			colors[SchemeSel][ColFg] = argv[++i];
-		#if FUZZYHIGHLIGHT_PATCH
+		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-nhb")) /* normal hi background color */
 			colors[SchemeNormHighlight][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-nhf")) /* normal hi foreground color */
@@ -1437,7 +1431,7 @@ main(int argc, char *argv[])
 			colors[SchemeSelHighlight][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-shf")) /* selected hi foreground color */
 			colors[SchemeSelHighlight][ColFg] = argv[++i];
-		#endif // FUZZYHIGHLIGHT_PATCH
+		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
 		#if DYNAMIC_OPTIONS_PATCH

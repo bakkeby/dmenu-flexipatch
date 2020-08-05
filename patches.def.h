@@ -57,6 +57,12 @@
  */
 #define GRID_PATCH 0
 
+/* This patch highlights the individual characters of matched text for each dmenu list entry.
+ * The fuzzy highlight patch takes precedence over this patch.
+ * https://tools.suckless.org/dmenu/patches/highlight/
+ */
+#define HIGHLIGHT_PATCH 0
+
 /* This patch causes dmenu to print out the current text each time a key is pressed.
  * https://tools.suckless.org/dmenu/patches/incremental/
  */

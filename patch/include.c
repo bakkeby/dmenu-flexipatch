@@ -1,14 +1,16 @@
 #if CENTER_PATCH
 #include "center.c"
 #endif
+#if DYNAMIC_OPTIONS_PATCH
+#include "dynamicoptions.c"
+#endif
 #if FUZZYHIGHLIGHT_PATCH
 #include "fuzzyhighlight.c"
+#elif HIGHLIGHT_PATCH
+#include "highlight.c"
 #endif
 #if FUZZYMATCH_PATCH
 #include "fuzzymatch.c"
-#endif
-#if DYNAMIC_OPTIONS_PATCH
-#include "dynamicoptions.c"
 #endif
 #if MOUSE_SUPPORT_PATCH
 #include "mousesupport.c"
