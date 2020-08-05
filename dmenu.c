@@ -160,7 +160,14 @@ calcoffsets(void)
 	int i, n;
 
 	if (lines > 0)
+		#if GRID_PATCH
+		if (columns)
+			n = lines * columns * bh;
+		else
+			n = lines * bh;
+		#else
 		n = lines * bh;
+		#endif // GRID_PATCH
 	else
 		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">"));
 	/* calculate which items will begin the next page and previous page */
@@ -334,6 +341,33 @@ drawmenu(void)
 	#endif // SCROLL_PATCH
 
 	if (lines > 0) {
+		#if GRID_PATCH
+		/* draw grid */
+		int i = 0;
+		for (item = curr; item != next; item = item->right, i++)
+			if (columns)
+				#if VERTFULL_PATCH
+				drawitem(
+					item,
+					0 + ((i / lines) *  (mw / columns)),
+					y + (((i % lines) + 1) * bh),
+					mw / columns
+				);
+				#else
+				drawitem(
+					item,
+					x + ((i / lines) *  ((mw - x) / columns)),
+					y + (((i % lines) + 1) * bh),
+					(mw - x) / columns
+				);
+				#endif // VERTFULL_PATCH
+			else
+				#if VERTFULL_PATCH
+				drawitem(item, 0, y += bh, mw);
+				#else
+				drawitem(item, x, y += bh, mw - x);
+				#endif // VERTFULL_PATCH
+		#else
 		/* draw vertical list */
 		for (item = curr; item != next; item = item->right)
 			#if VERTFULL_PATCH
@@ -341,6 +375,7 @@ drawmenu(void)
 			#else
 			drawitem(item, x, y += bh, mw - x);
 			#endif // VERTFULL_PATCH
+		#endif // GRID_PATCH
 	} else if (matches) {
 		/* draw horizontal list */
 		x += inputw;
@@ -1224,7 +1259,11 @@ usage(void)
 		#if REJECTNOMATCH_PATCH
 		"R" // (changed from r to R due to conflict with INCREMENTAL_PATCH)
 		#endif // REJECTNOMATCH_PATCH
-		"] [-l lines] [-p prompt] [-fn font] [-m monitor]"
+		"] "
+		#if GRID_PATCH
+		"[-g columns] "
+		#endif // GRID_PATCH
+		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
 		#if ALPHA_PATCH || BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
 		"\n            "
@@ -1322,6 +1361,13 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-H"))
 			histfile = argv[++i];
 		#endif // NAVHISTORY_PATCH
+		#if GRID_PATCH
+		else if (!strcmp(argv[i], "-g")) {   /* number of columns in grid */
+			columns = atoi(argv[++i]);
+			if (columns && lines == 0)
+				lines = 1;
+		}
+		#endif // GRID_PATCH
 		else if (!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
 			lines = atoi(argv[++i]);
 		#if XYW_PATCH

@@ -43,6 +43,13 @@
  */
 #define FUZZYMATCH_PATCH 0
 
+/* Allows dmenu's entries to be rendered in a grid by adding a new -g flag to specify
+ * the number of grid columns. The -g and -l options can be used together to create a
+ * G columns * L lines grid.
+ * https://tools.suckless.org/dmenu/patches/grid/
+ */
+#define GRID_PATCH 0
+
 /* This patch causes dmenu to print out the current text each time a key is pressed.
  * https://tools.suckless.org/dmenu/patches/incremental/
  */

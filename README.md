@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-08-05 - Added the grid patch
+
 2020-06-13 - Added the pango patch
 
 2020-06-10 - Added the case-insensitive patch
@@ -54,6 +56,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [fuzzymatch](https://tools.suckless.org/dmenu/patches/fuzzymatch/)
       - adds support for fuzzy-matching to dmenu, allowing users to type non-consecutive portions of the string to be matched
+
+   - [grid](https://tools.suckless.org/dmenu/patches/grid/)
+      - allows dmenu's entries to be rendered in a grid by adding a new `-g` flag to specify the number of grid columns
+      - the `-g` and `-l` options can be used together to create a G columns * L lines grid
 
    - [incremental](https://tools.suckless.org/dmenu/patches/incremental/)
       - this patch causes dmenu to print out the current text each time a key is pressed
