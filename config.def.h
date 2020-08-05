@@ -32,6 +32,9 @@ static const char *fonts[] =
 };
 #endif // PANGO_PATCH
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
+#if DYNAMIC_OPTIONS_PATCH
+static const char *dynamic     = NULL;      /* -dy option; dynamic command to run on input change */
+#endif // DYNAMIC_OPTIONS_PATCH
 
 #if ALPHA_PATCH
 static const unsigned int baralpha = 0xd0;

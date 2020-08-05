@@ -7,6 +7,9 @@
 #if FUZZYMATCH_PATCH
 #include "fuzzymatch.c"
 #endif
+#if DYNAMIC_OPTIONS_PATCH
+#include "dynamicoptions.c"
+#endif
 #if MOUSE_SUPPORT_PATCH
 #include "mousesupport.c"
 #endif

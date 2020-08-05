@@ -31,6 +31,13 @@
  */
 #define COLOR_EMOJI_PATCH 0
 
+/* This patch adds a flag (-dy) which makes dmenu run the command given to it whenever input
+ * is changed with the current input as the last argument and update the option list according
+ * to the output of that command.
+ * https://tools.suckless.org/dmenu/patches/dynamicoptions/
+ */
+#define DYNAMIC_OPTIONS_PATCH 0
+
 /* This patch make it so that fuzzy matches gets highlighted and is therefore meant
  * to be used together with the fuzzymatch patch.
  * https://tools.suckless.org/dmenu/patches/fuzzyhighlight/

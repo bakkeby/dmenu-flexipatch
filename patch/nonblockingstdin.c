@@ -28,7 +28,11 @@ readstdin(void)
 			die("cannot strdup %u bytes:", strlen(buf)+1);
 		if (strlen(item->text) > max) {
 			max = strlen(maxstr = item->text);
+			#if PANGO_PATCH
+			inputw = maxstr ? TEXTWM(maxstr) : 0;
+			#else
 			inputw = maxstr ? TEXTW(maxstr) : 0;
+			#endif // PANGO_PATCH
 		}
 		*end = item;
 		end = &item->next;

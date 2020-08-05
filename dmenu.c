@@ -449,6 +449,11 @@ grabkeyboard(void)
 static void
 match(void)
 {
+	#if DYNAMIC_OPTIONS_PATCH
+	if (dynamic && *dynamic)
+		refreshoptions();
+	#endif // DYNAMIC_OPTIONS_PATCH
+
 	#if FUZZYMATCH_PATCH
 	if (fuzzy) {
 		fuzzymatch();
@@ -494,8 +499,13 @@ match(void)
 		for (i = 0; i < tokc; i++)
 			if (!fstrstr(item->text, tokv[i]))
 				break;
+		#if DYNAMIC_OPTIONS_PATCH
+		if (i != tokc && !(dynamic && *dynamic)) /* not all tokens match */
+			continue;
+		#else
 		if (i != tokc) /* not all tokens match */
 			continue;
+		#endif // DYNAMIC_OPTIONS_PATCH
 		/* exact matches go first, then prefixes, then substrings */
 		if (!tokc || !fstrncmp(text, item->text, textsize))
 			appenditem(item, &matches, &matchend);
@@ -936,7 +946,7 @@ readstdin(void)
 	#endif // PASSWORD_PATCH
 
 	/* read each line from stdin and add it to the item list */
-	for (i = 0; fgets(buf, sizeof buf, stdin); i++) {
+	for (i = 0; fgets(buf, sizeof buf, stdin); i++)	{
 		if (i + 1 >= size / sizeof *items)
 			if (!(items = realloc(items, (size += BUFSIZ))))
 				die("cannot realloc %u bytes:", size);
@@ -1265,9 +1275,12 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH
 		"\n            "
 		#endif
+		#if DYNAMIC_OPTIONS_PATCH
+		" [ -dy command]"
+		#endif // DYNAMIC_OPTIONS_PATCH
 		#if ALPHA_PATCH
 		" [ -o opacity]"
 		#endif // ALPHA_PATCH
@@ -1418,6 +1431,10 @@ main(int argc, char *argv[])
 		#endif // FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		#if DYNAMIC_OPTIONS_PATCH
+		else if (!strcmp(argv[i], "-dy"))  /* dynamic command to run */
+			dynamic = argv[++i];
+		#endif // DYNAMIC_OPTIONS_PATCH
 		#if BORDER_PATCH
 		else if (!strcmp(argv[i], "-bw"))  /* border width around dmenu */
 			border_width = atoi(argv[++i]);
@@ -1486,9 +1503,19 @@ main(int argc, char *argv[])
 	#else
 	if (fast && !isatty(0)) {
 		grabkeyboard();
+		#if DYNAMIC_OPTIONS_PATCH
+		if (!(dynamic && *dynamic))
+			readstdin();
+		#else
 		readstdin();
+		#endif // DYNAMIC_OPTIONS_PATCH
 	} else {
+		#if DYNAMIC_OPTIONS_PATCH
+		if (!(dynamic && *dynamic))
+			readstdin();
+		#else
 		readstdin();
+		#endif // DYNAMIC_OPTIONS_PATCH
 		grabkeyboard();
 	}
 	#endif // NON_BLOCKING_STDIN_PATCH

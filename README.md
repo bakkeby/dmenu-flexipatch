@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-05 - Added the grid patch
+2020-08-05 - Added the grid and dynamic options patches
 
 2020-06-13 - Added the pango patch
 
@@ -50,6 +50,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
    - color_emoji
       - enables color emoji in dmenu by removing a workaround for a BadLength error in the Xft library when color glyphs are used
       - enabling this will crash dmenu on encountering such glyphs unless you also have an updated Xft library that can handle them
+
+   - [dynamic_options](https://tools.suckless.org/dmenu/patches/dynamicoptions/)
+      - adds a flag (`-dy`) which makes dmenu run the command given to it whenever input is changed with the current input as the last argument and update the option list according to the output of that command
 
    - [fuzzyhighlight](https://tools.suckless.org/dmenu/patches/fuzzyhighlight/)
       - intended to be combined with the fuzzymatch patch, this makes it so that fuzzy matches are highlighted
