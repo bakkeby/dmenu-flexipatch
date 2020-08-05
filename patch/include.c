@@ -19,6 +19,9 @@
 #if NON_BLOCKING_STDIN_PATCH
 #include "nonblockingstdin.c"
 #endif
+#if NUMBERS_PATCH
+#include "numbers.c"
+#endif
 #if XRESOURCES_PATCH
 #include "xresources.c"
 #endif

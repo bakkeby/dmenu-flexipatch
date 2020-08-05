@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-05 - Added the grid and dynamic options patches
+2020-08-05 - Added the grid, dynamic options and numbers patches
 
 2020-06-13 - Added the pango patch
 
@@ -87,6 +87,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
       - this is a patch to have dmenu read stdin in a non blocking way, making it wait for input both from stdin and from X
       - this means that you can continue feeding dmenu while you type
       - the patch is meant to be used along with the incremental patch in order to use stdout to feed stdin
+
+   - [numbers](https://tools.suckless.org/dmenu/patches/numbers/)
+      - adds text which displays the number of matched and total items in the top right corner of dmenu
 
    - [pango](https://github.com/StillANixRookie/dmenu-pango/)
       - adds simple markup for dmenu using pango markup

@@ -249,7 +249,7 @@ drawmenu(void)
 	unsigned int curpos;
 	#endif // SCROLL_PATCH
 	struct item *item;
-	int x = 0, y = 0, w;
+	int x = 0, y = 0, w, rpad = 0;
 	#if LINE_HEIGHT_PATCH && PANGO_PATCH
 	int fh = drw->font->h;
 	#elif LINE_HEIGHT_PATCH
@@ -340,6 +340,10 @@ drawmenu(void)
 	}
 	#endif // SCROLL_PATCH
 
+	#if NUMBERS_PATCH
+	recalculatenumbers();
+	rpad = TEXTW(numbers);
+	#endif // NUMBERS_PATCH
 	if (lines > 0) {
 		#if GRID_PATCH
 		/* draw grid */
@@ -391,20 +395,25 @@ drawmenu(void)
 		x += w;
 		for (item = curr; item != next; item = item->right)
 			#if PANGO_PATCH
-			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(">")));
+			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(">") - rpad));
 			#else
-			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">")));
+			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">") - rpad));
 			#endif // PANGO_PATCH
 		if (next) {
 			w = TEXTW(">");
 			drw_setscheme(drw, scheme[SchemeNorm]);
 			#if PANGO_PATCH
-			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, ">", 0, True);
+			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0, True);
 			#else
-			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, ">", 0);
+			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0);
 			#endif // PANGO_PATCH
 		}
 	}
+	#if NUMBERS_PATCH
+	drw_setscheme(drw, scheme[SchemeNorm]);
+	drw_text(drw, mw - TEXTW(numbers), 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
+	#else
+	#endif // NUMBERS_PATCH
 	drw_map(drw, win, 0, 0, mw, mh);
 	#if NON_BLOCKING_STDIN_PATCH
 	XFlush(dpy);

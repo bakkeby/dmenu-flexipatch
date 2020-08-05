@@ -97,6 +97,11 @@
  */
 #define NON_BLOCKING_STDIN_PATCH 0
 
+/* Adds text which displays the number of matched and total items in the top right corner of dmenu.
+ * https://tools.suckless.org/dmenu/patches/numbers/
+ */
+#define NUMBERS_PATCH 0
+
 /* This patch adds simple markup for dmenu using pango markup.
  * This depends on the pango library v1.44 or greater.
  * You need to uncomment the corresponding lines in config.mk to use the pango libraries
