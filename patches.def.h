@@ -90,6 +90,15 @@
  */
 #define LINE_HEIGHT_PATCH 0
 
+/* This patch adds a -wm flag which sets override_redirect to false; thus letting your window
+ * manager manage the dmenu window.
+ *
+ * This may be helpful in contexts where you don't want to exclusively bind dmenu or want to
+ * treat dmenu more as a "window" rather than as an overlay.
+ * https://tools.suckless.org/dmenu/patches/managed/
+ */
+#define MANAGED_PATCH 0
+
 /* This patch adds basic mouse support for dmenu.
  * https://tools.suckless.org/dmenu/patches/mouse-support/
  */

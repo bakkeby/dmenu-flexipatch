@@ -88,6 +88,9 @@ static struct item *items = NULL;
 static struct item *matches, *matchend;
 static struct item *prev, *curr, *next, *sel;
 static int mon = -1, screen;
+#if MANAGED_PATCH
+static int managed = 0;
+#endif // MANAGED_PATCH
 #if PRINTINPUTTEXT_PATCH
 static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
@@ -451,7 +454,9 @@ grabfocus(void)
 		XGetInputFocus(dpy, &focuswin, &revertwin);
 		if (focuswin == win)
 			return;
+		#if !MANAGED_PATCH
 		XSetInputFocus(dpy, win, RevertToParent, CurrentTime);
+		#endif // MANAGED_PATCH
 		nanosleep(&ts, NULL);
 	}
 	die("cannot grab focus");
@@ -463,7 +468,11 @@ grabkeyboard(void)
 	struct timespec ts = { .tv_sec = 0, .tv_nsec = 1000000  };
 	int i;
 
+	#if MANAGED_PATCH
+	if (embed || managed)
+	#else
 	if (embed)
+	#endif // MANAGED_PATCH
 		return;
 	/* try to grab keyboard, we may have to wait for another process to ungrab */
 	for (i = 0; i < 1000; i++) {
@@ -1232,7 +1241,11 @@ setup(void)
 	match();
 
 	/* create menu window */
+	#if MANAGED_PATCH
+	swa.override_redirect = managed ? False : True;
+	#else
 	swa.override_redirect = True;
+	#endif // MANAGED_PATCH
 	#if ALPHA_PATCH
 	swa.background_pixel = 0;
 	swa.colormap = cmap;
@@ -1274,6 +1287,17 @@ setup(void)
 
 	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
 	                XNClientWindow, win, XNFocusWindow, win, NULL);
+
+	#if MANAGED_PATCH
+	if (managed) {
+		XTextProperty prop;
+		char *windowtitle = prompt != NULL ? prompt : "dmenu";
+		Xutf8TextListToTextProperty(dpy, &windowtitle, 1, XUTF8StringStyle, &prop);
+		XSetWMName(dpy, win, &prop);
+		XSetTextProperty(dpy, win, &prop, XInternAtom(dpy, "_NET_WM_NAME", False));
+		XFree(prop.value);
+	}
+	#endif // MANAGED_PATCH
 
 	XMapRaised(dpy, win);
 	if (embed) {
@@ -1326,6 +1350,9 @@ usage(void)
 		"R" // (changed from r to R due to conflict with INCREMENTAL_PATCH)
 		#endif // REJECTNOMATCH_PATCH
 		"] "
+		#if MANAGED_PATCH
+		"[-wm] "
+		#endif // MANAGED_PATCH
 		#if GRID_PATCH
 		"[-g columns] "
 		#endif // GRID_PATCH
@@ -1402,6 +1429,10 @@ main(int argc, char *argv[])
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
 		#endif // CASEINSENSITIVE_PATCH
+		#if MANAGED_PATCH
+		} else if (!strcmp(argv[i], "-wm")) { /* display as managed wm window */
+			managed = 1;
+		#endif // MANAGED_PATCH
 		#if INSTANT_PATCH
 		} else if (!strcmp(argv[i], "-n")) { /* instant select only match */
 			instant = !instant;

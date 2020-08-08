@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-08 - Added the symbols patch
+2020-08-08 - Added the symbols and managed patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
@@ -84,6 +84,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
    - [line-height](http://tools.suckless.org/dmenu/patches/line-height/)
       - adds a '-h' option which sets the minimum height of a dmenu line
       - this helps integrate dmenu with other UI elements that require a particular vertical size
+
+   - [managed](https://tools.suckless.org/dmenu/patches/managed/)
+      - adds a `-wm` flag which sets override_redirect to false; thus letting your window manager manage the dmenu window
+      - this may be helpful in contexts where you don't want to exclusively bind dmenu or want to treat dmenu more as a "window" rather than as an overlay
 
    - [mouse-support](https://tools.suckless.org/dmenu/patches/mouse-support/)
       - adds basic mouse support for dmenu

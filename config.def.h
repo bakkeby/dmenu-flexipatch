@@ -31,7 +31,11 @@ static const char *fonts[] =
 	"monospace:size=10"
 };
 #endif // PANGO_PATCH
+#if MANAGED_PATCH
+static char *prompt            = NULL;      /* -p  option; prompt to the left of input field */
+#else
 static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
+#endif // MANAGED_PATCH
 #if DYNAMIC_OPTIONS_PATCH
 static const char *dynamic     = NULL;      /* -dy option; dynamic command to run on input change */
 #endif // DYNAMIC_OPTIONS_PATCH
