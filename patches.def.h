@@ -120,7 +120,7 @@
  *
  * https://tools.suckless.org/dmenu/patches/multi-selection/
  */
-#define MULTI_SELECT_PATCH 0
+#define MULTI_SELECTION_PATCH 0
 
 /* This patch provides dmenu the ability for history navigation similar to that of bash.
  * https://tools.suckless.org/dmenu/patches/navhistory/

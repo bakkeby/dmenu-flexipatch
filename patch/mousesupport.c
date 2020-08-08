@@ -71,24 +71,24 @@ buttonpress(XEvent *e)
 		for (item = curr; item != next; item = item->right) {
 			y += h;
 			if (ev->y >= y && ev->y <= (y + h)) {
-				#if !MULTI_SELECT_PATCH
+				#if !MULTI_SELECTION_PATCH
 				puts(item->text);
-				#endif // MULTI_SELECT_PATCH
+				#endif // MULTI_SELECTION_PATCH
 				if (!(ev->state & ControlMask)) {
-					#if MULTI_SELECT_PATCH
+					#if MULTI_SELECTION_PATCH
 					sel = item;
 					selsel();
 					printsel(ev->state);
-					#endif // MULTI_SELECT_PATCH
+					#endif // MULTI_SELECTION_PATCH
 					exit(0);
 				}
 				sel = item;
 				if (sel) {
-					#if MULTI_SELECT_PATCH
+					#if MULTI_SELECTION_PATCH
 					selsel();
 					#else
 					sel->out = 1;
-					#endif // MULTI_SELECT_PATCH
+					#endif // MULTI_SELECTION_PATCH
 					drawmenu();
 				}
 				return;
@@ -119,24 +119,24 @@ buttonpress(XEvent *e)
 			w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
 			#endif // SYMBOLS_PATCH
 			if (ev->x >= x && ev->x <= x + w) {
-				#if !MULTI_SELECT_PATCH
+				#if !MULTI_SELECTION_PATCH
 				puts(item->text);
-				#endif // MULTI_SELECT_PATCH
+				#endif // MULTI_SELECTION_PATCH
 				if (!(ev->state & ControlMask)) {
-					#if MULTI_SELECT_PATCH
+					#if MULTI_SELECTION_PATCH
 					sel = item;
 					selsel();
 					printsel(ev->state);
-					#endif // MULTI_SELECT_PATCH
+					#endif // MULTI_SELECTION_PATCH
 					exit(0);
 				}
 				sel = item;
 				if (sel) {
-					#if MULTI_SELECT_PATCH
+					#if MULTI_SELECTION_PATCH
 					selsel();
 					#else
 					sel->out = 1;
-					#endif // MULTI_SELECT_PATCH
+					#endif // MULTI_SELECTION_PATCH
 					drawmenu();
 				}
 				return;

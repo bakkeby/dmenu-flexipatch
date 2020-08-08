@@ -59,11 +59,11 @@ struct item {
 	#if NON_BLOCKING_STDIN_PATCH
 	struct item *next;
 	#endif // NON_BLOCKING_STDIN_PATCH
-	#if MULTI_SELECT_PATCH
+	#if MULTI_SELECTION_PATCH
 	int id; /* for multiselect */
 	#else
 	int out;
-	#endif // MULTI_SELECT_PATCH
+	#endif // MULTI_SELECTION_PATCH
 	#if HIGHPRIORITY_PATCH
 	int hp;
 	#endif // HIGHPRIORITY_PATCH
@@ -73,7 +73,7 @@ struct item {
 };
 
 static char text[BUFSIZ] = "";
-#if PIPEOUT_PATCH && !MULTI_SELECT_PATCH
+#if PIPEOUT_PATCH && !MULTI_SELECTION_PATCH
 static char pipeout[8] = " | dmenu";
 #endif // PIPEOUT_PATCH
 static char *embed;
@@ -98,11 +98,11 @@ static int mon = -1, screen;
 #if MANAGED_PATCH
 static int managed = 0;
 #endif // MANAGED_PATCH
-#if MULTI_SELECT_PATCH
+#if MULTI_SELECTION_PATCH
 static int *selid = NULL;
 static unsigned int selidsize = 0;
-#endif // MULTI_SELECT_PATCH
-#if PRINTINPUTTEXT_PATCH && !MULTI_SELECT_PATCH
+#endif // MULTI_SELECTION_PATCH
+#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
 static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
 #if PRESELECT_PATCH
@@ -225,9 +225,9 @@ cleanup(void)
 	drw_free(drw);
 	XSync(dpy, False);
 	XCloseDisplay(dpy);
-	#if MULTI_SELECT_PATCH
+	#if MULTI_SELECTION_PATCH
 	free(selid);
-	#endif // MULTI_SELECT_PATCH
+	#endif // MULTI_SELECTION_PATCH
 }
 
 static char *
@@ -255,11 +255,11 @@ drawitem(struct item *item, int x, int y, int w)
 	else if (item->left == sel || item->right == sel)
 		drw_setscheme(drw, scheme[SchemeMid]);
 	#endif // MORECOLOR_PATCH
-	#if MULTI_SELECT_PATCH
+	#if MULTI_SELECTION_PATCH
 	else if (issel(item->id))
 	#else
 	else if (item->out)
-	#endif // MULTI_SELECT_PATCH
+	#endif // MULTI_SELECTION_PATCH
 		drw_setscheme(drw, scheme[SchemeOut]);
 	else
 		drw_setscheme(drw, scheme[SchemeNorm]);
@@ -770,9 +770,9 @@ keypress(XKeyEvent *ev)
 			goto draw;
 		case XK_Return:
 		case XK_KP_Enter:
-			#if MULTI_SELECT_PATCH
+			#if MULTI_SELECTION_PATCH
 			selsel();
-			#endif // MULTI_SELECT_PATCH
+			#endif // MULTI_SELECTION_PATCH
 			break;
 		case XK_bracketleft:
 			cleanup();
@@ -874,7 +874,7 @@ insert:
 		break;
 	case XK_Return:
 	case XK_KP_Enter:
-		#if !MULTI_SELECT_PATCH
+		#if !MULTI_SELECTION_PATCH
 		#if PIPEOUT_PATCH
 		#if PRINTINPUTTEXT_PATCH
 		if (sel && (
@@ -905,22 +905,22 @@ insert:
 		#else
 		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
 		#endif // PIPEOUT_PATCH
-		#endif // MULTI_SELECT_PATCH
+		#endif // MULTI_SELECTION_PATCH
 		if (!(ev->state & ControlMask)) {
 			#if NAVHISTORY_PATCH
 			savehistory((sel && !(ev->state & ShiftMask))
 				    ? sel->text : text);
 			#endif // NAVHISTORY_PATCH
-			#if MULTI_SELECT_PATCH
+			#if MULTI_SELECTION_PATCH
 			printsel(ev->state);
-			#endif // MULTI_SELECT_PATCH
+			#endif // MULTI_SELECTION_PATCH
 			cleanup();
 			exit(0);
 		}
-		#if !MULTI_SELECT_PATCH
+		#if !MULTI_SELECTION_PATCH
 		if (sel)
 			sel->out = 1;
-		#endif // MULTI_SELECT_PATCH
+		#endif // MULTI_SELECTION_PATCH
 		break;
 	case XK_Right:
 		if (text[cursor] != '\0') {
@@ -1051,7 +1051,7 @@ readstdin(void)
 			*p = '\0';
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
-		#if MULTI_SELECT_PATCH
+		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
 		#else
 		items[i].out = 0;
@@ -1388,7 +1388,7 @@ usage(void)
 		#if INSTANT_PATCH
 		"n"
 		#endif // INSTANT_PATCH
-		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECT_PATCH
+		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
 		"t"
 		#endif // PRINTINPUTTEXT_PATCH
 		#if PREFIXCOMPLETION_PATCH
@@ -1494,7 +1494,7 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-n")) { /* instant select only match */
 			instant = !instant;
 		#endif // INSTANT_PATCH
-		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECT_PATCH
+		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
 		} else if (!strcmp(argv[i], "-t")) { /* favors text input over selection */
 			use_text_input = 1;
 		#endif // PRINTINPUTTEXT_PATCH
