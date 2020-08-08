@@ -64,6 +64,9 @@ static const char *colors[][2] =
 	[SchemeNorm] = { "#bbbbbb", "#222222" },
 	[SchemeSel]  = { "#eeeeee", "#005577" },
 	[SchemeOut]  = { "#000000", "#00ffff" },
+	#if MORECOLOR_PATCH
+	[SchemeMid]  = { "#eeeeee", "#770000" },
+	#endif // MORECOLOR_PATCH
 	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 	[SchemeSelHighlight]  = { "#ffc978", "#005577" },
 	[SchemeNormHighlight] = { "#ffc978", "#222222" },

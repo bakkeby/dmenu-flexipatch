@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-08 - Added the symbols, managed and preselect patches
+2020-08-08 - Added the symbols, managed, morecolor and preselect patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
@@ -89,6 +89,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
       - adds a `-wm` flag which sets override_redirect to false; thus letting your window manager manage the dmenu window
       - this may be helpful in contexts where you don't want to exclusively bind dmenu or want to treat dmenu more as a "window" rather than as an overlay
 
+   - [morecolor](https://tools.suckless.org/dmenu/patches/morecolor/)
+      - adds an additional color scheme for highlighting entries adjacent to the current selection
+
    - [mouse-support](https://tools.suckless.org/dmenu/patches/mouse-support/)
       - adds basic mouse support for dmenu
 
@@ -119,7 +122,6 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [preselect](https://tools.suckless.org/dmenu/patches/preselect/)
       - adds an option `-ps` to preselect an item by providing the index that should be pre-selected
- *
 
    - [printinputtext](https://tools.suckless.org/dmenu/patches/printinputtext/)
       - this patch adds a flag (-t) which makes Return key ignore selection and print the input text to stdout

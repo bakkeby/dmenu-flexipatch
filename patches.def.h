@@ -99,6 +99,12 @@
  */
 #define MANAGED_PATCH 0
 
+/* This patch adds an additional color scheme for highlighting entries adjacent to the current
+ * selection.
+ * https://tools.suckless.org/dmenu/patches/morecolor/
+ */
+#define MORECOLOR_PATCH 0
+
 /* This patch adds basic mouse support for dmenu.
  * https://tools.suckless.org/dmenu/patches/mouse-support/
  */

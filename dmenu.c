@@ -40,6 +40,9 @@ enum {
 	SchemeNorm,
 	SchemeSel,
 	SchemeOut,
+	#if MORECOLOR_PATCH
+	SchemeMid,
+	#endif // MORECOLOR_PATCH
 	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 	SchemeNormHighlight,
 	SchemeSelHighlight,
@@ -237,6 +240,10 @@ drawitem(struct item *item, int x, int y, int w)
 	else if (item->hp)
 		drw_setscheme(drw, scheme[SchemeHp]);
 	#endif // HIGHPRIORITY_PATCH
+	#if MORECOLOR_PATCH
+	else if (item->left == sel || item->right == sel)
+		drw_setscheme(drw, scheme[SchemeMid]);
+	#endif // MORECOLOR_PATCH
 	else if (item->out)
 		drw_setscheme(drw, scheme[SchemeOut]);
 	else
