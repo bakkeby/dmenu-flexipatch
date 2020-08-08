@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-08 - Added the symbols, managed, morecolor and preselect patches
+2020-08-08 - Added the symbols, managed, morecolor, multi-selection and preselect patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
@@ -94,6 +94,11 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [mouse-support](https://tools.suckless.org/dmenu/patches/mouse-support/)
       - adds basic mouse support for dmenu
+
+   - [multi-selection](https://tools.suckless.org/dmenu/patches/multi-selection/)
+      - without this patch when you press `Ctrl+Enter` dmenu just outputs current item and it is not possible to undo that
+      - with this patch dmenu will output all selected items only on exit
+      - it is also possible to deselect any selected item
 
    - [navhistory](https://tools.suckless.org/dmenu/patches/navhistory/)
       - provides dmenu the ability for history navigation similar to that of bash

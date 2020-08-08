@@ -15,6 +15,9 @@
 #if HIGHPRIORITY_PATCH
 #include "highpriority.c"
 #endif
+#if MULTI_SELECT_PATCH
+#include "multiselect.c"
+#endif
 #if MOUSE_SUPPORT_PATCH
 #include "mousesupport.c"
 #endif

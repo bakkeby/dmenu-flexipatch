@@ -21,6 +21,16 @@ buttonpress(XEvent *e)
 	/* left-click on input: clear input,
 	 * NOTE: if there is no left-arrow the space for < is reserved so
 	 *       add that to the input width */
+	#if SYMBOLS_PATCH
+	if (ev->button == Button1 &&
+	   ((lines <= 0 && ev->x >= 0 && ev->x <= x + w +
+	   ((!prev || !curr->left) ? TEXTW(symbol_1) : 0)) ||
+	   (lines > 0 && ev->y >= y && ev->y <= y + h))) {
+		insert(NULL, -cursor);
+		drawmenu();
+		return;
+	}
+	#else
 	if (ev->button == Button1 &&
 	   ((lines <= 0 && ev->x >= 0 && ev->x <= x + w +
 	   ((!prev || !curr->left) ? TEXTW("<") : 0)) ||
@@ -29,6 +39,7 @@ buttonpress(XEvent *e)
 		drawmenu();
 		return;
 	}
+	#endif // SYMBOLS_PATCH
 	/* middle-mouse click: paste selection */
 	if (ev->button == Button2) {
 		XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
@@ -60,12 +71,24 @@ buttonpress(XEvent *e)
 		for (item = curr; item != next; item = item->right) {
 			y += h;
 			if (ev->y >= y && ev->y <= (y + h)) {
+				#if !MULTI_SELECT_PATCH
 				puts(item->text);
-				if (!(ev->state & ControlMask))
+				#endif // MULTI_SELECT_PATCH
+				if (!(ev->state & ControlMask)) {
+					#if MULTI_SELECT_PATCH
+					sel = item;
+					selsel();
+					printsel(ev->state);
+					#endif // MULTI_SELECT_PATCH
 					exit(0);
+				}
 				sel = item;
 				if (sel) {
+					#if MULTI_SELECT_PATCH
+					selsel();
+					#else
 					sel->out = 1;
+					#endif // MULTI_SELECT_PATCH
 					drawmenu();
 				}
 				return;
@@ -74,7 +97,11 @@ buttonpress(XEvent *e)
 	} else if (matches) {
 		/* left-click on left arrow */
 		x += inputw;
+		#if SYMBOLS_PATCH
+		w = TEXTW(symbol_1);
+		#else
 		w = TEXTW("<");
+		#endif // SYMBOLS_PATCH
 		if (prev && curr->left) {
 			if (ev->x >= x && ev->x <= x + w) {
 				sel = curr = prev;
@@ -86,21 +113,41 @@ buttonpress(XEvent *e)
 		/* horizontal list: (ctrl)left-click on item */
 		for (item = curr; item != next; item = item->right) {
 			x += w;
+			#if SYMBOLS_PATCH
+			w = MIN(TEXTW(item->text), mw - x - TEXTW(symbol_2));
+			#else
 			w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
+			#endif // SYMBOLS_PATCH
 			if (ev->x >= x && ev->x <= x + w) {
+				#if !MULTI_SELECT_PATCH
 				puts(item->text);
-				if (!(ev->state & ControlMask))
+				#endif // MULTI_SELECT_PATCH
+				if (!(ev->state & ControlMask)) {
+					#if MULTI_SELECT_PATCH
+					sel = item;
+					selsel();
+					printsel(ev->state);
+					#endif // MULTI_SELECT_PATCH
 					exit(0);
+				}
 				sel = item;
 				if (sel) {
+					#if MULTI_SELECT_PATCH
+					selsel();
+					#else
 					sel->out = 1;
+					#endif // MULTI_SELECT_PATCH
 					drawmenu();
 				}
 				return;
 			}
 		}
 		/* left-click on right arrow */
+		#if SYMBOLS_PATCH
+		w = TEXTW(symbol_2);
+		#else
 		w = TEXTW(">");
+		#endif // SYMBOLS_PATCH
 		x = mw - w;
 		if (next && ev->x >= x && ev->x <= x + w) {
 			sel = curr = next;

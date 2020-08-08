@@ -110,6 +110,18 @@
  */
 #define MOUSE_SUPPORT_PATCH 0
 
+/* Without this patch when you press Ctrl+Enter dmenu just outputs current item and it is not
+ * possible to undo that.
+ * With this patch dmenu will output all selected items only on exit. It is also possible to
+ * deselect any selected item.
+ * Also refer to the dmenu_run replacement on the below URL that supports multiple selections.
+ *
+ * This patch is not compatible with the printinputtext and pipeout patches.
+ *
+ * https://tools.suckless.org/dmenu/patches/multi-selection/
+ */
+#define MULTI_SELECT_PATCH 0
+
 /* This patch provides dmenu the ability for history navigation similar to that of bash.
  * https://tools.suckless.org/dmenu/patches/navhistory/
  */
@@ -160,6 +172,9 @@
 /* This patch allows the selected text to be piped back out with dmenu. This can be useful if you
  * want to display the output of a command on the screen.
  * Only text starting with the character '#' is piped out by default.
+ *
+ * This patch is not compatible with the multi-select patch.
+ *
  * https://tools.suckless.org/dmenu/patches/pipeout/
  */
 #define PIPEOUT_PATCH 0
@@ -177,6 +192,9 @@
 
 /* This patch adds a flag (-t) which makes Return key to ignore selection and print the input
  * text to stdout. The flag basically swaps the functions of Return and Shift+Return hotkeys.
+ *
+ * This patch is not compatible with the multi-select patch.
+ *
  * https://tools.suckless.org/dmenu/patches/printinputtext/
  */
 #define PRINTINPUTTEXT_PATCH 0
