@@ -172,6 +172,12 @@
  */
 #define SCROLL_PATCH 0
 
+/* This patch allows the symbols, which are printed in dmenu to indicate that either the input
+ * is too long or there are too many options to be shown in dmenu in one line, to be defined.
+ * https://tools.suckless.org/dmenu/patches/symbols/
+ */
+#define SYMBOLS_PATCH 0
+
 /* This patch prevents dmenu from indenting items at the same level as the prompt length.
  * https://tools.suckless.org/dmenu/patches/vertfull/
  */

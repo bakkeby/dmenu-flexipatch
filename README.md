@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2020-08-08 - Added the symbols patch
+
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
 2020-06-13 - Added the pango patch
@@ -121,6 +123,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
    - [scroll](https://tools.suckless.org/dmenu/patches/scroll/)
       - this patch adds support for text scrolling
       - it doesn't append '...' for long input anymore as it can handle long text
+
+   - [symbols](https://tools.suckless.org/dmenu/patches/symbols/)
+      - allows the symbols, which are printed in dmenu to indicate that either the input is too long or there are too many options to be shown in dmenu in one line, to be defined
 
    - [vertfull](https://tools.suckless.org/dmenu/patches/vertfull/)
       - prevents dmenu from indenting items at the same level as the prompt length

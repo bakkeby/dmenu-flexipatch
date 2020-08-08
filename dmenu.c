@@ -175,7 +175,11 @@ calcoffsets(void)
 		n = lines * bh;
 		#endif // GRID_PATCH
 	else
+		#if SYMBOLS_PATCH
+		n = mw - (promptw + inputw + TEXTW(symbol_1) + TEXTW(symbol_2));
+		#else
 		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">"));
+		#endif // SYMBOLS_PATCH
 	/* calculate which items will begin the next page and previous page */
 	for (i = 0, next = curr; next; next = next->right)
 		#if PANGO_PATCH
@@ -398,16 +402,28 @@ drawmenu(void)
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right)
-			#if PANGO_PATCH
+			#if PANGO_PATCH && SYMBOLS_PATCH
+			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(symbol_2) - rpad));
+			#elif PANGO_PATCH
 			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(">") - rpad));
+			#elif SYMBOLS_PATCH
+			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(symbol_2) - rpad));
 			#else
 			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">") - rpad));
 			#endif // PANGO_PATCH
 		if (next) {
+			#if SYMBOLS_PATCH
+			w = TEXTW(symbol_2);
+			#else
 			w = TEXTW(">");
+			#endif // SYMBOLS_PATCH
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			#if PANGO_PATCH
+			#if PANGO_PATCH && SYMBOLS_PATCH
+			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, symbol_2, 0, True);
+			#elif PANGO_PATCH
 			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0, True);
+			#elif SYMBOLS_PATCH
+			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, symbol_2, 0);
 			#else
 			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0);
 			#endif // PANGO_PATCH

@@ -35,6 +35,10 @@ static const char *prompt      = NULL;      /* -p  option; prompt to the left of
 #if DYNAMIC_OPTIONS_PATCH
 static const char *dynamic     = NULL;      /* -dy option; dynamic command to run on input change */
 #endif // DYNAMIC_OPTIONS_PATCH
+#if SYMBOLS_PATCH
+static const char *symbol_1 = "<";
+static const char *symbol_2 = ">";
+#endif // SYMBOLS_PATCH
 
 #if ALPHA_PATCH
 static const unsigned int baralpha = 0xd0;
