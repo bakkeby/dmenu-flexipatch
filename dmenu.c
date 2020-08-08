@@ -17,8 +17,24 @@
 #include <X11/Xft/Xft.h>
 
 #include "patches.h"
+/* Patch incompatibility overrides */
+#if MULTI_SELECTION_PATCH
+#undef NON_BLOCKING_STDIN_PATCH
+#undef PIPEOUT_PATCH
+#undef JSON_PATCH
+#undef PRINTINPUTTEXT_PATCH
+#endif // MULTI_SELECTION_PATCH
+#if JSON_PATCH
+#undef NON_BLOCKING_STDIN_PATCH
+#undef PRINTINPUTTEXT_PATCH
+#undef PIPEOUT_PATCH
+#endif // JSON_PATCH
+
 #include "drw.h"
 #include "util.h"
+#if JSON_PATCH
+#include <jansson.h>
+#endif // JSON_PATCH
 
 /* macros */
 #define INTERSECT(x,y,w,h,r)  (MAX(0, MIN((x)+(w),(r).x_org+(r).width)  - MAX((x),(r).x_org)) \
@@ -67,13 +83,16 @@ struct item {
 	#if HIGHPRIORITY_PATCH
 	int hp;
 	#endif // HIGHPRIORITY_PATCH
+	#if JSON_PATCH
+	json_t *json;
+	#endif // JSON_PATCH
 	#if FUZZYMATCH_PATCH
 	double distance;
 	#endif // FUZZYMATCH_PATCH
 };
 
 static char text[BUFSIZ] = "";
-#if PIPEOUT_PATCH && !MULTI_SELECTION_PATCH
+#if PIPEOUT_PATCH
 static char pipeout[8] = " | dmenu";
 #endif // PIPEOUT_PATCH
 static char *embed;
@@ -102,7 +121,7 @@ static int managed = 0;
 static int *selid = NULL;
 static unsigned int selidsize = 0;
 #endif // MULTI_SELECTION_PATCH
-#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
+#if PRINTINPUTTEXT_PATCH
 static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
 #if PRESELECT_PATCH
@@ -536,6 +555,10 @@ match(void)
 	#if NON_BLOCKING_STDIN_PATCH
 	int preserve = 0;
 	#endif // NON_BLOCKING_STDIN_PATCH
+	#if JSON_PATCH
+	if (json)
+		fstrstr = strcasestr;
+	#endif // JSON_PATCH
 
 	strcpy(buf, text);
 	/* separate input text into tokens to be matched individually */
@@ -875,7 +898,10 @@ insert:
 	case XK_Return:
 	case XK_KP_Enter:
 		#if !MULTI_SELECTION_PATCH
-		#if PIPEOUT_PATCH
+		#if JSON_PATCH
+		if (!printjsonssel(ev->state))
+			break;
+		#elif PIPEOUT_PATCH
 		#if PRINTINPUTTEXT_PATCH
 		if (sel && (
 			(use_text_input && (ev->state & ShiftMask)) ||
@@ -1032,7 +1058,13 @@ static void
 readstdin(void)
 {
 	char buf[sizeof text], *p;
+	#if JSON_PATCH
+	size_t i;
+	unsigned int imax = 0;
+	struct item *item;
+	#else
 	size_t i, imax = 0, size = 0;
+	#endif // JSON_PATCH
 	unsigned int tmpmax = 0;
 
 	#if PASSWORD_PATCH
@@ -1044,15 +1076,26 @@ readstdin(void)
 
 	/* read each line from stdin and add it to the item list */
 	for (i = 0; fgets(buf, sizeof buf, stdin); i++)	{
+		#if JSON_PATCH
+		item = itemnew();
+		#else
 		if (i + 1 >= size / sizeof *items)
 			if (!(items = realloc(items, (size += BUFSIZ))))
 				die("cannot realloc %u bytes:", size);
+		#endif // JSON_PATCH
 		if ((p = strchr(buf, '\n')))
 			*p = '\0';
+		#if JSON_PATCH
+		if (!(item->text = strdup(buf)))
+		#else
 		if (!(items[i].text = strdup(buf)))
+		#endif // JSON_PATCH
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
+		#elif JSON_PATCH
+		item->json = NULL;
+		item->out = 0;
 		#else
 		items[i].out = 0;
 		#endif // items[i].out = 0;
@@ -1066,17 +1109,29 @@ readstdin(void)
 		#endif // PANGO_PATCH
 		if (tmpmax > inputw) {
 			inputw = tmpmax;
+			#if JSON_PATCH
+			imax = items_ln - 1;
+			#else
 			imax = i;
+			#endif // JSON_PATCH
 		}
 	}
 	if (items)
+		#if JSON_PATCH
+		items[items_ln].text = NULL;
+		#else
 		items[i].text = NULL;
+		#endif // JSON_PATCH
 	#if PANGO_PATCH
 	inputw = items ? TEXTWM(items[imax].text) : 0;
 	#else
 	inputw = items ? TEXTW(items[imax].text) : 0;
 	#endif // PANGO_PATCH
+	#if JSON_PATCH
+	lines = MIN(lines, items_ln);
+	#else
 	lines = MIN(lines, i);
+	#endif // JSON_PATCH
 }
 #endif // NON_BLOCKING_STDIN_PATCH
 
@@ -1388,7 +1443,7 @@ usage(void)
 		#if INSTANT_PATCH
 		"n"
 		#endif // INSTANT_PATCH
-		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
+		#if PRINTINPUTTEXT_PATCH
 		"t"
 		#endif // PRINTINPUTTEXT_PATCH
 		#if PREFIXCOMPLETION_PATCH
@@ -1412,9 +1467,12 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || JSON_PATCH
 		"\n            "
 		#endif
+		#if JSON_PATCH
+		" [ -j json-file]"
+		#endif // JSON_PATCH
 		#if DYNAMIC_OPTIONS_PATCH
 		" [ -dy command]"
 		#endif // DYNAMIC_OPTIONS_PATCH
@@ -1494,7 +1552,7 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-n")) { /* instant select only match */
 			instant = !instant;
 		#endif // INSTANT_PATCH
-		#if PRINTINPUTTEXT_PATCH && !MULTI_SELECTION_PATCH
+		#if PRINTINPUTTEXT_PATCH
 		} else if (!strcmp(argv[i], "-t")) { /* favors text input over selection */
 			use_text_input = 1;
 		#endif // PRINTINPUTTEXT_PATCH
@@ -1528,6 +1586,10 @@ main(int argc, char *argv[])
 				lines = 1;
 		}
 		#endif // GRID_PATCH
+		#if JSON_PATCH
+		else if (!strcmp(argv[i], "-j"))
+			readjson(argv[++i]);
+		#endif // JSON_PATCH
 		else if (!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
 			lines = atoi(argv[++i]);
 		#if XYW_PATCH
@@ -1662,19 +1724,39 @@ main(int argc, char *argv[])
 	#else
 	if (fast && !isatty(0)) {
 		grabkeyboard();
+		#if JSON_PATCH
+		if (json)
+			listjson(json);
 		#if DYNAMIC_OPTIONS_PATCH
+		else if (!(dynamic && *dynamic))
+			readstdin();
+		#else
+		else
+			readstdin();
+		#endif // DYNAMIC_OPTIONS_PATCH
+		#elif DYNAMIC_OPTIONS_PATCH
 		if (!(dynamic && *dynamic))
 			readstdin();
 		#else
 		readstdin();
-		#endif // DYNAMIC_OPTIONS_PATCH
+		#endif // JSON_PATCH | DYNAMIC_OPTIONS_PATCH
 	} else {
+		#if JSON_PATCH
+		if (json)
+			listjson(json);
 		#if DYNAMIC_OPTIONS_PATCH
+		else if (!(dynamic && *dynamic))
+			readstdin();
+		#else
+		else
+			readstdin();
+		#endif // DYNAMIC_OPTIONS_PATCH
+		#elif DYNAMIC_OPTIONS_PATCH
 		if (!(dynamic && *dynamic))
 			readstdin();
 		#else
 		readstdin();
-		#endif // DYNAMIC_OPTIONS_PATCH
+		#endif // JSON_PATCH | DYNAMIC_OPTIONS_PATCH
 		grabkeyboard();
 	}
 	#endif // NON_BLOCKING_STDIN_PATCH

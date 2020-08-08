@@ -18,6 +18,9 @@
 #if MULTI_SELECTION_PATCH
 #include "multiselect.c"
 #endif
+#if JSON_PATCH
+#include "json.c"
+#endif
 #if MOUSE_SUPPORT_PATCH
 #include "mousesupport.c"
 #endif

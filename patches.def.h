@@ -84,6 +84,19 @@
  */
 #define INSTANT_PATCH 0
 
+/* This patch adds basic support for json files.
+ * This patch depends on the jansson library. Uncomment the relevant line in config.mk when
+ * enabling this patch.
+ *
+ * This patch is not compatible with the multi-selection, printinputtext, pipeout and
+ * non-blocking stdin patches.
+ * The multi-selection patch takes precedence over this patch.
+ * This patch takes precedence over non-blocking stdin, pipeout and printintputtext patches.
+ *
+ * https://tools.suckless.org/dmenu/patches/json/
+ */
+#define JSON_PATCH 0
+
 /* This patch adds a '-h' option which sets the minimum height of a dmenu line. This helps
  * integrate dmenu with other UI elements that require a particular vertical size.
  * http://tools.suckless.org/dmenu/patches/line-height/
@@ -116,7 +129,8 @@
  * deselect any selected item.
  * Also refer to the dmenu_run replacement on the below URL that supports multiple selections.
  *
- * This patch is not compatible with the printinputtext and pipeout patches.
+ * This patch is not compatible with, and takes precedence over, the json, printinputtext,
+ * pipeout and non-blocking stdin patches.
  *
  * https://tools.suckless.org/dmenu/patches/multi-selection/
  */
@@ -131,6 +145,10 @@
  * from stdin and from X. This means that you can continue feeding dmenu while you type.
  * This patch is meant to be used along with the incremental patch, so that you can use stdout
  * to feed stdin.
+ *
+ * This patch is not compatible with the json and multi-selection patches, both of which takes
+ * precedence over this patch.
+ *
  * https://tools.suckless.org/dmenu/patches/non_blocking_stdin/
  */
 #define NON_BLOCKING_STDIN_PATCH 0
@@ -173,7 +191,8 @@
  * want to display the output of a command on the screen.
  * Only text starting with the character '#' is piped out by default.
  *
- * This patch is not compatible with the multi-select patch.
+ * This patch is not compatible with the json and multi-select patches, both of which takes
+ * precedence over this one.
  *
  * https://tools.suckless.org/dmenu/patches/pipeout/
  */
@@ -193,7 +212,8 @@
 /* This patch adds a flag (-t) which makes Return key to ignore selection and print the input
  * text to stdout. The flag basically swaps the functions of Return and Shift+Return hotkeys.
  *
- * This patch is not compatible with the multi-select patch.
+ * This patch is not compatible with the multi-select and json patches, both of which takes
+ * precedence over this one.
  *
  * https://tools.suckless.org/dmenu/patches/printinputtext/
  */

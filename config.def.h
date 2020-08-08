@@ -93,7 +93,7 @@ static int histnodup           = 1;	/* if 0, record repeated histories */
  * Characters not considered part of a word while deleting words
  * for example: " /?\"&[]"
  */
-#if PIPEOUT_PATCH && !MULTI_SELECTION_PATCH
+#if PIPEOUT_PATCH
 static const char startpipe[] = "#";
 #endif // PIPEOUT_PATCH
 static const char worddelimiters[] = " ";

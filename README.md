@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-08 - Added the symbols, managed, morecolor, multi-selection and preselect patches
+2020-08-08 - Added the json, symbols, managed, morecolor, multi-selection and preselect patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
@@ -80,6 +80,9 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [instant](https://tools.suckless.org/dmenu/patches/instant/)
       - adds a flag that will cause dmenu to select an item immediately if there is only one matching option left
+
+   - [json](https://tools.suckless.org/dmenu/patches/json/)
+      - adds basic support for json files
 
    - [line-height](http://tools.suckless.org/dmenu/patches/line-height/)
       - adds a '-h' option which sets the minimum height of a dmenu line
