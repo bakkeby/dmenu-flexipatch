@@ -15,7 +15,7 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
-2020-08-08 - Added the symbols and managed patches
+2020-08-08 - Added the symbols, managed and preselect patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
 
@@ -116,6 +116,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [prefix-completion](https://tools.suckless.org/dmenu/patches/prefix-completion/)
       - changes the behaviour of matched items and the Tab key to allow tab completion
+
+   - [preselect](https://tools.suckless.org/dmenu/patches/preselect/)
+      - adds an option `-ps` to preselect an item by providing the index that should be pre-selected
+ *
 
    - [printinputtext](https://tools.suckless.org/dmenu/patches/printinputtext/)
       - this patch adds a flag (-t) which makes Return key ignore selection and print the input text to stdout

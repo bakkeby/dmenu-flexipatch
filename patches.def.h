@@ -163,6 +163,12 @@
  */
 #define PREFIXCOMPLETION_PATCH 0
 
+/* This patch adds an option -ps to specify an item by providing the index that should be
+ * pre-selected.
+ * https://tools.suckless.org/dmenu/patches/preselect/
+ */
+#define PRESELECT_PATCH 0
+
 /* This patch adds a flag (-t) which makes Return key to ignore selection and print the input
  * text to stdout. The flag basically swaps the functions of Return and Shift+Return hotkeys.
  * https://tools.suckless.org/dmenu/patches/printinputtext/

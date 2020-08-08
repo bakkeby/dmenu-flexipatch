@@ -94,6 +94,9 @@ static int managed = 0;
 #if PRINTINPUTTEXT_PATCH
 static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
+#if PRESELECT_PATCH
+static unsigned int preselected = 0;
+#endif // PRESELECT_PATCH
 
 static Atom clip, utf8;
 #if WMTYPE_PATCH
@@ -1049,8 +1052,23 @@ run(void)
 #endif // NON_BLOCKING_STDIN_PATCH
 {
 	XEvent ev;
+	#if PRESELECT_PATCH
+	int i;
+	#endif // PRESELECT_PATCH
 
 	while (!XNextEvent(dpy, &ev)) {
+		#if PRESELECT_PATCH
+		if (preselected) {
+			for (i = 0; i < preselected; i++) {
+				if (sel && sel->right && (sel = sel->right) == next) {
+					curr = next;
+					calcoffsets();
+				}
+			}
+			drawmenu();
+			preselected = 0;
+		}
+		#endif // PRESELECT_PATCH
 		if (XFilterEvent(&ev, win))
 			continue;
 		switch(ev.type) {
@@ -1379,6 +1397,9 @@ usage(void)
 		#if LINE_HEIGHT_PATCH
 		" [-h height]"
 		#endif // LINE_HEIGHT_PATCH
+		#if PRESELECT_PATCH
+		" [-ps index]"
+		#endif // PRESELECT_PATCH
 		#if NAVHISTORY_PATCH
 		" [-H histfile]"
 		#endif // NAVHISTORY_PATCH
@@ -1529,6 +1550,10 @@ main(int argc, char *argv[])
 		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		#if PRESELECT_PATCH
+		else if (!strcmp(argv[i], "-ps"))   /* preselected item */
+			preselected = atoi(argv[++i]);
+		#endif // PRESELECT_PATCH
 		#if DYNAMIC_OPTIONS_PATCH
 		else if (!strcmp(argv[i], "-dy"))  /* dynamic command to run */
 			dynamic = argv[++i];
