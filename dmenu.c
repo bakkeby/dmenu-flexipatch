@@ -1222,9 +1222,6 @@ setup(void)
 		#else
 		scheme[j] = drw_scm_create(drw, (const char**)colors[j], 2);
 		#endif // ALPHA_PATCH
-	for (j = 0; j < SchemeOut; ++j)
-		for (i = 0; i < 2; ++i)
-			free(colors[j][i]);
 	#else
 	for (j = 0; j < SchemeLast; j++)
 		#if ALPHA_PATCH
@@ -1697,8 +1694,6 @@ main(int argc, char *argv[])
 	#else
 	if (!drw_fontset_create(drw, (const char**)fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
-
-	free(fonts[0]);
 	#endif // PANGO_PATCH
 	#elif PANGO_PATCH
 	if (!drw_font_create(drw, font))
