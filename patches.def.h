@@ -237,6 +237,16 @@
  */
 #define SYMBOLS_PATCH 0
 
+/* With this patch dmenu will split input lines at first tab character and only display first
+ * part, but it will perform matching on and output full lines as usual.
+ *
+ * This can be useful if you want to separate data and representation, for example, a music
+ * player wrapper can display only a track title to user, but still supply full filename to
+ * the underlying script.
+ * https://tools.suckless.org/dmenu/patches/tsv/
+ */
+#define TSV_PATCH 0
+
 /* This patch prevents dmenu from indenting items at the same level as the prompt length.
  * https://tools.suckless.org/dmenu/patches/vertfull/
  */

@@ -15,6 +15,8 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
 ### Changelog:
 
+2021-05-15 - Added the tsv patch
+
 2020-08-08 - Added the json, symbols, managed, morecolor, multi-selection and preselect patches
 
 2020-08-05 - Added the grid, highlight, highpriority, dynamic options and numbers patches
@@ -144,6 +146,10 @@ Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) 
 
    - [symbols](https://tools.suckless.org/dmenu/patches/symbols/)
       - allows the symbols, which are printed in dmenu to indicate that either the input is too long or there are too many options to be shown in dmenu in one line, to be defined
+
+   - [tsv](https://tools.suckless.org/dmenu/patches/tsv/)
+      - makes dmenu split input lines at first tab character and only display first part, but it will perform matching on and output full lines as usual
+      - can be useful if you want to separate data and representation
 
    - [vertfull](https://tools.suckless.org/dmenu/patches/vertfull/)
       - prevents dmenu from indenting items at the same level as the prompt length

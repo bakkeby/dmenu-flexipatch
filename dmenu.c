@@ -71,6 +71,9 @@ enum {
 
 struct item {
 	char *text;
+	#if TSV_PATCH
+	char *stext;
+	#endif // TSV_PATCH
 	struct item *left, *right;
 	#if NON_BLOCKING_STDIN_PATCH
 	struct item *next;
@@ -283,8 +286,18 @@ drawitem(struct item *item, int x, int y, int w)
 	else
 		drw_setscheme(drw, scheme[SchemeNorm]);
 
+	r = drw_text(drw, x, y, w, bh, lrpad / 2
+		#if TSV_PATCH
+		, item->stext
+		#else
+		, item->text
+		#endif // TSV_PATCH
+		, 0
+		#if PANGO_PATCH
+		, True
+		#endif // PANGO_PATCH
+		);
 	#if PANGO_PATCH
-	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0, True);
 	#else
 	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
 	#endif // PANGO_PATCH
@@ -304,7 +317,7 @@ drawmenu(void)
 	unsigned int curpos;
 	#endif // SCROLL_PATCH
 	struct item *item;
-	int x = 0, y = 0, w, rpad = 0;
+	int x = 0, y = 0, w, rpad = 0, itw = 0, stw = 0;
 	#if LINE_HEIGHT_PATCH && PANGO_PATCH
 	int fh = drw->font->h;
 	#elif LINE_HEIGHT_PATCH
@@ -448,16 +461,23 @@ drawmenu(void)
 			#endif // PANGO_PATCH
 		}
 		x += w;
-		for (item = curr; item != next; item = item->right)
-			#if PANGO_PATCH && SYMBOLS_PATCH
-			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(symbol_2) - rpad));
+		for (item = curr; item != next; item = item->right) {
+			#if PANGO_PATCH && TSV_PATCH
+			itw = TEXTWM(item->stext);
 			#elif PANGO_PATCH
-			x = drawitem(item, x, 0, MIN(TEXTWM(item->text), mw - x - TEXTW(">") - rpad));
-			#elif SYMBOLS_PATCH
-			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(symbol_2) - rpad));
+			itw = TEXTWM(item->text);
+			#elif TSV_PATCH
+			itw = TEXTW(item->stext);
 			#else
-			x = drawitem(item, x, 0, MIN(TEXTW(item->text), mw - x - TEXTW(">") - rpad));
-			#endif // PANGO_PATCH
+			itw = TEXTW(item->text);
+			#endif // PANGO_PATCH | TSV_PATCH
+			#if SYMBOLS_PATCH
+			stw = TEXTW(symbol_2);
+			#else
+			stw = TEXTW(">");
+			#endif // SYMBOLS_PATCH
+			x = drawitem(item, x, 0, MIN(itw, mw - x - stw - rpad));
+		}
 		if (next) {
 			#if SYMBOLS_PATCH
 			w = TEXTW(symbol_2);
@@ -1093,6 +1113,12 @@ readstdin(void)
 		if (!(items[i].text = strdup(buf)))
 		#endif // JSON_PATCH
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		#if TSV_PATCH
+		if ((p = strchr(buf, '\t')))
+			*p = '\0';
+		if (!(items[i].stext = strdup(buf)))
+			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		#endif // TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
 		#elif JSON_PATCH

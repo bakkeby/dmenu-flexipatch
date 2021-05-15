@@ -25,7 +25,7 @@ FREETYPEINC = /usr/include/freetype2
 #EXTRAFLAGS=-D_GNU_SOURCE
 
 # Uncomment this for the alpha patch / ALPHA_PATCH
-#XRENDER = -lXrender
+XRENDER = -lXrender
 
 # Uncomment for the pango patch / PANGO_PATCH
 #PANGOINC = `pkg-config --cflags xft pango pangoxft`
