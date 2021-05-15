@@ -67,7 +67,14 @@ printjsonssel(unsigned int state)
 			puts(json_string_value(sel->json));
 		}
 	} else {
+		#if PRINTINDEX_PATCH
+		if (print_index)
+			printf("%d\n", (sel && !(state & ShiftMask)) ? sel->index : -1);
+		else
+			puts((sel && !(state & ShiftMask)) ? sel->text : text);
+		#else
 		puts((sel && !(state & ShiftMask)) ? sel->text : text);
+		#endif // PRINTINDEX_PATCH
 	}
 	return 1;
 }

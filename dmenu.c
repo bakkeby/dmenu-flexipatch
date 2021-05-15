@@ -92,6 +92,9 @@ struct item {
 	#if FUZZYMATCH_PATCH
 	double distance;
 	#endif // FUZZYMATCH_PATCH
+	#if PRINTINDEX_PATCH
+	int index;
+	#endif // PRINTINDEX_PATCH
 };
 
 static char text[BUFSIZ] = "";
@@ -117,6 +120,9 @@ static struct item *items = NULL;
 static struct item *matches, *matchend;
 static struct item *prev, *curr, *next, *sel;
 static int mon = -1, screen;
+#if PRINTINDEX_PATCH
+static int print_index = 0;
+#endif // PRINTINDEX_PATCH
 #if MANAGED_PATCH
 static int managed = 0;
 #endif // MANAGED_PATCH
@@ -937,6 +943,11 @@ insert:
 				strncpy(sel->text + strlen(sel->text),pipeout,8);
 				puts(sel->text+1);
 			}
+			#if PRINTINDEX_PATCH
+			if (print_index)
+				printf("%d\n", sel->index);
+			else
+			#endif // PRINTINDEX_PATCH
 			puts(sel->text);
 		} else {
 			if (text[0] == startpipe[0]) {
@@ -948,11 +959,20 @@ insert:
 		#elif PRINTINPUTTEXT_PATCH
 		if (use_text_input)
 			puts((sel && (ev->state & ShiftMask)) ? sel->text : text);
+		#if PRINTINDEX_PATCH
+		else if (print_index)
+			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
+		#endif // PRINTINDEX_PATCH
+		else
+			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+		#elif PRINTINDEX_PATCH
+		if (print_index)
+			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
 		else
 			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
 		#else
 		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
-		#endif // PIPEOUT_PATCH
+		#endif // PIPEOUT_PATCH | PRINTINPUTTEXT_PATCH | PRINTINDEX_PATCH
 		#endif // MULTI_SELECTION_PATCH
 		if (!(ev->state & ControlMask)) {
 			#if NAVHISTORY_PATCH
@@ -1121,12 +1141,21 @@ readstdin(void)
 		#endif // TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
+		#if PRINTINDEX_PATCH
+		items[i].index = i;
+		#endif // PRINTINDEX_PATCH
 		#elif JSON_PATCH
 		item->json = NULL;
 		item->out = 0;
+		#if PRINTINDEX_PATCH
+		item->index = i;
+		#endif // PRINTINDEX_PATCH
+		#elif PRINTINDEX_PATCH
+		items[i].index = i;
 		#else
 		items[i].out = 0;
-		#endif // items[i].out = 0;
+		#endif // MULTI_SELECTION_PATCH | JSON_PATCH | PRINTINDEX_PATCH
+
 		#if HIGHPRIORITY_PATCH
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		#endif // HIGHPRIORITY_PATCH
@@ -1551,7 +1580,7 @@ main(int argc, char *argv[])
 		#if CENTER_PATCH
 		} else if (!strcmp(argv[i], "-c")) { /* toggles centering of dmenu window on screen */
 			center = !center;
-		#endif
+		#endif // CENTER_PATCH
 		#if !NON_BLOCKING_STDIN_PATCH
 		} else if (!strcmp(argv[i], "-f")) { /* grabs keyboard before reading stdin */
 			fast = 1;
@@ -1597,6 +1626,10 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-R")) { /* reject input which results in no match */
 			reject_no_match = 1;
 		#endif // REJECTNOMATCH_PATCH
+		#if PRINTINDEX_PATCH
+		} else if (!strcmp(argv[i], "-ix")) { /* adds ability to return index in list */
+			print_index = 1;
+		#endif // PRINTINDEX_PATCH
 		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */

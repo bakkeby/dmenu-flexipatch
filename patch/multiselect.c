@@ -12,9 +12,17 @@ printsel(unsigned int state)
 {
 	for (int i = 0;i < selidsize;i++)
 		if (selid[i] != -1 && (!sel || sel->id != selid[i]))
+			#if PRINTINDEX_PATCH
+			printf("%d\n", selid[i]);
+			#else
 			puts(items[selid[i]].text);
+			#endif // PRINTINDEX_PATCH
 	if (sel && !(state & ShiftMask))
+		#if PRINTINDEX_PATCH
+		printf("%d\n", sel->index);
+		#else
 		puts(sel->text);
+		#endif // PRINTINDEX_PATCH
 	else
 		puts(text);
 }

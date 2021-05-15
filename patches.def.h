@@ -209,6 +209,14 @@
  */
 #define PRESELECT_PATCH 0
 
+/* This patch allows dmenu to print out the 0-based index of matched text instead of the matched
+ * text itself. This can be useful in cases where you would like to select entries from one array
+ * of text but index into another, or when you are selecting from an ordered list of non-unique
+ * items.
+ * https://tools.suckless.org/dmenu/patches/printindex/
+ */
+#define PRINTINDEX_PATCH 0
+
 /* This patch adds a flag (-t) which makes Return key to ignore selection and print the input
  * text to stdout. The flag basically swaps the functions of Return and Shift+Return hotkeys.
  *
