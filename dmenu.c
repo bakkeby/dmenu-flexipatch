@@ -32,6 +32,9 @@
 
 #include "drw.h"
 #include "util.h"
+#if GRIDNAV_PATCH
+#include <stdbool.h>
+#endif // GRIDNAV_PATCH
 #if JSON_PATCH
 #include <jansson.h>
 #endif // JSON_PATCH
@@ -775,6 +778,11 @@ keypress(XKeyEvent *ev)
 	#endif // PREFIXCOMPLETION_PATCH
 	KeySym ksym;
 	Status status;
+	#if GRID_PATCH && GRIDNAV_PATCH
+	int i;
+	struct item *tmpsel;
+	bool offscreen = false;
+	#endif // GRIDNAV_PATCH
 
 	len = XmbLookupString(xic, ev, buf, sizeof buf, &ksym, &status);
 	switch (status) {
@@ -908,6 +916,26 @@ insert:
 		calcoffsets();
 		break;
 	case XK_Left:
+		#if GRID_PATCH && GRIDNAV_PATCH
+		if (columns > 1) {
+			if (!sel)
+				return;
+			tmpsel = sel;
+			for (i = 0; i < lines; i++) {
+				if (!tmpsel->left ||  tmpsel->left->right != tmpsel)
+					return;
+				if (tmpsel == curr)
+					offscreen = true;
+				tmpsel = tmpsel->left;
+			}
+			sel = tmpsel;
+			if (offscreen) {
+				curr = prev;
+				calcoffsets();
+			}
+			break;
+		}
+		#endif // GRIDNAV_PATCH
 		if (cursor > 0 && (!sel || !sel->left || lines > 0)) {
 			cursor = nextrune(-1);
 			break;
@@ -1005,6 +1033,26 @@ insert:
 		#endif // MULTI_SELECTION_PATCH
 		break;
 	case XK_Right:
+		#if GRID_PATCH && GRIDNAV_PATCH
+		if (columns > 1) {
+			if (!sel)
+				return;
+			tmpsel = sel;
+			for (i = 0; i < lines; i++) {
+				if (!tmpsel->right ||  tmpsel->right->left != tmpsel)
+					return;
+				tmpsel = tmpsel->right;
+				if (tmpsel == next)
+					offscreen = true;
+			}
+			sel = tmpsel;
+			if (offscreen) {
+				curr = next;
+				calcoffsets();
+			}
+			break;
+		}
+		#endif // GRIDNAV_PATCH
 		if (text[cursor] != '\0') {
 			cursor = nextrune(+1);
 			break;

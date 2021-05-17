@@ -26,7 +26,7 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
-2021-05-17 - Added the restrict return, no sort and plain-prompt (listfullwidth) patches
+2021-05-17 - Added the restrict return, no sort, gridnav and plain-prompt (listfullwidth) patches
 
 2021-05-15 - Added the tsv and printindex patches
 
@@ -91,6 +91,9 @@ dmenu, how to install it and how it works.
       - allows dmenu's entries to be rendered in a grid by adding a new `-g` flag to specify the
         number of grid columns
       - the `-g` and `-l` options can be used together to create a G columns * L lines grid
+
+   - [gridnav](https://tools.suckless.org/dmenu/patches/gridnav/)
+      - adds the ability to move left and right through a grid (when using the grid patch)
 
    - [highlight](https://tools.suckless.org/dmenu/patches/highlight/)
       - this patch highlights the individual characters of matched text for each dmenu list entry

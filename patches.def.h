@@ -57,6 +57,12 @@
  */
 #define GRID_PATCH 0
 
+/* This patch adds the ability to move left and right through a grid.
+ * This patch depends on the grid patch.
+ * https://tools.suckless.org/dmenu/patches/gridnav/
+ */
+#define GRIDNAV_PATCH 0
+
 /* This patch highlights the individual characters of matched text for each dmenu list entry.
  * The fuzzy highlight patch takes precedence over this patch.
  * https://tools.suckless.org/dmenu/patches/highlight/
