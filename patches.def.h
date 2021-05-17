@@ -141,6 +141,14 @@
  */
 #define NAVHISTORY_PATCH 0
 
+/* Adds the -S option to disable sorting menu items after matching. Useful, for example, when menu
+ * items are sorted by their frequency of use (using an external cache) and the most frequently
+ * selected items should always appear first regardless of how they were exact, prefix, or
+ * substring matches.
+ * https://tools.suckless.org/dmenu/patches/no-sort/
+ */
+#define NO_SORT_PATCH 0
+
 /* This is a patch to have dmenu read stdin in a non blocking way, making it wait for input both
  * from stdin and from X. This means that you can continue feeding dmenu while you type.
  * This patch is meant to be used along with the incremental patch, so that you can use stdout

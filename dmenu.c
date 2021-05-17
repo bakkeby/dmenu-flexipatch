@@ -130,6 +130,9 @@ static int managed = 0;
 static int *selid = NULL;
 static unsigned int selidsize = 0;
 #endif // MULTI_SELECTION_PATCH
+#if NO_SORT_PATCH
+static unsigned int sortmatches = 1;
+#endif // NO_SORT_PATCH
 #if PRINTINPUTTEXT_PATCH
 static int use_text_input = 0;
 #endif // PRINTINPUTTEXT_PATCH
@@ -631,6 +634,11 @@ match(void)
 		#else
 		/* exact matches go first, then prefixes, then substrings */
 		#endif // HIGHPRIORITY_PATCH
+		#if NO_SORT_PATCH
+		if (!sortmatches)
+ 			appenditem(item, &matches, &matchend);
+ 		else
+		#endif // NO_SORT_PATCH
 		if (!tokc || !fstrncmp(text, item->text, textsize))
 			appenditem(item, &matches, &matchend);
 		#if HIGHPRIORITY_PATCH
@@ -1513,6 +1521,9 @@ usage(void)
 		#if PASSWORD_PATCH
 		"P"
 		#endif // PASSWORD_PATCH
+		#if NO_SORT_PATCH
+		"S"
+		#endif // NO_SORT_PATCH
 		#if REJECTNOMATCH_PATCH
 		"R" // (changed from r to R due to conflict with INCREMENTAL_PATCH)
 		#endif // REJECTNOMATCH_PATCH
@@ -1633,6 +1644,10 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-R")) { /* reject input which results in no match */
 			reject_no_match = 1;
 		#endif // REJECTNOMATCH_PATCH
+		#if NO_SORT_PATCH
+		} else if (!strcmp(argv[i], "-S")) { /* do not sort matches */
+			sortmatches = 0;
+		#endif // NO_SORT_PATCH
 		#if PRINTINDEX_PATCH
 		} else if (!strcmp(argv[i], "-ix")) { /* adds ability to return index in list */
 			print_index = 1;

@@ -26,7 +26,7 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
-2021-05-17 - Added the restrict return patch
+2021-05-17 - Added the restrict return and no sort patches
 
 2021-05-15 - Added the tsv and printindex patches
 
@@ -136,6 +136,12 @@ dmenu, how to install it and how it works.
 
    - [navhistory](https://tools.suckless.org/dmenu/patches/navhistory/)
       - provides dmenu the ability for history navigation similar to that of bash
+
+   - [no-sort](https://tools.suckless.org/dmenu/patches/no-sort/)
+      - adds the -S option to disable sorting menu items after matching
+      - useful, for example, when menu items are sorted by their frequency of use (using an
+        external cache) and the most frequently selected items should always appear first regardless
+        of how they were exact, prefix, or substring matches
 
    - [non-blocking-stdin](https://tools.suckless.org/dmenu/patches/non_blocking_stdin/)
       - this is a patch to have dmenu read stdin in a non blocking way, making it wait for input
