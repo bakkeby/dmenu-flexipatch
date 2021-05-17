@@ -200,7 +200,7 @@ dmenu, how to install it and how it works.
 
    - [scroll](https://tools.suckless.org/dmenu/patches/scroll/)
       - this patch adds support for text scrolling
-      - it doesn't append '...' for long input anymore as it can handle long text
+      - it doesn't append `...` for long input anymore as it can handle long text
 
    - [symbols](https://tools.suckless.org/dmenu/patches/symbols/)
       - allows the symbols, which are printed in dmenu to indicate that either the input is too
