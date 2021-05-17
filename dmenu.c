@@ -925,6 +925,10 @@ insert:
 		break;
 	case XK_Return:
 	case XK_KP_Enter:
+		#if RESTRICT_RETURN_PATCH
+		if (restrict_return && (!sel || ev->state & (ShiftMask | ControlMask)))
+			break;
+		#endif // RESTRICT_RETURN_PATCH
 		#if !MULTI_SELECTION_PATCH
 		#if JSON_PATCH
 		if (!printjsonssel(ev->state))
@@ -1512,6 +1516,9 @@ usage(void)
 		#if REJECTNOMATCH_PATCH
 		"R" // (changed from r to R due to conflict with INCREMENTAL_PATCH)
 		#endif // REJECTNOMATCH_PATCH
+		#if RESTRICT_RETURN_PATCH
+		"1"
+		#endif // RESTRICT_RETURN_PATCH
 		"] "
 		#if MANAGED_PATCH
 		"[-wm] "
@@ -1630,6 +1637,10 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-ix")) { /* adds ability to return index in list */
 			print_index = 1;
 		#endif // PRINTINDEX_PATCH
+		#if RESTRICT_RETURN_PATCH
+		} else if (!strcmp(argv[i], "-1")) {
+			restrict_return = 1;
+		#endif // RESTRICT_RETURN_PATCH
 		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */

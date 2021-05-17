@@ -18,6 +18,9 @@ static int instant = 0;                     /* -n  option; if 1, selects matchin
 static int center = 1;                      /* -c  option; if 0, dmenu won't be centered on the screen */
 static int min_width = 500;                 /* minimum width when centered */
 #endif // CENTER_PATCH
+#if RESTRICT_RETURN_PATCH
+static int restrict_return = 0;             /* -1 option; if 1, disables shift-return and ctrl-return */
+#endif // RESTRICT_RETURN_PATCH
 /* -fn option overrides fonts[0]; default X11 font or font set */
 #if PANGO_PATCH
 static char font[] = "monospace 10";

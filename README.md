@@ -26,6 +26,8 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
+2021-05-17 - Added the restrict return patch
+
 2021-05-15 - Added the tsv and printindex patches
 
 2020-08-08 - Added the json, symbols, managed, morecolor, multi-selection and preselect patches
@@ -178,6 +180,10 @@ dmenu, how to install it and how it works.
    - [rejectnomatch](https://tools.suckless.org/dmenu/patches/reject-no-match/)
       - adds a new flag to dmenu with which text input will be rejected if it would result in no
         matching item
+
+   - [restrict-return](https://tools.suckless.org/dmenu/patches/restrict-return/)
+      - adds a '-1' option which disables Shift-Return and Ctrl-Return
+      - this guarantees that dmenu will only output one item, and that item was read from stdin
 
    - [scroll](https://tools.suckless.org/dmenu/patches/scroll/)
       - this patch adds support for text scrolling

@@ -233,6 +233,12 @@
  */
 #define REJECTNOMATCH_PATCH 0
 
+/* This patch adds a '-r' option which disables Shift-Return and Ctrl-Return.
+ * This guarantees that dmenu will only output one item, and that item was read from stdin.
+ * https://tools.suckless.org/dmenu/patches/restrict-return/
+ */
+#define RESTRICT_RETURN_PATCH 0
+
 /* This patch adds support for text scrolling and no longer appends '...' for long input as
  * it can handle long text.
  * https://tools.suckless.org/dmenu/patches/scroll/
