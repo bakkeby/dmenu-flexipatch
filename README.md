@@ -62,8 +62,8 @@ dmenu, how to install it and how it works.
       - adds a border around the dmenu window
 
    - [case-insensitive](http://tools.suckless.org/dmenu/patches/case-insensitive/)
-      - makes dmenu case-insensitive by default, replacing the case-insensitive \-i option with a
-        case sensitive \-s option
+      - makes dmenu case-insensitive by default, replacing the case-insensitive `-i` option with a
+        case sensitive `-s` option
 
    - [center](https://tools.suckless.org/dmenu/patches/center/)
       - this patch centers dmenu in the middle of the screen
@@ -116,7 +116,7 @@ dmenu, how to install it and how it works.
       - adds basic support for json files
 
    - [line-height](http://tools.suckless.org/dmenu/patches/line-height/)
-      - adds a '-h' option which sets the minimum height of a dmenu line
+      - adds a `-h` option which sets the minimum height of a dmenu line
       - this helps integrate dmenu with other UI elements that require a particular vertical size
 
    - [managed](https://tools.suckless.org/dmenu/patches/managed/)
@@ -141,7 +141,7 @@ dmenu, how to install it and how it works.
       - provides dmenu the ability for history navigation similar to that of bash
 
    - [no-sort](https://tools.suckless.org/dmenu/patches/no-sort/)
-      - adds the -S option to disable sorting menu items after matching
+      - adds the `-S` option to disable sorting menu items after matching
       - useful, for example, when menu items are sorted by their frequency of use (using an
         external cache) and the most frequently selected items should always appear first regardless
         of how they were exact, prefix, or substring matches
@@ -186,7 +186,7 @@ dmenu, how to install it and how it works.
         but index into another, or when you are selecting from an ordered list of non-unique items
 
    - [printinputtext](https://tools.suckless.org/dmenu/patches/printinputtext/)
-      - this patch adds a flag (-t) which makes Return key ignore selection and print the input
+      - this patch adds a flag `-t` which makes Return key ignore selection and print the input
         text to stdout
       - the flag basically swaps the functions of Return and Shift+Return hotkeys
 
@@ -195,7 +195,7 @@ dmenu, how to install it and how it works.
         matching item
 
    - [restrict-return](https://tools.suckless.org/dmenu/patches/restrict-return/)
-      - adds a '-1' option which disables Shift-Return and Ctrl-Return
+      - adds a `-1` option which disables Shift-Return and Ctrl-Return
       - this guarantees that dmenu will only output one item, and that item was read from stdin
 
    - [scroll](https://tools.suckless.org/dmenu/patches/scroll/)
