@@ -340,7 +340,9 @@ drawmenu(void)
 	drw_rect(drw, 0, 0, mw, mh, 1, 1);
 
 	if (prompt && *prompt) {
+		#if !PLAIN_PROMPT_PATCH
 		drw_setscheme(drw, scheme[SchemeSel]);
+		#endif // PLAIN_PROMPT_PATCH
 		#if PANGO_PATCH
 		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0, True);
 		#else

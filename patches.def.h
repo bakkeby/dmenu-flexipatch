@@ -206,6 +206,13 @@
  */
 #define PIPEOUT_PATCH 0
 
+/* Lifted from the listfullwidth patch this simple change just avoids colors for the prompt (with
+ * the -p option or in config.h) by making it use the same style as the rest of the input field.
+ * The rest of the listfullwidth patch is covered by the vertfull patch.
+ * https://tools.suckless.org/dmenu/patches/listfullwidth/
+ */
+#define PLAIN_PROMPT_PATCH 0
+
 /* This patch changes the behaviour of matched items and the Tab key to allow tab completion.
  * https://tools.suckless.org/dmenu/patches/prefix-completion/
  */

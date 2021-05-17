@@ -26,7 +26,7 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
-2021-05-17 - Added the restrict return and no sort patches
+2021-05-17 - Added the restrict return, no sort and plain-prompt (listfullwidth) patches
 
 2021-05-15 - Added the tsv and printindex patches
 
@@ -165,6 +165,10 @@ dmenu, how to install it and how it works.
    - [pipeout](https://tools.suckless.org/dmenu/patches/pipeout/)
       - this patch allows the selected text to be piped back out with dmenu
       - this can be useful if you want to display the output of a command on the screen
+
+   - [plain-prompt](https://tools.suckless.org/dmenu/patches/listfullwidth/)
+      - simple change that avoids colors for the prompt by making it use the same style as the
+        rest of the input field
 
    - [prefix-completion](https://tools.suckless.org/dmenu/patches/prefix-completion/)
       - changes the behaviour of matched items and the Tab key to allow tab completion
