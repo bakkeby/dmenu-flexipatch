@@ -828,6 +828,10 @@ keypress(XKeyEvent *ev)
 			break;
 		case XK_y: /* paste selection */
 		case XK_Y:
+		#if CTRL_V_TO_PASTE_PATCH
+		case XK_v:
+		case XK_V:
+		#endif // CTRL_V_TO_PASTE_PATCH
 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
 			                  utf8, utf8, win, CurrentTime);
 			return;

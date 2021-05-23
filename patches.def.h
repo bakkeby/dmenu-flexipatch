@@ -31,6 +31,11 @@
  */
 #define COLOR_EMOJI_PATCH 0
 
+/* Minor patch to enable the use of Ctrl+v (XA_PRIMARY) and Ctrl+Shift+v (CLIPBOARD) to paste.
+ * By default dmenu only supports Ctrl+y and Ctrl+Shift+y to paste.
+ */
+#define CTRL_V_TO_PASTE_PATCH 0
+
 /* This patch adds a flag (-dy) which makes dmenu run the command given to it whenever input
  * is changed with the current input as the last argument and update the option list according
  * to the output of that command.

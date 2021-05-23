@@ -26,6 +26,8 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
+2021-05-23 - Adding support for `ctrl+v` to paste
+
 2021-05-17 - Added the restrict return, no sort, gridnav and plain-prompt (listfullwidth) patches
 
 2021-05-15 - Added the tsv and printindex patches
