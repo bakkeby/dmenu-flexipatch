@@ -43,6 +43,15 @@
  */
 #define DYNAMIC_OPTIONS_PATCH 0
 
+/* This patch will allow for emojis on the left side with a colored background when selected.
+ * To test this try running:
+ *    $ echo -e ":b here\n:p there\n:r and here" | ./dmenu -p "Search..." -W 400 -l 20 -i -h -1
+ * NB: the original patch came embedded with the the xyw patch, the morecolors patch and the
+ * line height patch and as such is intended to be combined with these.
+ * https://tools.suckless.org/dmenu/patches/emoji-highlight/
+ */
+#define EMOJI_HIGHLIGHT_PATCH 0
+
 /* This patch make it so that fuzzy matches gets highlighted and is therefore meant
  * to be used together with the fuzzymatch patch.
  * https://tools.suckless.org/dmenu/patches/fuzzyhighlight/
@@ -259,8 +268,10 @@
  */
 #define REJECTNOMATCH_PATCH 0
 
-/* This patch adds a '-r' option which disables Shift-Return and Ctrl-Return.
+/* This patch adds a '-1' option which disables Shift-Return and Ctrl-Return.
  * This guarantees that dmenu will only output one item, and that item was read from stdin.
+ * The original patch used '-r'. This was changed to '-1' to avoid conflict with the incremental
+ * patch.
  * https://tools.suckless.org/dmenu/patches/restrict-return/
  */
 #define RESTRICT_RETURN_PATCH 0
@@ -304,6 +315,9 @@
  *    dmenu.foreground    : normal foreground color
  *    dmenu.selbackground : selected background color
  *    dmenu.selforeground : selected foreground color
+ *
+ * See patch/xresources.c for more color settings.
+ *
  * https://tools.suckless.org/dmenu/patches/xresources/
  */
 #define XRESOURCES_PATCH 0

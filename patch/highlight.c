@@ -1,20 +1,31 @@
 static void
+#if EMOJI_HIGHLIGHT_PATCH
+drawhighlights(struct item *item, char *output, int x, int y, int maxw)
+#else
 drawhighlights(struct item *item, int x, int y, int maxw)
+#endif // EMOJI_HIGHLIGHT_PATCH
 {
 	char restorechar, tokens[sizeof text], *highlight,  *token;
 	int indentx, highlightlen;
+	#if EMOJI_HIGHLIGHT_PATCH
+	char *itemtext = output;
+	#elif TSV_PATCH
+	char *itemtext = item->stext;
+	#else
+	char *itemtext = item->text;
+	#endif // TSV_PATCH
 
 	drw_setscheme(drw, scheme[item == sel ? SchemeSelHighlight : SchemeNormHighlight]);
 	strcpy(tokens, text);
 	for (token = strtok(tokens, " "); token; token = strtok(NULL, " ")) {
-		highlight = fstrstr(item->text, token);
+		highlight = fstrstr(itemtext, token);
 		while (highlight) {
 			// Move item str end, calc width for highlight indent, & restore
-			highlightlen = highlight - item->text;
+			highlightlen = highlight - itemtext;
 			restorechar = *highlight;
-			item->text[highlightlen] = '\0';
-			indentx = TEXTW(item->text);
-			item->text[highlightlen] = restorechar;
+			itemtext[highlightlen] = '\0';
+			indentx = TEXTW(itemtext);
+			itemtext[highlightlen] = restorechar;
 
 			// Move highlight str end, draw highlight, & restore
 			restorechar = highlight[strlen(token)];

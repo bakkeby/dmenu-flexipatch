@@ -1,17 +1,29 @@
 static void
+#if EMOJI_HIGHLIGHT_PATCH
+drawhighlights(struct item *item, char *output, int x, int y, int maxw)
+#else
 drawhighlights(struct item *item, int x, int y, int maxw)
+#endif // EMOJI_HIGHLIGHT_PATCH
 {
 	int i, indent;
 	char *highlight;
 	char c;
 
-	if (!(strlen(item->text) && strlen(text)))
+	#if EMOJI_HIGHLIGHT_PATCH
+	char *itemtext = output;
+	#elif TSV_PATCH
+	char *itemtext = item->stext;
+	#else
+	char *itemtext = item->text;
+	#endif // TSV_PATCH
+
+	if (!(strlen(itemtext) && strlen(text)))
 		return;
 
 	drw_setscheme(drw, scheme[item == sel
 	                   ? SchemeSelHighlight
 	                   : SchemeNormHighlight]);
-	for (i = 0, highlight = item->text; *highlight && text[i];) {
+	for (i = 0, highlight = itemtext; *highlight && text[i];) {
 		#if FUZZYMATCH_PATCH
 		if (!fstrncmp(&(*highlight), &text[i], 1))
 		#else
@@ -21,7 +33,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 			/* get indentation */
 			c = *highlight;
 			*highlight = '\0';
-			indent = TEXTW(item->text);
+			indent = TEXTW(itemtext);
 			*highlight = c;
 
 			/* highlight character */

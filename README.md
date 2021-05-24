@@ -26,7 +26,7 @@ dmenu, how to install it and how it works.
 
 ### Changelog:
 
-2021-05-23 - Adding support for `ctrl+v` to paste
+2021-05-23 - Adding support for `ctrl+v` to paste and adding emoji-highlight patch
 
 2021-05-17 - Added the restrict return, no sort, gridnav and plain-prompt (listfullwidth) patches
 
@@ -80,6 +80,9 @@ dmenu, how to install it and how it works.
       - adds a flag (`-dy`) which makes dmenu run the command given to it whenever input is changed
         with the current input as the last argument and update the option list according to the
         output of that command
+
+   - [emoji-highlight](https://tools.suckless.org/dmenu/patches/emoji-highlight/)
+      - this patch will allow for emojis on the left side with a colored background when selected
 
    - [fuzzyhighlight](https://tools.suckless.org/dmenu/patches/fuzzyhighlight/)
       - intended to be combined with the fuzzymatch patch, this makes it so that fuzzy matches are

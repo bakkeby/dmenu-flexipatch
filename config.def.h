@@ -57,12 +57,11 @@ static const unsigned int alphas[][3]      = {
 };
 #endif // ALPHA_PATCH
 
-#if XRESOURCES_PATCH
-static char *colors[][2] =
-#else
-static const char *colors[][2] =
+static
+#if !XRESOURCES_PATCH
+const
 #endif // XRESOURCES_PATCH
-{
+char *colors[][2] = {
 	/*               fg         bg       */
 	[SchemeNorm] = { "#bbbbbb", "#222222" },
 	[SchemeSel]  = { "#eeeeee", "#005577" },
@@ -77,6 +76,14 @@ static const char *colors[][2] =
 	#if HIGHPRIORITY_PATCH
 	[SchemeHp]   = { "#bbbbbb", "#333333" },
 	#endif // HIGHPRIORITY_PATCH
+	#if EMOJI_HIGHLIGHT_PATCH
+	[SchemeHover]  = { "#ffffff", "#353D4B" },
+	[SchemeGreen]  = { "#ffffff", "#52E067" },
+	[SchemeRed]    = { "#ffffff", "#e05252" },
+	[SchemeYellow] = { "#ffffff", "#e0c452" },
+	[SchemeBlue]   = { "#ffffff", "#5280e0" },
+	[SchemePurple] = { "#ffffff", "#9952e0" },
+	#endif // EMOJI_HIGHLIGHT_PATCH
 };
 /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
 static unsigned int lines      = 0;
@@ -86,6 +93,7 @@ static unsigned int columns    = 0;
 #endif // GRID_PATCH
 #if LINE_HEIGHT_PATCH
 static unsigned int lineheight = 0;         /* -h option; minimum height of a menu line     */
+static unsigned int min_lineheight = 8;
 #endif // LINE_HEIGHT_PATCH
 #if NAVHISTORY_PATCH
 static unsigned int maxhist    = 15;

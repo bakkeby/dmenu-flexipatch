@@ -69,6 +69,14 @@ enum {
 	#if HIGHPRIORITY_PATCH
 	SchemeHp,
 	#endif // HIGHPRIORITY_PATCH
+	#if EMOJI_HIGHLIGHT_PATCH
+	SchemeHover,
+	SchemeGreen,
+	SchemeYellow,
+	SchemeBlue,
+	SchemePurple,
+	SchemeRed,
+	#endif // EMOJI_HIGHLIGHT_PATCH
 	SchemeLast,
 }; /* color schemes */
 
@@ -142,6 +150,10 @@ static int use_text_input = 0;
 #if PRESELECT_PATCH
 static unsigned int preselected = 0;
 #endif // PRESELECT_PATCH
+#if EMOJI_HIGHLIGHT_PATCH
+static int commented = 0;
+static int animated = 0;
+#endif // EMOJI_HIGHLIGHT_PATCH
 
 static Atom clip, utf8;
 #if WMTYPE_PATCH
@@ -279,6 +291,118 @@ static int
 drawitem(struct item *item, int x, int y, int w)
 {
 	int r;
+	#if TSV_PATCH
+	char *text = item->stext;
+	#else
+	char *text = item->text;
+	#endif // TSV_PATCH
+
+	#if EMOJI_HIGHLIGHT_PATCH
+	int iscomment = 0;
+	if (text[0] == '>') {
+		if (text[1] == '>') {
+			iscomment = 3;
+			switch (text[2]) {
+			case 'r':
+				drw_setscheme(drw, scheme[SchemeRed]);
+				break;
+			case 'g':
+				drw_setscheme(drw, scheme[SchemeGreen]);
+				break;
+			case 'y':
+				drw_setscheme(drw, scheme[SchemeYellow]);
+				break;
+			case 'b':
+				drw_setscheme(drw, scheme[SchemeBlue]);
+				break;
+			case 'p':
+				drw_setscheme(drw, scheme[SchemePurple]);
+				break;
+			#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+			case 'h':
+				drw_setscheme(drw, scheme[SchemeNormHighlight]);
+				break;
+			#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+			case 's':
+				drw_setscheme(drw, scheme[SchemeSel]);
+				break;
+			default:
+				iscomment = 1;
+				drw_setscheme(drw, scheme[SchemeNorm]);
+			break;
+			}
+		} else {
+			drw_setscheme(drw, scheme[SchemeNorm]);
+			iscomment = 1;
+		}
+	} else if (text[0] == ':') {
+		iscomment = 2;
+		if (item == sel) {
+			switch (text[1]) {
+			case 'r':
+				drw_setscheme(drw, scheme[SchemeRed]);
+				break;
+			case 'g':
+				drw_setscheme(drw, scheme[SchemeGreen]);
+				break;
+			case 'y':
+				drw_setscheme(drw, scheme[SchemeYellow]);
+				break;
+			case 'b':
+				drw_setscheme(drw, scheme[SchemeBlue]);
+				break;
+			case 'p':
+				drw_setscheme(drw, scheme[SchemePurple]);
+				break;
+			#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+			case 'h':
+				drw_setscheme(drw, scheme[SchemeNormHighlight]);
+				break;
+			#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+			case 's':
+				drw_setscheme(drw, scheme[SchemeSel]);
+				break;
+			default:
+				drw_setscheme(drw, scheme[SchemeSel]);
+				iscomment = 0;
+				break;
+			}
+		} else {
+			drw_setscheme(drw, scheme[SchemeNorm]);
+		}
+	}
+	#endif // EMOJI_HIGHLIGHT_PATCH
+
+	#if EMOJI_HIGHLIGHT_PATCH
+	int temppadding = 0;
+	if (iscomment == 2) {
+		if (text[2] == ' ') {
+			temppadding = drw->fonts->h * 3;
+			animated = 1;
+			char dest[1000];
+			strcpy(dest, text);
+			dest[6] = '\0';
+			#if LINE_HEIGHT_PATCH
+			drw_text(drw, x, y, temppadding, MAX(lineheight, bh), temppadding / 2.6, dest + 3, 0);
+			#else
+			drw_text(drw, x, y, temppadding, bh, temppadding / 2.6, dest + 3, 0);
+			#endif // LINE_HEIGHT_PATCH
+			iscomment = 6;
+			drw_setscheme(drw, sel == item ? scheme[SchemeHover] : scheme[SchemeNorm]);
+		}
+	}
+
+	char *output;
+	if (commented) {
+		static char onestr[2];
+		onestr[0] = text[0];
+		onestr[1] = '\0';
+		output = onestr;
+	} else {
+		output = text;
+	}
+	#endif // EMOJI_HIGHLIGHT_PATCH
+
 	if (item == sel)
 		drw_setscheme(drw, scheme[SchemeSel]);
 	#if HIGHPRIORITY_PATCH
@@ -298,23 +422,36 @@ drawitem(struct item *item, int x, int y, int w)
 	else
 		drw_setscheme(drw, scheme[SchemeNorm]);
 
-	r = drw_text(drw, x, y, w, bh, lrpad / 2
-		#if TSV_PATCH
-		, item->stext
+	r = drw_text(drw
+		#if EMOJI_HIGHLIGHT_PATCH
+		, x + ((iscomment == 6) ? temppadding : 0)
 		#else
-		, item->text
-		#endif // TSV_PATCH
+		, x
+		#endif // EMOJI_HIGHLIGHT_PATCH
+		, y
+		, w
+		, bh
+		#if EMOJI_HIGHLIGHT_PATCH
+		, commented ? (bh - drw_fontset_getwidth(drw, output)) / 2 : lrpad / 2
+		#else
+		, lrpad / 2
+		#endif // EMOJI_HIGHLIGHT_PATCH
+		#if EMOJI_HIGHLIGHT_PATCH
+		, output + iscomment
+		#else
+		, text
+		#endif // EMOJI_HIGHLIGHT_PATCH
 		, 0
 		#if PANGO_PATCH
 		, True
 		#endif // PANGO_PATCH
 		);
-	#if PANGO_PATCH
-	#else
-	r = drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
-	#endif // PANGO_PATCH
 	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if EMOJI_HIGHLIGHT_PATCH
+	drawhighlights(item, output + iscomment, x + ((iscomment == 6) ? temppadding : 0), y, w);
+	#else
 	drawhighlights(item, x, y, w);
+	#endif // EMOJI_HIGHLIGHT_PATCH
 	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 	return r;
 }
@@ -1755,7 +1892,7 @@ main(int argc, char *argv[])
 		#if LINE_HEIGHT_PATCH
 		else if(!strcmp(argv[i], "-h")) { /* minimum height of one menu line */
 			lineheight = atoi(argv[++i]);
-			lineheight = MAX(lineheight,8); /* reasonable default in case of value too small/negative */
+			lineheight = MAX(lineheight, min_lineheight); /* reasonable default in case of value too small/negative */
 		}
 		#endif // LINE_HEIGHT_PATCH
 		else if (!strcmp(argv[i], "-nb"))  /* normal background color */
@@ -1846,6 +1983,11 @@ main(int argc, char *argv[])
 	#else
 	lrpad = drw->fonts->h;
 	#endif // PANGO_PATCH
+
+	#if LINE_HEIGHT_PATCH
+	if (lineheight == -1)
+		lineheight = drw->fonts->h * 2.5;
+	#endif // LINE_HEIGHT_PATCH
 
 #ifdef __OpenBSD__
 	if (pledge("stdio rpath", NULL) == -1)
