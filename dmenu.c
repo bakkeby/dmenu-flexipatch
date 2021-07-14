@@ -377,16 +377,29 @@ drawitem(struct item *item, int x, int y, int w)
 	int temppadding = 0;
 	if (iscomment == 2) {
 		if (text[2] == ' ') {
+			#if PANGO_PATCH
+			temppadding = drw->font->h * 3;
+			#else
 			temppadding = drw->fonts->h * 3;
+			#endif // PANGO_PATCH
 			animated = 1;
 			char dest[1000];
 			strcpy(dest, text);
 			dest[6] = '\0';
-			#if LINE_HEIGHT_PATCH
-			drw_text(drw, x, y, temppadding, MAX(lineheight, bh), temppadding / 2.6, dest + 3, 0);
-			#else
-			drw_text(drw, x, y, temppadding, bh, temppadding / 2.6, dest + 3, 0);
-			#endif // LINE_HEIGHT_PATCH
+			drw_text(drw, x, y
+				, temppadding
+				#if LINE_HEIGHT_PATCH
+				, MAX(lineheight, bh)
+				#else
+				, bh
+				#endif // LINE_HEIGHT_PATCH
+				, temppadding / 2.6
+				, dest + 3
+				, 0
+				#if PANGO_PATCH
+				, True
+				#endif // PANGO_PATCH
+			);
 			iscomment = 6;
 			drw_setscheme(drw, sel == item ? scheme[SchemeHover] : scheme[SchemeNorm]);
 		}
@@ -432,7 +445,7 @@ drawitem(struct item *item, int x, int y, int w)
 		, w
 		, bh
 		#if EMOJI_HIGHLIGHT_PATCH
-		, commented ? (bh - drw_fontset_getwidth(drw, output)) / 2 : lrpad / 2
+		, commented ? (bh - TEXTW(output) - lrpad) / 2 : lrpad / 2
 		#else
 		, lrpad / 2
 		#endif // EMOJI_HIGHLIGHT_PATCH
@@ -483,11 +496,11 @@ drawmenu(void)
 		#if !PLAIN_PROMPT_PATCH
 		drw_setscheme(drw, scheme[SchemeSel]);
 		#endif // PLAIN_PROMPT_PATCH
-		#if PANGO_PATCH
-		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0, True);
-		#else
-		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0);
-		#endif // PANGO_PATCH
+		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0
+			#if PANGO_PATCH
+			, True
+			#endif // PANGO_PATCH
+		);
 	}
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
@@ -495,8 +508,8 @@ drawmenu(void)
 	#if SCROLL_PATCH
 	w -= lrpad / 2;
 	x += lrpad / 2;
-	rcurlen = drw_fontset_getwidth(drw, text + cursor);
-	curlen = drw_fontset_getwidth(drw, text) - rcurlen;
+	rcurlen = TEXTW(text + cursor) - lrpad;
+	curlen = TEXTW(text) - lrpad - rcurlen;
 	curpos += curlen - oldcurlen;
 	curpos = MIN(w, MAX(0, curpos));
 	curpos = MAX(curpos, w - rcurlen);
@@ -530,22 +543,29 @@ drawmenu(void)
 	if (passwd) {
 		censort = ecalloc(1, sizeof(text));
 		memset(censort, '.', strlen(text));
-		#if PANGO_PATCH
-		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0, False);
-		#else
-		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0);
-		#endif // PANGO_PATCH
+		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0
+			#if PANGO_PATCH
+			, False
+			#endif // PANGO_PATCH
+		);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, censort, 0
+			#if PANGO_PATCH
+			, False
+			#endif // PANGO_PATCH
+		);
 		free(censort);
 	} else
-		#if PANGO_PATCH
-		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0, False);
-		#else
-		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
-		#endif // PANGO_PATCH
-	#elif PANGO_PATCH
-	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0, False);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0
+			#if PANGO_PATCH
+			, False
+			#endif // PANGO_PATCH
+		);
 	#else
-	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
+	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0
+		#if PANGO_PATCH
+		, False
+		#endif // PANGO_PATCH
+	);
 	#endif // PASSWORD_PATCH
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
@@ -605,11 +625,11 @@ drawmenu(void)
 		w = TEXTW("<");
 		if (curr->left) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			#if PANGO_PATCH
-			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0, True);
-			#else
-			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0);
-			#endif // PANGO_PATCH
+			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0
+				#if PANGO_PATCH
+				, True
+				#endif // PANGO_PATCH
+			);
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right) {
@@ -636,15 +656,17 @@ drawmenu(void)
 			w = TEXTW(">");
 			#endif // SYMBOLS_PATCH
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			#if PANGO_PATCH && SYMBOLS_PATCH
-			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, symbol_2, 0, True);
-			#elif PANGO_PATCH
-			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0, True);
-			#elif SYMBOLS_PATCH
-			drw_text(drw, mw - w, 0, w, bh, lrpad / 2, symbol_2, 0);
-			#else
-			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2, ">", 0);
-			#endif // PANGO_PATCH
+			drw_text(drw, mw - w - rpad, 0, w, bh, lrpad / 2
+				#if SYMBOLS_PATCH
+				, symbol_2
+				#else
+				, ">"
+				#endif // SYMBOLS_PATCH
+				, 0
+				#if PANGO_PATCH
+				, True
+				#endif // PANGO_PATCH
+			);
 		}
 	}
 	#if NUMBERS_PATCH
@@ -1986,7 +2008,11 @@ main(int argc, char *argv[])
 
 	#if LINE_HEIGHT_PATCH
 	if (lineheight == -1)
+		#if PANGO_PATCH
+		lineheight = drw->font->h * 2.5;
+		#else
 		lineheight = drw->fonts->h * 2.5;
+		#endif // PANGO_PATCH
 	#endif // LINE_HEIGHT_PATCH
 
 #ifdef __OpenBSD__
