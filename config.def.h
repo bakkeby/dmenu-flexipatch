@@ -3,7 +3,7 @@
 
 static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom */
 #if ALPHA_PATCH
-static double opacity = 1.0;                /* -o  option; defines alpha translucency */
+static int opacity = 1;                     /* -o  option; if 0, then alpha is disabled */
 #endif // ALPHA_PATCH
 #if FUZZYMATCH_PATCH
 static int fuzzy = 1;                       /* -F  option; if 0, dmenu doesn't use fuzzy matching */

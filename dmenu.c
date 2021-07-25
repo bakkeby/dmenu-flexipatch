@@ -1312,7 +1312,7 @@ xinitvisual()
 
 	XFree(infos);
 
-	if (! visual) {
+	if (!visual || !opacity) {
 		visual = DefaultVisual(dpy, screen);
 		depth = DefaultDepth(dpy, screen);
 		cmap = DefaultColormap(dpy, screen);
@@ -1641,22 +1641,22 @@ setup(void)
 	swa.background_pixel = scheme[SchemeNorm][ColBg].pixel;
 	#endif // ALPHA_PATCH
 	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask
-	#if MOUSE_SUPPORT_PATCH
-	| ButtonPressMask
-	#endif // MOUSE_SUPPORT_PATCH
+		#if MOUSE_SUPPORT_PATCH
+		| ButtonPressMask
+		#endif // MOUSE_SUPPORT_PATCH
 	;
 	#if BORDER_PATCH
 	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, border_width,
 	#else
 	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, 0,
 	#endif // BORDER_PATCH
-						#if ALPHA_PATCH
-	                    depth, InputOutput, visual,
-	                    CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa
-						#else
-	                    CopyFromParent, CopyFromParent, CopyFromParent,
-	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa
-						#endif // ALPHA_PATCH
+		#if ALPHA_PATCH
+		depth, InputOutput, visual,
+		CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa
+		#else
+		CopyFromParent, CopyFromParent, CopyFromParent,
+		CWOverrideRedirect | CWBackPixel | CWEventMask, &swa
+		#endif // ALPHA_PATCH
 	);
 	#if BORDER_PATCH
 	if (border_width)
@@ -1900,8 +1900,8 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);
 		#if ALPHA_PATCH
-		else if (!strcmp(argv[i], "-o"))  /* opacity */
-			opacity = atof(argv[++i]);
+		else if (!strcmp(argv[i], "-o"))  /* opacity, pass -o 0 to disable alpha */
+			opacity = atoi(argv[++i]);
 		#endif // ALPHA_PATCH
 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
 			prompt = argv[++i];
