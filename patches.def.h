@@ -3,6 +3,7 @@
 /* The alpha patch adds transparency for the dmenu window.
  * You need to uncomment the corresponding line in config.mk to use the -lXrender library
  * when including this patch.
+ * https://github.com/bakkeby/patches/blob/master/dmenu/dmenu-alpha-5.0_20210725_523aa08.diff
  */
 #define ALPHA_PATCH 0
 

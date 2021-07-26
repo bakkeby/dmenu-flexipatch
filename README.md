@@ -57,7 +57,7 @@ dmenu, how to install it and how it works.
 
 ### Patches included:
 
-   - [alpha](https://github.com/bakkeby/patches/blob/master/dmenu/dmenu-alpha-4.9_20190303_190303.diff)
+   - [alpha](https://github.com/bakkeby/patches/blob/master/dmenu/dmenu-alpha-5.0_20210725_523aa08.diff)
       - adds transparency for the dmenu window
 
    - [border](http://tools.suckless.org/dmenu/patches/border/)
