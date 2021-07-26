@@ -1,103 +1,126 @@
 static char *histfile;
-static char *histbuf, *histptr;
-static size_t histsz;
+static char **history;
+static size_t histsz, histpos;
 
 static void
 loadhistory(void)
 {
 	FILE *fp = NULL;
-	size_t sz;
+	static size_t cap = 0;
+	size_t llen;
+	char *line;
 
-	if (!histfile)
+	if (!histfile) {
 		return;
-	if (!(fp = fopen(histfile, "r")))
-		return;
-	fseek(fp, 0, SEEK_END);
-	sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	if (sz) {
-		histsz = sz + 1 + BUFSIZ;
-		if (!(histbuf = malloc(histsz))) {
-			fprintf(stderr, "warning: cannot malloc %lu "\
-				"bytes", histsz);
-		} else {
-			histptr = histbuf + fread(histbuf, 1, sz, fp);
-			if (histptr <= histbuf) { /* fread error */
-				free(histbuf);
-				histbuf = NULL;
-				return;
-			}
-			if (histptr[-1] != '\n')
-				*histptr++ = '\n';
-			histptr[BUFSIZ - 1] = '\0';
-			*histptr = '\0';
-			histsz = histptr - histbuf + BUFSIZ;
-		}
 	}
-	fclose(fp);
+
+	fp = fopen(histfile, "r");
+	if (!fp) {
+		return;
+	}
+
+	for (;;) {
+		line = NULL;
+		llen = 0;
+		if (-1 == getline(&line, &llen, fp)) {
+			if (ferror(fp)) {
+				die("failed to read history");
+			}
+			free(line);
+			break;
+		}
+
+		if (cap == histsz) {
+			cap += 64 * sizeof(char*);
+			history = realloc(history, cap);
+			if (!history) {
+				die("failed to realloc memory");
+			}
+		}
+		strtok(line, "\n");
+		history[histsz] = line;
+		histsz++;
+	}
+	histpos = histsz;
+
+	if (fclose(fp)) {
+		die("failed to close file %s", histfile);
+	}
 }
 
 static void
 navhistory(int dir)
 {
-	char *p;
-	size_t len = 0, textlen;
+	static char def[BUFSIZ];
+	char *p = NULL;
+	size_t len = 0;
 
-	if (!histbuf)
+	if (!history || histpos + 1 == 0)
 		return;
-	if (dir > 0) {
-		if (histptr == histbuf + histsz - BUFSIZ)
-			return;
-		while (*histptr && *histptr++ != '\n');
-		for (p = histptr; *p && *p++ != '\n'; len++);
-	} else {
-		if (histptr == histbuf)
-			return;
-		if (histptr == histbuf + histsz - BUFSIZ) {
-			textlen = strlen(text);
-			textlen = MIN(textlen, BUFSIZ - 1);
-			strncpy(histptr, text, textlen);
-			histptr[textlen] = '\0';
-		}
-		for (histptr--; histptr != histbuf && histptr[-1] != '\n';
-		     histptr--, len++);
+
+	if (histsz == histpos) {
+		strncpy(def, text, sizeof(def));
 	}
-	len = MIN(len, BUFSIZ - 1);
-	strncpy(text, histptr, len);
+
+	switch(dir) {
+	case 1:
+		if (histpos < histsz - 1) {
+			p = history[++histpos];
+		} else if (histpos == histsz - 1) {
+			p = def;
+			histpos++;
+		}
+		break;
+	case -1:
+		if (histpos > 0) {
+			p = history[--histpos];
+		}
+		break;
+	}
+	if (p == NULL) {
+		return;
+	}
+
+	len = MIN(strlen(p), BUFSIZ - 1);
+	strncpy(text, p, len);
 	text[len] = '\0';
 	cursor = len;
 	match();
 }
 
 static void
-savehistory(char *str)
+savehistory(char *input)
 {
-	unsigned int n = 0, len = 0;
-	size_t slen;
-	char *p;
+	unsigned int i;
 	FILE *fp;
 
-	if (!histfile || !maxhist)
-		return;
-	if (!(slen = strlen(str)))
-		return;
-	if (histbuf && maxhist > 1) {
-		p = histbuf + histsz - BUFSIZ - 1; /* skip the last newline */
-		if (histnodup) {
-			for (; p != histbuf && p[-1] != '\n'; p--, len++);
-			n++;
-			if (slen == len && !strncmp(p, str, len)) {
-				return;
-			}
-		}
-		for (; p != histbuf; p--, len++)
-			if (p[-1] == '\n' && ++n + 1 > maxhist)
-				break;
-		fp = fopen(histfile, "w");
-		fwrite(p, 1, len + 1, fp);	/* plus the last newline */
-	} else {
-		fp = fopen(histfile, "w");
+	if (!histfile ||
+	    0 == maxhist ||
+	    0 == strlen(input)) {
+		goto out;
 	}
-	fwrite(str, 1, strlen(str), fp);
-	fclose(fp);
+
+	fp = fopen(histfile, "w");
+	if (!fp) {
+		die("failed to open %s", histfile);
+	}
+	for (i = histsz < maxhist ? 0 : histsz - maxhist; i < histsz; i++) {
+		if (0 >= fprintf(fp, "%s\n", history[i])) {
+			die("failed to write to %s", histfile);
+		}
+	}
+	if (histsz == 0 || !histnodup || (histsz > 0 && strcmp(input, history[histsz-1]) != 0)) { /* TODO */
+		if (0 >= fputs(input, fp)) {
+			die("failed to write to %s", histfile);
+		}
+	}
+	if (fclose(fp)) {
+		die("failed to close file %s", histfile);
+	}
+
+out:
+	for (i = 0; i < histsz; i++) {
+		free(history[i]);
+	}
+	free(history);
 }

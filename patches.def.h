@@ -158,6 +158,10 @@
 #define MULTI_SELECTION_PATCH 0
 
 /* This patch provides dmenu the ability for history navigation similar to that of bash.
+ *
+ * If you take this patch then it is recommended that you also uncomment the line in the
+ * dmenu_run script which replaces the exec command.
+ *
  * https://tools.suckless.org/dmenu/patches/navhistory/
  */
 #define NAVHISTORY_PATCH 0

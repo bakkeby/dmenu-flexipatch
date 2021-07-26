@@ -1027,8 +1027,14 @@ keypress(XKeyEvent *ev)
 		case XK_k: ksym = XK_Prior; break;
 		case XK_l: ksym = XK_Down;  break;
 		#if NAVHISTORY_PATCH
-		case XK_p: navhistory(-1); buf[0]=0; break;
-		case XK_n: navhistory(1); buf[0]=0; break;
+		case XK_p:
+			navhistory(-1);
+			buf[0]=0;
+			break;
+		case XK_n:
+			navhistory(1);
+			buf[0]=0;
+			break;
 		#endif // NAVHISTORY_PATCH
 		default:
 			return;
