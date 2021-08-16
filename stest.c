@@ -84,7 +84,7 @@ main(int argc, char *argv[])
 	if (!argc) {
 		/* read list from stdin */
 		while ((n = getline(&line, &linesiz, stdin)) > 0) {
-			if (n && line[n - 1] == '\n')
+			if (line[n - 1] == '\n')
 				line[n - 1] = '\0';
 			test(line, line);
 		}
