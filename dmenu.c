@@ -1670,7 +1670,7 @@ setup(void)
 		#endif // MOUSE_SUPPORT_PATCH
 	;
 	#if BORDER_PATCH
-	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, border_width,
+	win = XCreateWindow(dpy, parentwin, x, y - (topbar ? 0 : border_width * 2), mw - border_width * 2, mh, border_width,
 	#else
 	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, 0,
 	#endif // BORDER_PATCH
