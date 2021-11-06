@@ -127,7 +127,11 @@ static int lrpad; /* sum of left and right padding */
 static int reject_no_match = 0;
 #endif // REJECTNOMATCH_PATCH
 static size_t cursor;
+#if NAVHISTORY_PATCH && NAVHISTORY_SEARCH_PATCH
+static struct item *items = NULL, *backup_items;
+#else
 static struct item *items = NULL;
+#endif // NAVHISTORY_SEARCH_PATCH
 static struct item *matches, *matchend;
 static struct item *prev, *curr, *next, *sel;
 static int mon = -1, screen;
@@ -932,6 +936,9 @@ keypress(XKeyEvent *ev)
 {
 	char buf[32];
 	int len;
+	#if NAVHISTORY_PATCH && NAVHISTORY_SEARCH_PATCH
+	int j;
+	#endif // NAVHISTORY_SEARCH_PATCH
 	#if PREFIXCOMPLETION_PATCH
 	struct item * item;
 	#endif // PREFIXCOMPLETION_PATCH
@@ -994,6 +1001,23 @@ keypress(XKeyEvent *ev)
 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
 			                  utf8, utf8, win, CurrentTime);
 			return;
+		#if NAVHISTORY_PATCH && NAVHISTORY_SEARCH_PATCH
+		case XK_r:
+			if (histfile) {
+				if (!backup_items) {
+					backup_items = items;
+					items = calloc(histsz + 1, sizeof(struct item));
+					if (!items)
+						die("cannot allocate memory");
+					for (j = 0; j < histsz; j++)
+						items[j].text = history[j];
+				} else {
+					free(items);
+					items = backup_items;
+					backup_items = NULL;
+				}
+			}
+		#endif // NAVHISTORY_SEARCH_PATCH
 		case XK_Left:
 		case XK_KP_Left:
 			movewordedge(-1);
@@ -2118,3 +2142,4 @@ main(int argc, char *argv[])
 
 	return 1; /* unreachable */
 }
+

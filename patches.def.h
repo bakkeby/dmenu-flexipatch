@@ -166,6 +166,13 @@
  */
 #define NAVHISTORY_PATCH 0
 
+/* This patch extends NAVHISTORY_PATCH with history-search functionality, replacing program
+ * suggestions with previously issued commands stored in history.
+ * This variant depends on NAVHISTORY_PATCH being enabled.
+ * https://tools.suckless.org/dmenu/patches/navhistory/
+ */
+#define NAVHISTORY_SEARCH_PATCH 0
+
 /* Adds the -S option to disable sorting menu items after matching. Useful, for example, when menu
  * items are sorted by their frequency of use (using an external cache) and the most frequently
  * selected items should always appear first regardless of how they were exact, prefix, or
@@ -332,3 +339,4 @@
  * https://tools.suckless.org/dmenu/patches/xyw/
  */
 #define XYW_PATCH 0
+
