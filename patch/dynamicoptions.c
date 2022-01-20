@@ -33,6 +33,12 @@ readstream(FILE* stream)
 			*p = '\0';
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		#if TSV_PATCH
+		if ((p = strchr(buf, '\t')))
+			*p = '\0';
+		if (!(items[i].stext = strdup(buf)))
+			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		#endif // TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i;
 		#else
