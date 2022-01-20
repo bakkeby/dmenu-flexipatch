@@ -57,6 +57,11 @@ readstream(FILE* stream)
 			imax = i;
 		}
 	}
+
+	/* If the command did not give any output at all, then do not clear the existing items */
+	if (!i)
+		return;
+
 	if (items)
 		items[i].text = NULL;
 	#if PANGO_PATCH
@@ -66,4 +71,8 @@ readstream(FILE* stream)
 	#endif // PANGO_PATCH
 	if (!dynamic || !*dynamic)
 		lines = MIN(lines, i);
+	else {
+		text[0] = '\0';
+		cursor = 0;
+	}
 }

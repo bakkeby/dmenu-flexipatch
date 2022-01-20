@@ -36,7 +36,7 @@ fuzzymatch(void)
 			for (i = 0; i < itext_len && (c = it->text[i]); i++) {
 				/* fuzzy match pattern */
 				if (!fstrncmp(&text[pidx], &c, 1)) {
-					if(sidx == -1)
+					if (sidx == -1)
 						sidx = i;
 					pidx++;
 					if (pidx == text_len) {
