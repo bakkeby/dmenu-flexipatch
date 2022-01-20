@@ -33,7 +33,11 @@ readstream(FILE* stream)
 			*p = '\0';
 		if (!(items[i].text = strdup(buf)))
 			die("cannot strdup %u bytes:", strlen(buf) + 1);
+		#if MULTI_SELECTION_PATCH
+		items[i].id = i;
+		#else
 		items[i].out = 0;
+		#endif // MULTI_SELECTION_PATCH
 		#if HIGHPRIORITY_PATCH
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		#endif // HIGHPRIORITY_PATCH
