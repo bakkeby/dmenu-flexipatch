@@ -1,5 +1,5 @@
-Similar to [dwm-flexipatch](https://github.com/bakkeby/dwm-flexipatch) this dmenu 5.0 (d78ff08,
-2021-08-20) project has a different take on patching. It uses preprocessor directives to decide
+Similar to [dwm-flexipatch](https://github.com/bakkeby/dwm-flexipatch) this dmenu 5.1 (3a505ce,
+2022-03-01) project has a different take on patching. It uses preprocessor directives to decide
 whether or not to include a patch during build time. Essentially this means that this build, for
 better or worse, contains both the patched _and_ the original code. The aim being that you can
 select which patches to include and the build will contain that code and nothing more.
@@ -25,6 +25,8 @@ dmenu, how to install it and how it works.
 ---
 
 ### Changelog:
+
+2022-03-02 - Bump to 5.1
 
 2021-05-23 - Adding support for `ctrl+v` to paste and adding emoji-highlight patch
 
