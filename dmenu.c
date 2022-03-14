@@ -1007,6 +1007,10 @@ keypress(XKeyEvent *ev)
 			goto draw;
 		case XK_Return:
 		case XK_KP_Enter:
+			#if RESTRICT_RETURN_PATCH
+			if (restrict_return)
+				break;
+			#endif // RESTRICT_RETURN_PATCH
 			#if MULTI_SELECTION_PATCH
 			selsel();
 			#endif // MULTI_SELECTION_PATCH
