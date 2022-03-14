@@ -23,7 +23,10 @@ fuzzymatch(void)
 	char c;
 	int number_of_matches = 0, i, pidx, sidx, eidx;
 	int text_len = strlen(text), itext_len;
-
+	#if HIGHPRIORITY_PATCH
+	struct item *lhpprefix, *hpprefixend;
+	lhpprefix = hpprefixend = NULL;
+	#endif // HIGHPRIORITY_PATCH
 	matches = matchend = NULL;
 
 	/* walk through all items */
@@ -77,10 +80,27 @@ fuzzymatch(void)
 		matches = matchend = NULL;
 		for (i = 0, it = fuzzymatches[i];  i < number_of_matches && it && \
 				it->text; i++, it = fuzzymatches[i]) {
+			#if HIGHPRIORITY_PATCH
+			#if NO_SORT_PATCH
+			if (sortmatches && it->hp)
+			#else
+			if (it->hp)
+			#endif // NO_SORT_PATCH
+				appenditem(it, &lhpprefix, &hpprefixend);
+			else
+				appenditem(it, &matches, &matchend);
+			#else
 			appenditem(it, &matches, &matchend);
+			#endif // HIGHPRIORITY_PATCH
 		}
 		free(fuzzymatches);
 	}
+	#if HIGHPRIORITY_PATCH
+	if (lhpprefix) {
+		hpprefixend->right = matches;
+		matches = lhpprefix;
+	}
+	#endif // HIGHPRIORITY_PATCH
 	curr = sel = matches;
 	calcoffsets();
 }
