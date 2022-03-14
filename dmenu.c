@@ -59,6 +59,9 @@ enum {
 	SchemeNorm,
 	SchemeSel,
 	SchemeOut,
+	#if BORDER_PATCH
+	SchemeBorder,
+	#endif // BORDER_PATCH
 	#if MORECOLOR_PATCH
 	SchemeMid,
 	#endif // MORECOLOR_PATCH
@@ -1684,7 +1687,7 @@ setup(void)
 	);
 	#if BORDER_PATCH
 	if (border_width)
-		XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
+		XSetWindowBorder(dpy, win, scheme[SchemeBorder][ColBg].pixel);
 	#endif // BORDER_PATCH
 	XSetClassHint(dpy, win, &ch);
 	#if WMTYPE_PATCH

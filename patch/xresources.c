@@ -39,6 +39,10 @@ readxresources(void)
 		if (XrmGetResource(xdb, "dmenu.midforeground", "*", &type, &xval))
 			colors[SchemeMid][ColFg] = strdup(xval.addr);
 		#endif // MORECOLOR_PATCH
+		#if BORDER_PATCH
+		if (XrmGetResource(xdb, "dmenu.bordercolor", "*", &type, &xval))
+			colors[SchemeBorder][ColBg] = strdup(xval.addr);
+		#endif // BORDER_PATCH
 		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 		if (XrmGetResource(xdb, "dmenu.selhlbackground", "*", &type, &xval))
 			colors[SchemeSelHighlight][ColBg] = strdup(xval.addr);
