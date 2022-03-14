@@ -67,6 +67,10 @@ fuzzymatch(void)
 		for (i = 0, it = matches; it && i < number_of_matches; i++, it = it->right) {
 			fuzzymatches[i] = it;
 		}
+
+		#if NO_SORT_PATCH
+		if (sortmatches)
+		#endif // NO_SORT_PATCH
 		/* sort matches according to distance */
 		qsort(fuzzymatches, number_of_matches, sizeof(struct item*), compare_distance);
 		/* rebuild list of matches */
