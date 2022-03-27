@@ -271,6 +271,11 @@ cleanup(void)
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for (i = 0; i < SchemeLast; i++)
 		free(scheme[i]);
+	#if HIGHPRIORITY_PATCH
+	for (i = 0; i < hplength; ++i)
+		free(hpitems[i]);
+	free(hpitems);
+	#endif // HIGHPRIORITY_PATCH
 	drw_free(drw);
 	XSync(dpy, False);
 	XCloseDisplay(dpy);
