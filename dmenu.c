@@ -1358,12 +1358,10 @@ readstdin(void)
 	char buf[sizeof text], *p;
 	#if JSON_PATCH
 	size_t i;
-	unsigned int imax = 0;
 	struct item *item;
 	#else
-	size_t i, imax = 0, size = 0;
+	size_t i, size = 0;
 	#endif // JSON_PATCH
-	unsigned int tmpmax = 0;
 
 	#if PASSWORD_PATCH
 	if (passwd) {
@@ -1415,19 +1413,6 @@ readstdin(void)
 		#if HIGHPRIORITY_PATCH
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		#endif // HIGHPRIORITY_PATCH
-		#if PANGO_PATCH
-		drw_font_getexts(drw->font, buf, strlen(buf), &tmpmax, NULL, True);
-		#else
-		drw_font_getexts(drw->fonts, buf, strlen(buf), &tmpmax, NULL);
-		#endif // PANGO_PATCH
-		if (tmpmax > inputw) {
-			inputw = tmpmax;
-			#if JSON_PATCH
-			imax = items_ln - 1;
-			#else
-			imax = i;
-			#endif // JSON_PATCH
-		}
 	}
 	if (items)
 		#if JSON_PATCH
@@ -1435,11 +1420,6 @@ readstdin(void)
 		#else
 		items[i].text = NULL;
 		#endif // JSON_PATCH
-	#if PANGO_PATCH
-	inputw = items ? TEXTWM(items[imax].text) : 0;
-	#else
-	inputw = items ? TEXTW(items[imax].text) : 0;
-	#endif // PANGO_PATCH
 	#if JSON_PATCH
 	lines = MIN(lines, items_ln);
 	#else
@@ -1514,12 +1494,13 @@ static void
 setup(void)
 {
 	int x, y, i, j;
-	unsigned int du;
+	unsigned int du, tmp;
 	XSetWindowAttributes swa;
 	XIM xim;
 	Window w, dw, *dws;
 	XWindowAttributes wa;
 	XClassHint ch = {"dmenu", "dmenu"};
+	struct item *item;
 #ifdef XINERAMA
 	XineramaScreenInfo *info;
 	Window pw;
@@ -1656,7 +1637,12 @@ setup(void)
 	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 	#endif // PANGO_PATCH
 	#endif // CENTER_PATCH
-	inputw = MIN(inputw, mw/3);
+	for (item = items; item && item->text; ++item) {
+		if ((tmp = textw_clamp(item->text, mw/3)) > inputw) {
+			if ((inputw = tmp) == mw/3)
+				break;
+		}
+	}
 	match();
 
 	/* create menu window */
