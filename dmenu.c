@@ -270,6 +270,9 @@ cleanup(void)
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for (i = 0; i < SchemeLast; i++)
 		free(scheme[i]);
+	for (i = 0; items && items[i].text; ++i)
+		free(items[i].text);
+	free(items);
 	#if HIGHPRIORITY_PATCH
 	for (i = 0; i < hplength; ++i)
 		free(hpitems[i]);
@@ -760,7 +763,7 @@ match(void)
 	/* separate input text into tokens to be matched individually */
 	for (s = strtok(buf, " "); s; tokv[tokc - 1] = s, s = strtok(NULL, " "))
 		if (++tokc > tokn && !(tokv = realloc(tokv, ++tokn * sizeof *tokv)))
-			die("cannot realloc %u bytes:", tokn * sizeof *tokv);
+			die("cannot realloc %zu bytes:", tokn * sizeof *tokv);
 	len = tokc ? strlen(tokv[0]) : 0;
 
 	#if PREFIXCOMPLETION_PATCH
@@ -1377,7 +1380,7 @@ readstdin(void)
 		#else
 		if (i + 1 >= size / sizeof *items)
 			if (!(items = realloc(items, (size += BUFSIZ))))
-				die("cannot realloc %u bytes:", size);
+				die("cannot realloc %zu bytes:", size);
 		#endif // JSON_PATCH
 		if ((p = strchr(buf, '\n')))
 			*p = '\0';
@@ -1386,12 +1389,12 @@ readstdin(void)
 		#else
 		if (!(items[i].text = strdup(buf)))
 		#endif // JSON_PATCH
-			die("cannot strdup %u bytes:", strlen(buf) + 1);
+			die("cannot strdup %zu bytes:", strlen(buf) + 1);
 		#if TSV_PATCH
 		if ((p = strchr(buf, '\t')))
 			*p = '\0';
 		if (!(items[i].stext = strdup(buf)))
-			die("cannot strdup %u bytes:", strlen(buf) + 1);
+			die("cannot strdup %zu bytes:", strlen(buf) + 1);
 		#endif // TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
