@@ -189,6 +189,13 @@ static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
 static char *(*fstrstr)(const char *, const char *) = strstr;
 #endif // CASEINSENSITIVE_PATCH
 
+static unsigned int
+textw_clamp(const char *str, unsigned int n)
+{
+	unsigned int w = drw_fontset_getwidth_clamp(drw, str, n) + lrpad;
+	return MIN(w, n);
+}
+
 static void appenditem(struct item *item, struct item **list, struct item **last);
 static void calcoffsets(void);
 static void cleanup(void);
@@ -248,18 +255,10 @@ calcoffsets(void)
 		#endif // SYMBOLS_PATCH
 	/* calculate which items will begin the next page and previous page */
 	for (i = 0, next = curr; next; next = next->right)
-		#if PANGO_PATCH
-		if ((i += (lines > 0) ? bh : MIN(TEXTWM(next->text), n)) > n)
-		#else
-		if ((i += (lines > 0) ? bh : MIN(TEXTW(next->text), n)) > n)
-		#endif // PANGO_PATCH
+		if ((i += (lines > 0) ? bh : textw_clamp(next->text, n)) > n)
 			break;
 	for (i = 0, prev = curr; prev && prev->left; prev = prev->left)
-		#if PANGO_PATCH
-		if ((i += (lines > 0) ? bh : MIN(TEXTWM(prev->left->text), n)) > n)
-		#else
-		if ((i += (lines > 0) ? bh : MIN(TEXTW(prev->left->text), n)) > n)
-		#endif // PANGO_PATCH
+		if ((i += (lines > 0) ? bh : textw_clamp(prev->left->text, n)) > n)
 			break;
 }
 
@@ -641,21 +640,17 @@ drawmenu(void)
 		}
 		x += w;
 		for (item = curr; item != next; item = item->right) {
-			#if PANGO_PATCH && TSV_PATCH
-			itw = TEXTWM(item->stext);
-			#elif PANGO_PATCH
-			itw = TEXTWM(item->text);
-			#elif TSV_PATCH
-			itw = TEXTW(item->stext);
-			#else
-			itw = TEXTW(item->text);
-			#endif // PANGO_PATCH | TSV_PATCH
 			#if SYMBOLS_PATCH
 			stw = TEXTW(symbol_2);
 			#else
 			stw = TEXTW(">");
 			#endif // SYMBOLS_PATCH
-			x = drawitem(item, x, 0, MIN(itw, mw - x - stw - rpad));
+			#if TSV_PATCH
+			itw = textw_clamp(item->stext, mw - x - stw - rpad);
+			#else
+			itw = textw_clamp(item->text, mw - x - stw - rpad);
+			#endif // PANGO_PATCH | TSV_PATCH
+			x = drawitem(item, x, 0, itw);
 		}
 		if (next) {
 			#if SYMBOLS_PATCH
