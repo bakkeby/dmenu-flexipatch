@@ -22,6 +22,8 @@ you selected.
 Refer to [https://tools.suckless.org/dmenu/](https://tools.suckless.org/dmenu/) for details on
 dmenu, how to install it and how it works.
 
+Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6jBM9dayf3) diagram which tries to organise patches into categories.
+
 ---
 
 ### Changelog:
