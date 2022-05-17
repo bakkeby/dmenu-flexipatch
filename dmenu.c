@@ -236,9 +236,9 @@ appenditem(struct item *item, struct item **list, struct item **last)
 static void
 calcoffsets(void)
 {
-	int i, n;
+	int i, n, rpad = 0;
 
-	if (lines > 0)
+	if (lines > 0) {
 		#if GRID_PATCH
 		if (columns)
 			n = lines * columns * bh;
@@ -247,12 +247,16 @@ calcoffsets(void)
 		#else
 		n = lines * bh;
 		#endif // GRID_PATCH
-	else
+	} else {
+		#if NUMBERS_PATCH
+		rpad = TEXTW(numbers);
+		#endif // NUMBERS_PATCH
 		#if SYMBOLS_PATCH
-		n = mw - (promptw + inputw + TEXTW(symbol_1) + TEXTW(symbol_2));
+		n = mw - (promptw + inputw + TEXTW(symbol_1) + TEXTW(symbol_2) + rpad);
 		#else
-		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">"));
+		n = mw - (promptw + inputw + TEXTW("<") + TEXTW(">") + rpad);
 		#endif // SYMBOLS_PATCH
+	}
 	/* calculate which items will begin the next page and previous page */
 	for (i = 0, next = curr; next; next = next->right)
 		if ((i += (lines > 0) ? bh : textw_clamp(next->text, n)) > n)
