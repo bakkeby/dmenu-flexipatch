@@ -126,6 +126,10 @@ static int inputw = 0, promptw;
 static int passwd = 0;
 #endif // PASSWORD_PATCH
 static int lrpad; /* sum of left and right padding */
+#if BARPADDING_PATCH
+static int vp; /* vertical padding for bar */
+static int sp; /* side padding for bar */
+#endif // BARPADDING_PATCH
 #if REJECTNOMATCH_PATCH
 static int reject_no_match = 0;
 #endif // REJECTNOMATCH_PATCH
@@ -596,6 +600,12 @@ drawmenu(void)
 	#if NUMBERS_PATCH
 	recalculatenumbers();
 	rpad = TEXTW(numbers);
+	#if BARPADDING_PATCH
+	rpad += 2 * sp;
+	#endif // BARPADDING_PATCH
+	#if BORDER_PATCH
+	rpad += border_width;
+	#endif // BORDER_PATCH
 	#endif // NUMBERS_PATCH
 	if (lines > 0) {
 		#if GRID_PATCH
@@ -681,8 +691,7 @@ drawmenu(void)
 	}
 	#if NUMBERS_PATCH
 	drw_setscheme(drw, scheme[SchemeNorm]);
-	drw_text(drw, mw - TEXTW(numbers), 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
-	#else
+	drw_text(drw, mw - rpad, 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
 	#endif // NUMBERS_PATCH
 	drw_map(drw, win, 0, 0, mw, mh);
 	#if NON_BLOCKING_STDIN_PATCH
@@ -1683,11 +1692,17 @@ setup(void)
 		| ButtonPressMask
 		#endif // MOUSE_SUPPORT_PATCH
 	;
-	#if BORDER_PATCH
-	win = XCreateWindow(dpy, parentwin, x, y - (topbar ? 0 : border_width * 2), mw - border_width * 2, mh, border_width,
-	#else
-	win = XCreateWindow(dpy, parentwin, x, y, mw, mh, 0,
-	#endif // BORDER_PATCH
+	win = XCreateWindow(
+		dpy, parentwin,
+		#if BARPADDING_PATCH && BORDER_PATCH
+		x + sp, y + vp - (topbar ? 0 : border_width * 2), mw - 2 * sp - border_width * 2, mh, border_width,
+		#elif BARPADDING_PATCH
+		x + sp, y + vp, mw - 2 * sp, mh, 0,
+		#elif BORDER_PATCH
+		x, y - (topbar ? 0 : border_width * 2), mw - border_width * 2, mh, border_width,
+		#else
+		x, y, mw, mh, 0,
+		#endif // BORDER_PATCH | BARPADDING_PATCH
 		#if ALPHA_PATCH
 		depth, InputOutput, visual,
 		CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa
@@ -2068,6 +2083,11 @@ main(int argc, char *argv[])
 	#else
 	lrpad = drw->fonts->h;
 	#endif // PANGO_PATCH
+
+	#if BARPADDING_PATCH
+	sp = sidepad;
+	vp = (topbar ? vertpad : - vertpad);
+	#endif // BARPADDING_PATCH
 
 	#if LINE_HEIGHT_PATCH
 	if (lineheight == -1)

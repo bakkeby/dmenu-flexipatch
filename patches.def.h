@@ -7,6 +7,12 @@
  */
 #define ALPHA_PATCH 0
 
+/* This adds padding for dmenu in similar fashion to the similarly named patch for dwm. The idea
+ * is to have dmenu appear on top of the bar when using said patch in dwm.
+ * https://github.com/bakkeby/patches/wiki/barpadding
+ */
+#define BARPADDING_PATCH 0
+
 /* This patch adds a border around the dmenu window. It is intended to be used with the center
  * or xyw patches, to make the menu stand out from similarly coloured windows.
  * http://tools.suckless.org/dmenu/patches/border/

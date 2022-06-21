@@ -28,7 +28,7 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
-2022-06-21 - Adding relative input width patch
+2022-06-21 - Adding barpadding patch and relative input width patch
 
 2022-03-02 - Bump to 5.1
 
@@ -65,6 +65,10 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
    - [alpha](https://github.com/bakkeby/patches/blob/master/dmenu/dmenu-alpha-5.0_20210725_523aa08.diff)
       - adds transparency for the dmenu window
+
+   - [barpadding](https://github.com/bakkeby/patches/wiki/barpadding)
+      - adds padding for dmenu in similar fashion to the [barpadding](https://dwm.suckless.org/patches/barpadding/)
+        patch for dwm
 
    - [border](http://tools.suckless.org/dmenu/patches/border/)
       - adds a border around the dmenu window
