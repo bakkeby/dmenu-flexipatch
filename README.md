@@ -1,5 +1,5 @@
-Similar to [dwm-flexipatch](https://github.com/bakkeby/dwm-flexipatch) this dmenu 5.1 (33685b0,
-2022-03-28) project has a different take on patching. It uses preprocessor directives to decide
+Similar to [dwm-flexipatch](https://github.com/bakkeby/dwm-flexipatch) this dmenu 5.1 (28fb3e2,
+2022-05-01) project has a different take on patching. It uses preprocessor directives to decide
 whether or not to include a patch during build time. Essentially this means that this build, for
 better or worse, contains both the patched _and_ the original code. The aim being that you can
 select which patches to include and the build will contain that code and nothing more.
@@ -27,6 +27,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 ---
 
 ### Changelog:
+
+2022-06-21 - Adding relative input width patch
 
 2022-03-02 - Bump to 5.1
 
@@ -202,6 +204,14 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
    - [rejectnomatch](https://tools.suckless.org/dmenu/patches/reject-no-match/)
       - adds a new flag to dmenu with which text input will be rejected if it would result in no
         matching item
+
+   - relative_input_width
+      - prior to commit [e1e1de7](https://git.suckless.org/dmenu/commit/e1e1de7b3b8399cba90ddca9613f837b2dbef7b9.html)
+        the input width was calculated based on the input options
+      - this feature was removed in favour of hardcoding the input width to always take up 1/3rd of
+        the available space
+      - this patch adds that feature back in with some bespoke performance optimisations at the cost
+        of accuracy and correctness
 
    - [restrict-return](https://tools.suckless.org/dmenu/patches/restrict-return/)
       - adds a `-1` option which disables Shift-Return and Ctrl-Return

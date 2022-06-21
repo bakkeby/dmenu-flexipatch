@@ -1501,13 +1501,17 @@ static void
 setup(void)
 {
 	int x, y, i, j;
-	unsigned int du, tmp;
+	unsigned int du;
+	#if RELATIVE_INPUT_WIDTH_PATCH
+	unsigned int tmp, minstrlen = 0, curstrlen = 0;
+	int numwidthchecks = 100;
+	struct item *item;
+	#endif // RELATIVE_INPUT_WIDTH_PATCH
 	XSetWindowAttributes swa;
 	XIM xim;
 	Window w, dw, *dws;
 	XWindowAttributes wa;
 	XClassHint ch = {"dmenu", "dmenu"};
-	struct item *item;
 #ifdef XINERAMA
 	XineramaScreenInfo *info;
 	Window pw;
@@ -1644,12 +1648,22 @@ setup(void)
 	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
 	#endif // PANGO_PATCH
 	#endif // CENTER_PATCH
-	for (item = items; item && item->text; ++item) {
-		if ((tmp = textw_clamp(item->text, mw/3)) > inputw) {
-			if ((inputw = tmp) == mw/3)
-				break;
+	#if RELATIVE_INPUT_WIDTH_PATCH
+	for (item = items; !lines && item && item->text; ++item) {
+		curstrlen = strlen(item->text);
+		if (numwidthchecks || minstrlen < curstrlen) {
+			numwidthchecks = MAX(numwidthchecks - 1, 0);
+			minstrlen = MAX(minstrlen, curstrlen);
+			if ((tmp = textw_clamp(item->text, mw/3)) > inputw) {
+				inputw = tmp;
+				if (tmp == mw/3)
+					break;
+			}
 		}
 	}
+	#else
+	inputw = mw / 3; /* input width: ~33.33% of monitor width */
+	#endif // RELATIVE_INPUT_WIDTH_PATCH
 	match();
 
 	/* create menu window */

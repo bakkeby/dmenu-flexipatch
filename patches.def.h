@@ -273,6 +273,17 @@
  */
 #define REJECTNOMATCH_PATCH 0
 
+/* The input width used to be relative to the input options prior to commit e1e1de7:
+ * https://git.suckless.org/dmenu/commit/e1e1de7b3b8399cba90ddca9613f837b2dbef7b9.html
+ *
+ * This had a performance hit when using large data sets and was removed in favour of having the
+ * input width take up 1/3rd of the available space.
+ *
+ * This option adds that feature back in with some performance optimisations at the cost of
+ * accuracy and correctness.
+ */
+#define RELATIVE_INPUT_WIDTH_PATCH 0
+
 /* This patch adds a '-1' option which disables Shift-Return and Ctrl-Return.
  * This guarantees that dmenu will only output one item, and that item was read from stdin.
  * The original patch used '-r'. This was changed to '-1' to avoid conflict with the incremental
