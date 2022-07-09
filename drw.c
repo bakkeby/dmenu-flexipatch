@@ -18,6 +18,30 @@ static const unsigned char utfmask[UTF_SIZ + 1] = {0xC0, 0x80, 0xE0, 0xF0, 0xF8}
 static const long utfmin[UTF_SIZ + 1] = {       0,    0,  0x80,  0x800,  0x10000};
 static const long utfmax[UTF_SIZ + 1] = {0x10FFFF, 0x7F, 0x7FF, 0xFFFF, 0x10FFFF};
 
+#if ALPHA_PATCH
+unsigned short
+hextodec(const char *hex)
+{
+	if (hex[0] == 0)
+		return 0xff;
+
+    unsigned short dec = 0;
+    for (int i = 0; i < 2; i++) {
+        char digit = hex[i];
+        if (digit >= '0' && digit <= '9')
+            digit -= '0';
+        else if (digit >= 'a' && digit <= 'f')
+            digit += 10 - 'a';
+        else if (digit >= 'A' && digit <= 'F')
+            digit += 10 - 'A';
+        else
+            digit = 0;
+        dec = (dec << 4) + digit;
+    }
+    return dec;
+}
+#endif // ALPHA_PATCH
+
 static long
 utf8decodebyte(const char c, size_t *i)
 {
@@ -284,20 +308,20 @@ drw_fontset_free(Fnt *font)
 #endif // PANGO_PATCH
 
 void
-#if ALPHA_PATCH
-drw_clr_create(Drw *drw, Clr *dest, const char *clrname, unsigned int alpha)
-#else
 drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
-#endif // ALPHA_PATCH
 {
 	if (!drw || !dest || !clrname)
 		return;
 
 	#if ALPHA_PATCH
+	char color[8];
+	strncpy(color, clrname, 7);
+	color[7] = 0;
 	if (!XftColorAllocName(drw->dpy, drw->visual, drw->cmap,
-	                       clrname, dest))
-		die("error, cannot allocate color '%s'", clrname);
+	                       color, dest))
+		die("error, cannot allocate color '%s'", color);
 
+	unsigned short alpha = hextodec(clrname + 7);
 	dest->pixel = (dest->pixel & 0x00ffffffU) | (alpha << 24);
 	#else
 	if (!XftColorAllocName(drw->dpy, DefaultVisual(drw->dpy, drw->screen),
@@ -310,11 +334,7 @@ drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
 /* Wrapper to create color schemes. The caller has to call free(3) on the
  * returned color scheme when done using it. */
 Clr *
-#if ALPHA_PATCH
-drw_scm_create(Drw *drw, const char *clrnames[], const unsigned int alphas[], size_t clrcount)
-#else
 drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount)
-#endif // ALPHA_PATCH
 {
 	size_t i;
 	Clr *ret;
@@ -324,11 +344,7 @@ drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount)
 		return NULL;
 
 	for (i = 0; i < clrcount; i++)
-		#if ALPHA_PATCH
-		drw_clr_create(drw, &ret[i], clrnames[i], alphas[i]);
-		#else
 		drw_clr_create(drw, &ret[i], clrnames[i]);
-		#endif // ALPHA_PATCH
 	return ret;
 }
 

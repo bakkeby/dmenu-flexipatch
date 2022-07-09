@@ -51,37 +51,6 @@ static const char *symbol_1 = "<";
 static const char *symbol_2 = ">";
 #endif // SYMBOLS_PATCH
 
-#if ALPHA_PATCH
-static const unsigned int baralpha = 0xd0;
-static const unsigned int borderalpha = OPAQUE;
-static const unsigned int alphas[][3]      = {
-	/*               fg      bg        border     */
-	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
-	#if BORDER_PATCH
-	[SchemeBorder] = { OPAQUE, OPAQUE, OPAQUE },
-	#endif // BORDER_PATCH
-	#if MORECOLOR_PATCH
-	[SchemeMid] = { OPAQUE, baralpha, borderalpha },
-	#endif // MORECOLOR_PATCH
-	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
-	[SchemeSelHighlight] = { OPAQUE, baralpha, borderalpha },
-	[SchemeNormHighlight] = { OPAQUE, baralpha, borderalpha },
-	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
-	#if HIGHPRIORITY_PATCH
-	[SchemeHp] = { OPAQUE, baralpha, borderalpha },
-	#endif // HIGHPRIORITY_PATCH
-	#if EMOJI_HIGHLIGHT_PATCH
-	[SchemeHover] = { OPAQUE, baralpha, borderalpha },
-	[SchemeGreen] = { OPAQUE, baralpha, borderalpha },
-	[SchemeRed] = { OPAQUE, baralpha, borderalpha },
-	[SchemeYellow] = { OPAQUE, baralpha, borderalpha },
-	[SchemeBlue] = { OPAQUE, baralpha, borderalpha },
-	[SchemePurple] = { OPAQUE, baralpha, borderalpha },
-	#endif // EMOJI_HIGHLIGHT_PATCH
-};
-#endif // ALPHA_PATCH
-
 static
 #if !XRESOURCES_PATCH
 const

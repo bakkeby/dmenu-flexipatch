@@ -50,7 +50,6 @@
 #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
 #endif // PANGO_PATCH
 #if ALPHA_PATCH
-#define OPAQUE                0xffU
 #define OPACITY               "_NET_WM_WINDOW_OPACITY"
 #endif // ALPHA_PATCH
 
@@ -1529,18 +1528,10 @@ setup(void)
 	/* init appearance */
 	#if XRESOURCES_PATCH
 	for (j = 0; j < SchemeLast; j++)
-		#if ALPHA_PATCH
-		scheme[j] = drw_scm_create(drw, (const char**)colors[j], alphas[j], 2);
-		#else
 		scheme[j] = drw_scm_create(drw, (const char**)colors[j], 2);
-		#endif // ALPHA_PATCH
 	#else
 	for (j = 0; j < SchemeLast; j++)
-		#if ALPHA_PATCH
-		scheme[j] = drw_scm_create(drw, colors[j], alphas[j], 2);
-		#else
 		scheme[j] = drw_scm_create(drw, colors[j], 2);
-		#endif // ALPHA_PATCH
 	#endif // XRESOURCES_PATCH
 
 	clip = XInternAtom(dpy, "CLIPBOARD",   False);
