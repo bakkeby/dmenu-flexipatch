@@ -1,6 +1,9 @@
 #if DYNAMIC_OPTIONS_PATCH
 #include "dynamicoptions.h"
 #endif
+#if FZFEXPECT_PATCH
+#include "fzfexpect.h"
+#endif
 #if JSON_PATCH
 #include "json.h"
 #endif

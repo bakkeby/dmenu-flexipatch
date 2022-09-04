@@ -975,6 +975,30 @@ keypress(XKeyEvent *ev)
 
 	if (ev->state & ControlMask) {
 		switch(ksym) {
+		#if FZFEXPECT_PATCH
+		case XK_a: expect("ctrl-a", ev); ksym = XK_Home;      break;
+		case XK_b: expect("ctrl-b", ev); ksym = XK_Left;      break;
+		case XK_c: expect("ctrl-c", ev); ksym = XK_Escape;    break;
+		case XK_d: expect("ctrl-d", ev); ksym = XK_Delete;    break;
+		case XK_e: expect("ctrl-e", ev); ksym = XK_End;       break;
+		case XK_f: expect("ctrl-f", ev); ksym = XK_Right;     break;
+		case XK_g: expect("ctrl-g", ev); ksym = XK_Escape;    break;
+		case XK_h: expect("ctrl-h", ev); ksym = XK_BackSpace; break;
+		case XK_i: expect("ctrl-i", ev); ksym = XK_Tab;       break;
+		case XK_j: expect("ctrl-j", ev); ksym = XK_Down;      break;
+		case XK_J:/* fallthrough */
+		case XK_l: expect("ctrl-l", ev); break;
+		case XK_m: expect("ctrl-m", ev); /* fallthrough */
+		case XK_M: ksym = XK_Return; ev->state &= ~ControlMask; break;
+		case XK_n: expect("ctrl-n", ev); ksym = XK_Down; break;
+		case XK_p: expect("ctrl-p", ev); ksym = XK_Up;   break;
+		case XK_o: expect("ctrl-o", ev); break;
+		case XK_q: expect("ctrl-q", ev); break;
+		case XK_r: expect("ctrl-r", ev); break;
+		case XK_s: expect("ctrl-s", ev); break;
+		case XK_t: expect("ctrl-t", ev); break;
+		case XK_k: expect("ctrl-k", ev); ksym = XK_Up; break;
+		#else
 		case XK_a: ksym = XK_Home;      break;
 		case XK_b: ksym = XK_Left;      break;
 		case XK_c: ksym = XK_Escape;    break;
@@ -995,24 +1019,45 @@ keypress(XKeyEvent *ev)
 			text[cursor] = '\0';
 			match();
 			break;
+		#endif // FZFEXPECT_PATCH
+		#if FZFEXPECT_PATCH
+		case XK_u: expect("ctrl-u", ev); /* delete left */
+		#else
 		case XK_u: /* delete left */
+		#endif // FZFEXPECT_PATCH
 			insert(NULL, 0 - cursor);
 			break;
+		#if FZFEXPECT_PATCH
+		case XK_w: expect("ctrl-w", ev); /* delete word */
+		#else
 		case XK_w: /* delete word */
+		#endif // FZFEXPECT_PATCH
 			while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
 				insert(NULL, nextrune(-1) - cursor);
 			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
 				insert(NULL, nextrune(-1) - cursor);
 			break;
-		case XK_y: /* paste selection */
-		case XK_Y:
-		#if CTRL_V_TO_PASTE_PATCH
+		#if FZFEXPECT_PATCH || CTRL_V_TO_PASTE_PATCH
 		case XK_v:
+		#if FZFEXPECT_PATCH
+			expect("ctrl-v", ev);
+		#endif // FZFEXPECT_PATCH
 		case XK_V:
-		#endif // CTRL_V_TO_PASTE_PATCH
 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
 			                  utf8, utf8, win, CurrentTime);
 			return;
+		#endif // FZFEXPECT_PATCH | CTRL_V_TO_PASTE_PATCH
+		#if FZFEXPECT_PATCH
+		case XK_y: expect("ctrl-y", ev); /* paste selection */
+		#else
+		case XK_y: /* paste selection */
+		#endif // FZFEXPECT_PATCH
+		case XK_Y:
+			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
+			                  utf8, utf8, win, CurrentTime);
+			return;
+		case XK_x: expect("ctrl-x", ev); break;
+		case XK_z: expect("ctrl-z", ev); break;
 		case XK_Left:
 		case XK_KP_Left:
 			movewordedge(-1);
@@ -1805,17 +1850,20 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || JSON_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || JSON_PATCH || FZFEXPECT_PATCH
 		"\n            "
 		#endif
 		#if JSON_PATCH
-		" [ -j json-file]"
+		" [-j json-file]"
 		#endif // JSON_PATCH
 		#if DYNAMIC_OPTIONS_PATCH
-		" [ -dy command]"
+		" [-dy command]"
 		#endif // DYNAMIC_OPTIONS_PATCH
+		#if FZFEXPECT_PATCH
+		" [-ex expectkey]"
+		#endif // FZFEXPECT_PATCH
 		#if ALPHA_PATCH
-		" [ -o opacity]"
+		" [-o opacity]"
 		#endif // ALPHA_PATCH
 		#if BORDER_PATCH
 		" [-bw width]"
@@ -1826,6 +1874,7 @@ usage(void)
 		#if INITIALTEXT_PATCH
 		" [-it text]"
 		#endif // INITIALTEXT_PATCH
+		"\n            "
 		#if LINE_HEIGHT_PATCH
 		" [-h height]"
 		#endif // LINE_HEIGHT_PATCH
@@ -1839,7 +1888,7 @@ usage(void)
 		" [-X xoffset] [-Y yoffset] [-W width]" // (arguments made upper case due to conflicts)
 		#endif // XYW_PATCH
 		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
-		"\n [-nhb color] [-nhf color] [-shb color] [-shf color]" // highlight colors
+		"\n             [-nhb color] [-nhf color] [-shb color] [-shf color]" // highlight colors
 		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 		"\n", stderr);
 	exit(1);
@@ -1928,6 +1977,10 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-P")) { /* is the input a password */
 			passwd = 1;
 		#endif // PASSWORD_PATCH
+		#if FZFEXPECT_PATCH
+		} else if (!strcmp(argv[i], "-ex")) { /* expect key */
+			expected = argv[++i];
+		#endif // FZFEXPECT_PATCH
 		#if REJECTNOMATCH_PATCH
 		} else if (!strcmp(argv[i], "-R")) { /* reject input which results in no match */
 			reject_no_match = 1;

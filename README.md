@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2022-09-04 - Added the fzfexpect patch
+
 2022-06-21 - Adding barpadding patch and relative input width patch
 
 2022-03-02 - Bump to 5.1
@@ -101,6 +103,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
    - [fuzzymatch](https://tools.suckless.org/dmenu/patches/fuzzymatch/)
       - adds support for fuzzy-matching to dmenu, allowing users to type non-consecutive portions
         of the string to be matched
+
+   - [fzfexpect](https://github.com/DAFF0D11/dafmenu/blob/master/patches/dmenu-fzfexpect-5.1.diff)
+      - adds fzf expect functionality in dmenu
 
    - [grid](https://tools.suckless.org/dmenu/patches/grid/)
       - allows dmenu's entries to be rendered in a grid by adding a new `-g` flag to specify the

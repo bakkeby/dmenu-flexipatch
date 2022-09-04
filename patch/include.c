@@ -12,6 +12,9 @@
 #if FUZZYMATCH_PATCH
 #include "fuzzymatch.c"
 #endif
+#if FZFEXPECT_PATCH
+#include "fzfexpect.c"
+#endif
 #if HIGHPRIORITY_PATCH
 #include "highpriority.c"
 #endif
