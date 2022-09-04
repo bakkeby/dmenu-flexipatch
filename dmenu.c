@@ -769,7 +769,7 @@ match(void)
 	#endif // NON_BLOCKING_STDIN_PATCH
 	#if JSON_PATCH
 	if (json)
-		fstrstr = strcasestr;
+		fstrstr = cistrstr;
 	#endif // JSON_PATCH
 
 	strcpy(buf, text);
@@ -1416,13 +1416,18 @@ xinitvisual()
 static void
 readstdin(void)
 {
-	char buf[sizeof text], *p;
+	char *line = NULL;
+	#if JSON_PATCH || TSV_PATCH
+	char *buf, *p;
+	#endif // JSON_PATCH | TSV_PATCH
+
 	#if JSON_PATCH
-	size_t i;
 	struct item *item;
 	#else
-	size_t i, size = 0;
+	size_t size = 0;
 	#endif // JSON_PATCH
+	size_t i, junk;
+	ssize_t len;
 
 	#if PASSWORD_PATCH
 	if (passwd) {
@@ -1432,7 +1437,7 @@ readstdin(void)
 	#endif // PASSWORD_PATCH
 
 	/* read each line from stdin and add it to the item list */
-	for (i = 0; fgets(buf, sizeof buf, stdin); i++)	{
+	for (i = 0; (len = getline(&line, &junk, stdin)) != -1; i++, line = NULL) {
 		#if JSON_PATCH
 		item = itemnew();
 		#else
@@ -1440,19 +1445,20 @@ readstdin(void)
 			if (!(items = realloc(items, (size += BUFSIZ))))
 				die("cannot realloc %zu bytes:", size);
 		#endif // JSON_PATCH
-		if ((p = strchr(buf, '\n')))
-			*p = '\0';
+		if (line[len - 1] == '\n')
+			line[len - 1] = '\0';
+
 		#if JSON_PATCH
-		if (!(item->text = strdup(buf)))
-		#else
-		if (!(items[i].text = strdup(buf)))
+		if (!(item->text = strdup(line)))
+			die("cannot strdup %zu bytes:", strlen(line) + 1);
 		#endif // JSON_PATCH
-			die("cannot strdup %zu bytes:", strlen(buf) + 1);
+		items[i].text = line;
 		#if TSV_PATCH
+		buf = strdup(line);
 		if ((p = strchr(buf, '\t')))
 			*p = '\0';
 		if (!(items[i].stext = strdup(buf)))
-			die("cannot strdup %zu bytes:", strlen(buf) + 1);
+			die("cannot strdup %zu bytes:", strlen(line) + 1);
 		#endif // TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
