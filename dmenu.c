@@ -21,23 +21,14 @@
 #if MULTI_SELECTION_PATCH
 #undef NON_BLOCKING_STDIN_PATCH
 #undef PIPEOUT_PATCH
-#undef JSON_PATCH
 #undef PRINTINPUTTEXT_PATCH
 #endif // MULTI_SELECTION_PATCH
-#if JSON_PATCH
-#undef NON_BLOCKING_STDIN_PATCH
-#undef PRINTINPUTTEXT_PATCH
-#undef PIPEOUT_PATCH
-#endif // JSON_PATCH
 
 #include "drw.h"
 #include "util.h"
 #if GRIDNAV_PATCH
 #include <stdbool.h>
 #endif // GRIDNAV_PATCH
-#if JSON_PATCH
-#include <jansson.h>
-#endif // JSON_PATCH
 
 /* macros */
 #define INTERSECT(x,y,w,h,r)  (MAX(0, MIN((x)+(w),(r).x_org+(r).width)  - MAX((x),(r).x_org)) \
@@ -100,9 +91,6 @@ struct item {
 	#if HIGHPRIORITY_PATCH
 	int hp;
 	#endif // HIGHPRIORITY_PATCH
-	#if JSON_PATCH
-	json_t *json;
-	#endif // JSON_PATCH
 	#if FUZZYMATCH_PATCH
 	double distance;
 	#endif // FUZZYMATCH_PATCH
@@ -572,12 +560,13 @@ drawmenu(void)
 			#endif // PANGO_PATCH
 		);
 		free(censort);
-	} else
+	} else {
 		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0
 			#if PANGO_PATCH
 			, False
 			#endif // PANGO_PATCH
 		);
+	}
 	#else
 	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0
 		#if PANGO_PATCH
@@ -655,6 +644,7 @@ drawmenu(void)
 				#endif // PANGO_PATCH
 			);
 		}
+		fprintf(stderr, "bbbb\n" );
 		x += w;
 		for (item = curr; item != next; item = item->right) {
 			#if SYMBOLS_PATCH
@@ -669,6 +659,7 @@ drawmenu(void)
 			#endif // PANGO_PATCH | TSV_PATCH
 			x = drawitem(item, x, 0, itw);
 		}
+		fprintf(stderr, "ajaj\n" );
 		if (next) {
 			#if SYMBOLS_PATCH
 			w = TEXTW(symbol_2);
@@ -689,6 +680,7 @@ drawmenu(void)
 			);
 		}
 	}
+
 	#if NUMBERS_PATCH
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	drw_text(drw, mw - rpad, 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
@@ -767,10 +759,6 @@ match(void)
 	#if NON_BLOCKING_STDIN_PATCH
 	int preserve = 0;
 	#endif // NON_BLOCKING_STDIN_PATCH
-	#if JSON_PATCH
-	if (json)
-		fstrstr = cistrstr;
-	#endif // JSON_PATCH
 
 	strcpy(buf, text);
 	/* separate input text into tokens to be matched individually */
@@ -1214,10 +1202,7 @@ insert:
 			break;
 		#endif // RESTRICT_RETURN_PATCH
 		#if !MULTI_SELECTION_PATCH
-		#if JSON_PATCH
-		if (!printjsonssel(ev->state))
-			break;
-		#elif PIPEOUT_PATCH
+		#if PIPEOUT_PATCH
 		#if PRINTINPUTTEXT_PATCH
 		if (sel && (
 			(use_text_input && (ev->state & ShiftMask)) ||
@@ -1417,15 +1402,11 @@ static void
 readstdin(void)
 {
 	char *line = NULL;
-	#if JSON_PATCH || TSV_PATCH
+	#if TSV_PATCH
 	char *buf, *p;
-	#endif // JSON_PATCH | TSV_PATCH
+	#endif // TSV_PATCH
 
-	#if JSON_PATCH
-	struct item *item;
-	#else
 	size_t size = 0;
-	#endif // JSON_PATCH
 	size_t i, junk;
 	ssize_t len;
 
@@ -1438,20 +1419,12 @@ readstdin(void)
 
 	/* read each line from stdin and add it to the item list */
 	for (i = 0; (len = getline(&line, &junk, stdin)) != -1; i++, line = NULL) {
-		#if JSON_PATCH
-		item = itemnew();
-		#else
 		if (i + 1 >= size / sizeof *items)
 			if (!(items = realloc(items, (size += BUFSIZ))))
 				die("cannot realloc %zu bytes:", size);
-		#endif // JSON_PATCH
 		if (line[len - 1] == '\n')
 			line[len - 1] = '\0';
 
-		#if JSON_PATCH
-		if (!(item->text = strdup(line)))
-			die("cannot strdup %zu bytes:", strlen(line) + 1);
-		#endif // JSON_PATCH
 		items[i].text = line;
 		#if TSV_PATCH
 		buf = strdup(line);
@@ -1465,33 +1438,19 @@ readstdin(void)
 		#if PRINTINDEX_PATCH
 		items[i].index = i;
 		#endif // PRINTINDEX_PATCH
-		#elif JSON_PATCH
-		item->json = NULL;
-		item->out = 0;
-		#if PRINTINDEX_PATCH
-		item->index = i;
-		#endif // PRINTINDEX_PATCH
 		#elif PRINTINDEX_PATCH
 		items[i].index = i;
 		#else
 		items[i].out = 0;
-		#endif // MULTI_SELECTION_PATCH | JSON_PATCH | PRINTINDEX_PATCH
+		#endif // MULTI_SELECTION_PATCH | PRINTINDEX_PATCH
 
 		#if HIGHPRIORITY_PATCH
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		#endif // HIGHPRIORITY_PATCH
 	}
 	if (items)
-		#if JSON_PATCH
-		items[items_ln].text = NULL;
-		#else
 		items[i].text = NULL;
-		#endif // JSON_PATCH
-	#if JSON_PATCH
-	lines = MIN(lines, items_ln);
-	#else
 	lines = MIN(lines, i);
-	#endif // JSON_PATCH
 }
 #endif // NON_BLOCKING_STDIN_PATCH
 
@@ -1856,12 +1815,9 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || JSON_PATCH || FZFEXPECT_PATCH
+		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || FZFEXPECT_PATCH
 		"\n            "
 		#endif
-		#if JSON_PATCH
-		" [-j json-file]"
-		#endif // JSON_PATCH
 		#if DYNAMIC_OPTIONS_PATCH
 		" [-dy command]"
 		#endif // DYNAMIC_OPTIONS_PATCH
@@ -2017,10 +1973,6 @@ main(int argc, char *argv[])
 				lines = 1;
 		}
 		#endif // GRID_PATCH
-		#if JSON_PATCH
-		else if (!strcmp(argv[i], "-j"))
-			readjson(argv[++i]);
-		#endif // JSON_PATCH
 		else if (!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
 			lines = atoi(argv[++i]);
 		#if XYW_PATCH
@@ -2170,39 +2122,19 @@ main(int argc, char *argv[])
 	#else
 	if (fast && !isatty(0)) {
 		grabkeyboard();
-		#if JSON_PATCH
-		if (json)
-			listjson(json);
 		#if DYNAMIC_OPTIONS_PATCH
-		else if (!(dynamic && *dynamic))
-			readstdin();
-		#else
-		else
-			readstdin();
-		#endif // DYNAMIC_OPTIONS_PATCH
-		#elif DYNAMIC_OPTIONS_PATCH
 		if (!(dynamic && *dynamic))
 			readstdin();
 		#else
 		readstdin();
-		#endif // JSON_PATCH | DYNAMIC_OPTIONS_PATCH
+		#endif // DYNAMIC_OPTIONS_PATCH
 	} else {
-		#if JSON_PATCH
-		if (json)
-			listjson(json);
 		#if DYNAMIC_OPTIONS_PATCH
-		else if (!(dynamic && *dynamic))
-			readstdin();
-		#else
-		else
-			readstdin();
-		#endif // DYNAMIC_OPTIONS_PATCH
-		#elif DYNAMIC_OPTIONS_PATCH
 		if (!(dynamic && *dynamic))
 			readstdin();
 		#else
 		readstdin();
-		#endif // JSON_PATCH | DYNAMIC_OPTIONS_PATCH
+		#endif // DYNAMIC_OPTIONS_PATCH
 		grabkeyboard();
 	}
 	#endif // NON_BLOCKING_STDIN_PATCH

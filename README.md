@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2022-09-05 - Removed the json patch due to maintenance and compatibility reasons
+
 2022-09-04 - Added the fzfexpect patch
 
 2022-06-21 - Adding barpadding patch and relative input width patch
@@ -132,8 +134,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
       - adds a flag that will cause dmenu to select an item immediately if there is only one
         matching option left
 
-   - [json](https://tools.suckless.org/dmenu/patches/json/)
-      - adds basic support for json files
+   - [~json~](https://tools.suckless.org/dmenu/patches/json/)
+      - ~adds basic support for json files~
 
    - [line-height](http://tools.suckless.org/dmenu/patches/line-height/)
       - adds a `-h` option which sets the minimum height of a dmenu line

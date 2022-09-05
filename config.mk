@@ -19,9 +19,6 @@ FREETYPEINC = /usr/include/freetype2
 #FREETYPEINC = $(X11INC)/freetype2
 #MANPREFIX = ${PREFIX}/man
 
-# Uncomment this for the json patch / JSON_PATCH
-#JANSSONINC = `pkg-config --cflags jansson`
-#JANSSONLIBS = `pkg-config --libs jansson`
 # uncomment on RHEL for strcasecmp
 #EXTRAFLAGS=-D_GNU_SOURCE
 

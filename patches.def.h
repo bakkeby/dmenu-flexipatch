@@ -117,19 +117,6 @@
  */
 #define INSTANT_PATCH 0
 
-/* This patch adds basic support for json files.
- * This patch depends on the jansson library. Uncomment the relevant line in config.mk when
- * enabling this patch.
- *
- * This patch is not compatible with the multi-selection, printinputtext, pipeout and
- * non-blocking stdin patches.
- * The multi-selection patch takes precedence over this patch.
- * This patch takes precedence over non-blocking stdin, pipeout and printintputtext patches.
- *
- * https://tools.suckless.org/dmenu/patches/json/
- */
-#define JSON_PATCH 0
-
 /* This patch adds a '-h' option which sets the minimum height of a dmenu line. This helps
  * integrate dmenu with other UI elements that require a particular vertical size.
  * http://tools.suckless.org/dmenu/patches/line-height/
