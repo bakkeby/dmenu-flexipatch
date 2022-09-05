@@ -76,9 +76,11 @@ enum {
 
 struct item {
 	char *text;
-	#if TSV_PATCH
+	#if SEPARATOR_PATCH
+	char *text_output;
+	#elif TSV_PATCH
 	char *stext;
-	#endif // TSV_PATCH
+	#endif // SEPARATOR_PATCH | TSV_PATCH
 	struct item *left, *right;
 	#if NON_BLOCKING_STDIN_PATCH
 	struct item *next;
@@ -104,6 +106,11 @@ static char text[BUFSIZ] = "";
 static char pipeout[8] = " | dmenu";
 #endif // PIPEOUT_PATCH
 static char *embed;
+#if SEPARATOR_PATCH
+static char separator;
+static int separator_greedy;
+static int separator_reverse;
+#endif // SEPARATOR_PATCH
 static int bh, mw, mh;
 #if XYW_PATCH
 static int dmx = 0, dmy = 0; /* put dmenu at these x and y offsets */
@@ -297,7 +304,7 @@ static int
 drawitem(struct item *item, int x, int y, int w)
 {
 	int r;
-	#if TSV_PATCH
+	#if TSV_PATCH && !SEPARATOR_PATCH
 	char *text = item->stext;
 	#else
 	char *text = item->text;
@@ -644,7 +651,6 @@ drawmenu(void)
 				#endif // PANGO_PATCH
 			);
 		}
-		fprintf(stderr, "bbbb\n" );
 		x += w;
 		for (item = curr; item != next; item = item->right) {
 			#if SYMBOLS_PATCH
@@ -652,14 +658,13 @@ drawmenu(void)
 			#else
 			stw = TEXTW(">");
 			#endif // SYMBOLS_PATCH
-			#if TSV_PATCH
+			#if TSV_PATCH && !SEPARATOR_PATCH
 			itw = textw_clamp(item->stext, mw - x - stw - rpad);
 			#else
 			itw = textw_clamp(item->text, mw - x - stw - rpad);
-			#endif // PANGO_PATCH | TSV_PATCH
+			#endif // TSV_PATCH
 			x = drawitem(item, x, 0, itw);
 		}
-		fprintf(stderr, "ajaj\n" );
 		if (next) {
 			#if SYMBOLS_PATCH
 			w = TEXTW(symbol_2);
@@ -680,7 +685,6 @@ drawmenu(void)
 			);
 		}
 	}
-
 	#if NUMBERS_PATCH
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	drw_text(drw, mw - rpad, 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
@@ -1044,8 +1048,10 @@ keypress(XKeyEvent *ev)
 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
 			                  utf8, utf8, win, CurrentTime);
 			return;
+		#if FZFEXPECT_PATCH
 		case XK_x: expect("ctrl-x", ev); break;
 		case XK_z: expect("ctrl-z", ev); break;
+		#endif // FZFEXPECT_PATCH
 		case XK_Left:
 		case XK_KP_Left:
 			movewordedge(-1);
@@ -1237,12 +1243,22 @@ insert:
 			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
 		#endif // PRINTINDEX_PATCH
 		else
+			#if SEPARATOR_PATCH
+			puts((sel && !(ev->state & ShiftMask)) ? sel->text_output : text);
+			#else
 			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+			#endif // SEPARATOR_PATCH
 		#elif PRINTINDEX_PATCH
 		if (print_index)
 			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
 		else
+			#if SEPARATOR_PATCH
+			puts((sel && !(ev->state & ShiftMask)) ? sel->text_output : text);
+			#else
 			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+			#endif // SEPARATOR_PATCH
+		#elif SEPARATOR_PATCH
+		puts((sel && !(ev->state & ShiftMask)) ? sel->text_output : text);
 		#else
 		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
 		#endif // PIPEOUT_PATCH | PRINTINPUTTEXT_PATCH | PRINTINDEX_PATCH
@@ -1402,9 +1418,11 @@ static void
 readstdin(void)
 {
 	char *line = NULL;
-	#if TSV_PATCH
+	#if SEPARATOR_PATCH
+	char *p;
+	#elif TSV_PATCH
 	char *buf, *p;
-	#endif // TSV_PATCH
+	#endif // SEPARATOR_PATCH | TSV_PATCH
 
 	size_t size = 0;
 	size_t i, junk;
@@ -1426,13 +1444,26 @@ readstdin(void)
 			line[len - 1] = '\0';
 
 		items[i].text = line;
-		#if TSV_PATCH
-		buf = strdup(line);
+		#if SEPARATOR_PATCH
+		if (separator && (p = separator_greedy ?
+			strrchr(items[i].text, separator) : strchr(items[i].text, separator))) {
+			*p = '\0';
+			items[i].text_output = ++p;
+		} else {
+			items[i].text_output = items[i].text;
+		}
+		if (separator_reverse) {
+			p = items[i].text;
+			items[i].text = items[i].text_output;
+			items[i].text_output = p;
+		}
+		#elif TSV_PATCH
+		if (!(buf = strdup(line)))
+			die("cannot strdup %u bytes:", strlen(line) + 1);
 		if ((p = strchr(buf, '\t')))
 			*p = '\0';
-		if (!(items[i].stext = strdup(buf)))
-			die("cannot strdup %zu bytes:", strlen(line) + 1);
-		#endif // TSV_PATCH
+		items[i].stext = buf;
+		#endif // SEPARATOR_PATCH | TSV_PATCH
 		#if MULTI_SELECTION_PATCH
 		items[i].id = i; /* for multiselect */
 		#if PRINTINDEX_PATCH
@@ -1815,7 +1846,7 @@ usage(void)
 		#endif // GRID_PATCH
 		"[-l lines] [-p prompt] [-fn font] [-m monitor]"
 		"\n             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]"
-		#if ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH || INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || NAVHISTORY_PATCH || XYW_PATCH || DYNAMIC_OPTIONS_PATCH || FZFEXPECT_PATCH
+		#if DYNAMIC_OPTIONS_PATCH || FZFEXPECT_PATCH || ALPHA_PATCH || BORDER_PATCH || HIGHPRIORITY_PATCH
 		"\n            "
 		#endif
 		#if DYNAMIC_OPTIONS_PATCH
@@ -1833,10 +1864,12 @@ usage(void)
 		#if HIGHPRIORITY_PATCH
 		" [-hb color] [-hf color] [-hp items]"
 		#endif // HIGHPRIORITY_PATCH
+		#if INITIALTEXT_PATCH || LINE_HEIGHT_PATCH || PRESELECT_PATCH || NAVHISTORY_PATCH || XYW_PATCH
+		"\n            "
+		#endif
 		#if INITIALTEXT_PATCH
 		" [-it text]"
 		#endif // INITIALTEXT_PATCH
-		"\n            "
 		#if LINE_HEIGHT_PATCH
 		" [-h height]"
 		#endif // LINE_HEIGHT_PATCH
@@ -1852,6 +1885,9 @@ usage(void)
 		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 		"\n             [-nhb color] [-nhf color] [-shb color] [-shf color]" // highlight colors
 		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+		#if SEPARATOR_PATCH
+		"\n             [-d separator] [-D separator]"
+		#endif // SEPARATOR_PATCH
 		"\n", stderr);
 	exit(1);
 }
@@ -2031,6 +2067,13 @@ main(int argc, char *argv[])
 		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		#if SEPARATOR_PATCH
+		else if (!strcmp(argv[i], "-d") || /* field separator */
+				(separator_greedy = !strcmp(argv[i], "-D"))) {
+			separator = argv[++i][0];
+			separator_reverse = argv[i][1] == '|';
+		}
+		#endif // SEPARATOR_PATCH
 		#if PRESELECT_PATCH
 		else if (!strcmp(argv[i], "-ps"))   /* preselected item */
 			preselected = atoi(argv[++i]);

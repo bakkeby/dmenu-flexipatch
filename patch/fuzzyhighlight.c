@@ -11,7 +11,7 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 
 	#if EMOJI_HIGHLIGHT_PATCH
 	char *itemtext = output;
-	#elif TSV_PATCH
+	#elif TSV_PATCH && !SEPARATOR_PATCH
 	char *itemtext = item->stext;
 	#else
 	char *itemtext = item->text;

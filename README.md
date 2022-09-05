@@ -28,7 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
-2022-09-05 - Removed the json patch due to maintenance and compatibility reasons
+2022-09-05 - Removed the json patch due to maintenance and compatibility reasons, added the
+             separator patch
 
 2022-09-04 - Added the fzfexpect patch
 
@@ -231,6 +232,10 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
    - [scroll](https://tools.suckless.org/dmenu/patches/scroll/)
       - this patch adds support for text scrolling
       - it doesn't append `...` for long input anymore as it can handle long text
+
+   - [separator](https://tools.suckless.org/dmenu/patches/separator/)
+      - adds `-d` and `-D` flags which separates the input into two halves; one half to be
+        displayed in dmenu and the other to be printed to stdout
 
    - [symbols](https://tools.suckless.org/dmenu/patches/symbols/)
       - allows the symbols, which are printed in dmenu to indicate that either the input is too

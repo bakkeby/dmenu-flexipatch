@@ -297,6 +297,13 @@
  */
 #define SCROLL_PATCH 0
 
+/* This patch adds -d and -D flags which separates the input into two halves; one half to be
+ * displayed in dmenu and the other to be printed to stdout. This patch takes precedence over
+ * the TSV patch.
+ * https://tools.suckless.org/dmenu/patches/separator/
+ */
+#define SEPARATOR_PATCH 0
+
 /* This patch allows the symbols, which are printed in dmenu to indicate that either the input
  * is too long or there are too many options to be shown in dmenu in one line, to be defined.
  * https://tools.suckless.org/dmenu/patches/symbols/

@@ -1,9 +1,6 @@
 #if CENTER_PATCH
 #include "center.c"
 #endif
-#if DYNAMIC_OPTIONS_PATCH
-#include "dynamicoptions.c"
-#endif
 #if FUZZYHIGHLIGHT_PATCH
 #include "fuzzyhighlight.c"
 #elif HIGHLIGHT_PATCH
@@ -17,6 +14,9 @@
 #endif
 #if HIGHPRIORITY_PATCH
 #include "highpriority.c"
+#endif
+#if DYNAMIC_OPTIONS_PATCH
+#include "dynamicoptions.c"
 #endif
 #if MULTI_SELECTION_PATCH
 #include "multiselect.c"
