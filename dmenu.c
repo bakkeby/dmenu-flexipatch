@@ -199,6 +199,13 @@ static void appenditem(struct item *item, struct item **list, struct item **last
 static void calcoffsets(void);
 static void cleanup(void);
 static char * cistrstr(const char *s, const char *sub);
+#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+#if EMOJI_HIGHLIGHT_PATCH
+static void drawhighlights(struct item *item, char *output, int x, int y, int maxw);
+#else
+static void drawhighlights(struct item *item, int x, int y, int maxw);
+#endif // EMOJI_HIGHLIGHT_PATCH
+#endif // HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 static int drawitem(struct item *item, int x, int y, int w);
 static void drawmenu(void);
 static void grabfocus(void);
@@ -299,6 +306,36 @@ cistrstr(const char *s, const char *sub)
 			return (char *)s;
 	return NULL;
 }
+
+#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+static void
+#if EMOJI_HIGHLIGHT_PATCH
+drawhighlights(struct item *item, char *output, int x, int y, int maxw)
+#else // EMOJI_HIGHLIGHT_PATCH
+drawhighlights(struct item *item, int x, int y, int maxw)
+#endif
+{
+#if FUZZYHIGHLIGHT_PATCH
+    if (fuzzy) {
+#if EMOJI_HIGHLIGHT_PATCH
+        drawhighlights_fuzzy(item, output, x, y, maxw);
+#else
+        drawhighlights_fuzzy(item, x, y, maxw);
+#endif // EMOJI_HIGHLIGHT_PATCH
+    }
+#endif // FUZZYHIGHLIGHT_PATCH
+
+#if HIGHLIGHT_PATCH
+    if (!fuzzy) {
+#if EMOJI_HIGHLIGHT_PATCH
+        drawhighlights_normal(item, output, x, y, maxw);
+#else
+        drawhighlights_normal(item, x, y, maxw);
+#endif // EMOJI_HIGHLIGHT_PATCH
+    }
+#endif // HIGHLIGHT_PATCH
+}
+#endif // HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
 
 static int
 drawitem(struct item *item, int x, int y, int w)

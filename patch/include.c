@@ -3,7 +3,8 @@
 #endif
 #if FUZZYHIGHLIGHT_PATCH
 #include "fuzzyhighlight.c"
-#elif HIGHLIGHT_PATCH
+#endif
+#if HIGHLIGHT_PATCH
 #include "highlight.c"
 #endif
 #if FUZZYMATCH_PATCH
