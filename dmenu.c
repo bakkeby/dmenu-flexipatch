@@ -1798,7 +1798,7 @@ setup(void)
 static void
 usage(void)
 {
-	fputs("usage: dmenu [-bv"
+	die("usage: dmenu [-bv"
 		#if CENTER_PATCH
 		"c"
 		#endif
@@ -1888,8 +1888,7 @@ usage(void)
 		#if SEPARATOR_PATCH
 		"\n             [-d separator] [-D separator]"
 		#endif // SEPARATOR_PATCH
-		"\n", stderr);
-	exit(1);
+		"\n");
 }
 
 int
