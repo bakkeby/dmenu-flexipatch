@@ -30,14 +30,6 @@
  */
 #define CENTER_PATCH 0
 
-/* This patch enables color emoji in dmenu by removing a workaround for a BadLength error
- * in the Xft library when color glyphs are used.
- * To enable this you will need an updated Xft library that can handle color glyphs otherwise
- * the program will crash on encountering such characters. Note that you will also need a font
- * that provides color emojis for this to work.
- */
-#define COLOR_EMOJI_PATCH 0
-
 /* Minor patch to enable the use of Ctrl+v (XA_PRIMARY) and Ctrl+Shift+v (CLIPBOARD) to paste.
  * By default dmenu only supports Ctrl+y and Ctrl+Shift+y to paste.
  */
@@ -164,6 +156,12 @@
  * https://tools.suckless.org/dmenu/patches/navhistory/
  */
 #define NAVHISTORY_PATCH 0
+
+/* This patch adds back in the workaround for a BadLength error in the Xft library when color
+ * glyphs are used. This is for systems that do not have an updated version of the Xft library
+ * (or generally prefer monochrome fonts).
+ */
+#define NO_COLOR_EMOJI_PATCH 0
 
 /* Adds the -S option to disable sorting menu items after matching. Useful, for example, when menu
  * items are sorted by their frequency of use (using an external cache) and the most frequently
