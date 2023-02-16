@@ -18,30 +18,6 @@ static const unsigned char utfmask[UTF_SIZ + 1] = {0xC0, 0x80, 0xE0, 0xF0, 0xF8}
 static const long utfmin[UTF_SIZ + 1] = {       0,    0,  0x80,  0x800,  0x10000};
 static const long utfmax[UTF_SIZ + 1] = {0x10FFFF, 0x7F, 0x7FF, 0xFFFF, 0x10FFFF};
 
-#if ALPHA_PATCH
-unsigned short
-hextodec(const char *hex)
-{
-	if (hex[0] == 0)
-		return 0xff;
-
-    unsigned short dec = 0;
-    for (int i = 0; i < 2; i++) {
-        char digit = hex[i];
-        if (digit >= '0' && digit <= '9')
-            digit -= '0';
-        else if (digit >= 'a' && digit <= 'f')
-            digit += 10 - 'a';
-        else if (digit >= 'A' && digit <= 'F')
-            digit += 10 - 'A';
-        else
-            digit = 0;
-        dec = (dec << 4) + digit;
-    }
-    return dec;
-}
-#endif // ALPHA_PATCH
-
 static long
 utf8decodebyte(const char c, size_t *i)
 {
@@ -321,7 +297,7 @@ drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
 	                       color, dest))
 		die("error, cannot allocate color '%s'", color);
 
-	unsigned short alpha = hextodec(clrname + 7);
+	unsigned short alpha = (unsigned short) strtol(clrname + 7, NULL, 16);
 	dest->pixel = (dest->pixel & 0x00ffffffU) | (alpha << 24);
 	#else
 	if (!XftColorAllocName(drw->dpy, DefaultVisual(drw->dpy, drw->screen),
