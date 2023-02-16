@@ -297,7 +297,11 @@ drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
 	                       color, dest))
 		die("error, cannot allocate color '%s'", color);
 
-	unsigned short alpha = (unsigned short) strtol(clrname + 7, NULL, 16);
+
+	unsigned short alpha = 0xff;
+	if (clrname[7])
+		alpha = (unsigned short) strtol(clrname + 7, NULL, 16);
+
 	dest->pixel = (dest->pixel & 0x00ffffffU) | (alpha << 24);
 	#else
 	if (!XftColorAllocName(drw->dpy, DefaultVisual(drw->dpy, drw->screen),
