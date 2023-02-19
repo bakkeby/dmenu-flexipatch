@@ -1907,6 +1907,16 @@ main(int argc, char *argv[])
 		die("cannot open display");
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
+
+	// Prior pass for `embed` is necessary
+	for (i = 0; i < argc; i++) {
+		if (!strcmp(argv[i], "-w")) {
+			embed = argv[++i];
+			break;
+		}
+	}
+	i = 0;
+
 	if (!embed || !(parentwin = strtol(embed, NULL, 0)))
 		parentwin = root;
 	if (!XGetWindowAttributes(dpy, parentwin, &wa))
