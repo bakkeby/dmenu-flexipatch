@@ -44,8 +44,6 @@ typedef struct {
 	#endif // PANGO_PATCH
 } Drw;
 
-unsigned short hextodec(const char *hex);
-
 /* Drawable abstraction */
 #if ALPHA_PATCH
 Drw *drw_create(Display *dpy, int screen, Window win, unsigned int w, unsigned int h, Visual *visual, unsigned int depth, Colormap cmap);
