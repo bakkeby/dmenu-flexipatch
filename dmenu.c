@@ -687,7 +687,11 @@ drawmenu(void)
 	}
 	#if NUMBERS_PATCH
 	drw_setscheme(drw, scheme[SchemeNorm]);
+	#if PANGO_PATCH
+	drw_text(drw, mw - rpad, 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0, False);
+	#else
 	drw_text(drw, mw - rpad, 0, TEXTW(numbers), bh, lrpad / 2, numbers, 0);
+	#endif // PANGO_PATCH
 	#endif // NUMBERS_PATCH
 	drw_map(drw, win, 0, 0, mw, mh);
 	#if NON_BLOCKING_STDIN_PATCH
