@@ -1741,7 +1741,7 @@ setup(void)
 		#endif // MOUSE_SUPPORT_PATCH
 	;
 	win = XCreateWindow(
-		dpy, parentwin,
+		dpy, root,
 		#if BARPADDING_PATCH && BORDER_PATCH
 		x + sp, y + vp - (topbar ? 0 : border_width * 2), mw - 2 * sp - border_width * 2, mh, border_width,
 		#elif BARPADDING_PATCH
@@ -1790,6 +1790,7 @@ setup(void)
 
 	XMapRaised(dpy, win);
 	if (embed) {
+		XReparentWindow(dpy, win, parentwin, x, y);
 		XSelectInput(dpy, parentwin, FocusChangeMask | SubstructureNotifyMask);
 		if (XQueryTree(dpy, parentwin, &dw, &w, &dws, &du) && dws) {
 			for (i = 0; i < du && dws[i] != win; ++i)
