@@ -1428,7 +1428,7 @@ readstdin(void)
 	char *buf, *p;
 	#endif // SEPARATOR_PATCH | TSV_PATCH
 
-	size_t i, junk, itemsiz = 0;
+	size_t i, linesiz, itemsiz = 0;
 	ssize_t len;
 
 	#if PASSWORD_PATCH
@@ -1439,7 +1439,7 @@ readstdin(void)
 	#endif // PASSWORD_PATCH
 
 	/* read each line from stdin and add it to the item list */
-	for (i = 0; (len = getline(&line, &junk, stdin)) != -1; i++) {
+	for (i = 0; (len = getline(&line, &linesiz, stdin)) != -1; i++) {
 		if (i + 1 >= itemsiz) {
 			itemsiz += 256;
 			if (!(items = realloc(items, itemsiz * sizeof(*items))))
@@ -1448,7 +1448,8 @@ readstdin(void)
 		if (line[len - 1] == '\n')
 			line[len - 1] = '\0';
 
-		items[i].text = line;
+		if (!(items[i].text = strdup(line)))
+			die("strdup:");
 		#if SEPARATOR_PATCH
 		if (separator && (p = separator_greedy ?
 			strrchr(items[i].text, separator) : strchr(items[i].text, separator))) {
@@ -1483,7 +1484,6 @@ readstdin(void)
 		#if HIGHPRIORITY_PATCH
 		items[i].hp = arrayhas(hpitems, hplength, items[i].text);
 		#endif // HIGHPRIORITY_PATCH
-		line = NULL;
 	}
 	free(line);
 	if (items)
