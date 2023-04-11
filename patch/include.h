@@ -4,6 +4,9 @@
 #if FZFEXPECT_PATCH
 #include "fzfexpect.h"
 #endif
+#if MULTI_SELECTION_PATCH
+#include "multiselect.h"
+#endif
 #if HIGHPRIORITY_PATCH
 #include "highpriority.h"
 #endif

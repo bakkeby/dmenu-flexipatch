@@ -20,6 +20,15 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 	if (!(strlen(itemtext) && strlen(text)))
 		return;
 
+	/* Do not highlight items scheduled for output */
+	#if MULTI_SELECTION_PATCH
+	if (issel(item->id))
+		return;
+	#else
+	if (item->out)
+		return;
+	#endif // MULTI_SELECTION_PATCH
+
 	drw_setscheme(drw, scheme[item == sel
 	                   ? SchemeSelHighlight
 	                   : SchemeNormHighlight]);
