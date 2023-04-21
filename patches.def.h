@@ -347,3 +347,7 @@
  * https://tools.suckless.org/dmenu/patches/xyw/
  */
 #define XYW_PATCH 0
+
+/* Adds support for input methods (fctix, ibus, etc.)
+*/
+#define INPUTMETHOD_PATCH 0

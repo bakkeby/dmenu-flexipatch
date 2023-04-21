@@ -102,6 +102,10 @@ struct item {
 };
 
 static char text[BUFSIZ] = "";
+#if INPUTMETHOD_PATCH
+static int composing;
+static char preview[512] = "";
+#endif
 #if PIPEOUT_PATCH
 static char pipeout[8] = " | dmenu";
 #endif // PIPEOUT_PATCH
@@ -205,7 +209,7 @@ static void grabfocus(void);
 static void grabkeyboard(void);
 static void match(void);
 static void insert(const char *str, ssize_t n);
-static size_t nextrune(int inc);
+static size_t nextrune(const char *text, size_t position, int inc);
 static void movewordedge(int dir);
 static void keypress(XKeyEvent *ev);
 static void paste(void);
@@ -915,30 +919,57 @@ insert(const char *str, ssize_t n)
 	#endif // REJECTNOMATCH_PATCH
 }
 
-static size_t
-nextrune(int inc)
+static size_t nextrune(const char *text, size_t position, int inc)
 {
 	ssize_t n;
 
 	/* return location of next utf8 rune in the given direction (+1 or -1) */
-	for (n = cursor + inc; n + inc >= 0 && (text[n] & 0xc0) == 0x80; n += inc)
+	for (n = position + inc; n + inc >= 0 && (text[n] & 0xc0) == 0x80; n += inc)
 		;
 	return n;
 }
+
+      
+#if INPUTMETHOD_PATCH
+/* return bytes from beginning of text to nth utf8 rune to the right */
+static size_t runebytes(const char *text, size_t n)
+{
+	size_t ret;
+
+	ret = 0;
+	while (n-- > 0)
+		ret += nextrune(text + ret, 0, 1);
+	return ret;
+}
+
+/* return number of characters from beginning of text to nth byte to the right
+ */
+static size_t runechars(const char *text, size_t n)
+{
+	size_t ret, i;
+
+	ret = i = 0;
+	while (i < n) {
+		i += nextrune(text + i, 0, 1);
+		ret++;
+	}
+	return ret;
+}
+#endif
 
 static void
 movewordedge(int dir)
 {
 	if (dir < 0) { /* move cursor to the start of the word*/
-		while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
-			cursor = nextrune(-1);
-		while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
-			cursor = nextrune(-1);
+		while (cursor > 0 && strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
+			cursor = nextrune(text, cursor, -1);
+		while (cursor > 0 && !strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
+			cursor = nextrune(text, cursor, -1);
 	} else { /* move cursor to the end of the word */
 		while (text[cursor] && strchr(worddelimiters, text[cursor]))
-			cursor = nextrune(+1);
+			cursor = nextrune(text, cursor, +1);
 		while (text[cursor] && !strchr(worddelimiters, text[cursor]))
-			cursor = nextrune(+1);
+			cursor = nextrune(text, cursor, +1);
 	}
 }
 
@@ -1028,10 +1059,10 @@ keypress(XKeyEvent *ev)
 		#else
 		case XK_w: /* delete word */
 		#endif // FZFEXPECT_PATCH
-			while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
-				insert(NULL, nextrune(-1) - cursor);
-			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
-				insert(NULL, nextrune(-1) - cursor);
+			while (cursor > 0 && strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
+				insert(NULL, nextrune(text, cursor, -1) - cursor);
+			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
+				insert(NULL, nextrune(text, cursor, -1) - cursor);
 			break;
 		#if FZFEXPECT_PATCH || CTRL_V_TO_PASTE_PATCH
 		case XK_v:
@@ -1119,12 +1150,12 @@ insert:
 	case XK_KP_Delete:
 		if (text[cursor] == '\0')
 			return;
-		cursor = nextrune(+1);
+		cursor = nextrune(text, cursor, +1);
 		/* fallthrough */
 	case XK_BackSpace:
 		if (cursor == 0)
 			return;
-		insert(NULL, nextrune(-1) - cursor);
+		insert(NULL, nextrune(text, cursor, -1) - cursor);
 		break;
 	case XK_End:
 	case XK_KP_End:
@@ -1178,7 +1209,7 @@ insert:
 		}
 		#endif // GRIDNAV_PATCH
 		if (cursor > 0 && (!sel || !sel->left || lines > 0)) {
-			cursor = nextrune(-1);
+			cursor = nextrune(text, cursor, -1);
 			break;
 		}
 		if (lines > 0)
@@ -1306,7 +1337,7 @@ insert:
 		}
 		#endif // GRIDNAV_PATCH
 		if (text[cursor] != '\0') {
-			cursor = nextrune(+1);
+			cursor = nextrune(text, cursor, +1);
 			break;
 		}
 		if (lines > 0)
@@ -1377,6 +1408,118 @@ paste(void)
 	}
 	drawmenu();
 }
+
+#if INPUTMETHOD_PATCH
+/* move caret on pre-edit text */
+static void preeditcaret(XIC xic, XPointer clientdata, XPointer calldata)
+{
+	XIMPreeditCaretCallbackStruct *pcaret;
+	struct Prompt *prompt;
+
+	(void)xic;
+	prompt = (struct Prompt *)clientdata;
+	pcaret = (XIMPreeditCaretCallbackStruct *)calldata;
+	if (!pcaret)
+		return;
+	switch (pcaret->direction) {
+	case XIMForwardChar:
+		cursor = nextrune(text, cursor, +1);
+		break;
+	case XIMBackwardChar:
+		cursor = nextrune(text, cursor, -1);
+		break;
+	case XIMForwardWord:
+		movewordedge(+1);
+		break;
+	case XIMBackwardWord:
+		movewordedge(-1);
+		break;
+	case XIMLineStart:
+		cursor = 0;
+		break;
+	case XIMLineEnd:
+		if (preview[cursor] != '\0')
+			cursor = strlen(preview);
+		break;
+	case XIMAbsolutePosition:
+		cursor = runebytes(text, pcaret->position);
+		break;
+	case XIMDontChange:
+		/* do nothing */
+		break;
+	case XIMCaretUp:
+	case XIMCaretDown:
+	case XIMNextLine:
+	case XIMPreviousLine:
+		/* not implemented */
+		break;
+	}
+	pcaret->position = runechars(preview, cursor);
+}
+
+/* start input method pre-editing */
+static int preeditstart(XIC xic, XPointer clientdata, XPointer calldata)
+{
+	(void)xic;
+	(void)calldata;
+	(void)clientdata;
+	composing = 1;
+	printf("PREEDIT\n");
+	return BUFSIZ;
+}
+
+/* end input method pre-editing */
+static void preeditdone(XIC xic, XPointer clientdata, XPointer calldata)
+{
+	(void)xic;
+	(void)clientdata;
+	(void)calldata;
+	printf("DONE\n");
+
+	composing = 0;
+}
+
+/* draw input method pre-edit text */
+static void preeditdraw(XIC xic, XPointer clientdata, XPointer calldata)
+{
+	XIMPreeditDrawCallbackStruct *pdraw;
+	size_t beg, dellen, inslen, endlen;
+
+	printf("DRAW\n");
+
+	(void)xic;
+	pdraw = (XIMPreeditDrawCallbackStruct *)calldata;
+	if (!pdraw)
+		return;
+
+	/* we do not support wide characters */
+	if (pdraw->text && pdraw->text->encoding_is_wchar == True) {
+		fputs("warning: xprompt does not support wchar; use utf8!", stderr);
+		return;
+	}
+
+	beg = runebytes(text, pdraw->chg_first);
+	dellen = runebytes(preview + beg, pdraw->chg_length);
+	inslen = pdraw->text ? runebytes(pdraw->text->string.multi_byte, pdraw->text->length) : 0;
+	endlen = 0;
+	if (beg + dellen < strlen(preview))
+		endlen = strlen(preview + beg + dellen);
+
+	/* we cannot change text past the end of our pre-edit string */
+
+	if (beg + dellen >= BUFSIZ || beg + inslen >= BUFSIZ)
+		return;
+
+	/* get space for text to be copied, and copy it */
+	memmove(preview + beg + inslen, preview + beg + dellen, endlen + 1);
+	if (pdraw->text && pdraw->text->length)
+		memcpy(preview + beg, pdraw->text->string.multi_byte, inslen);
+	(preview + beg + inslen + endlen)[0] = '\0';
+
+	/* get caret position */
+	cursor = runebytes(text, pdraw->caret);
+}
+#endif
 
 #if ALPHA_PATCH
 static void
@@ -1504,6 +1647,8 @@ run(void)
 	int i;
 	#endif // PRESELECT_PATCH
 
+	XMapRaised(dpy, win);
+	grabfocus();
 	while (!XNextEvent(dpy, &ev)) {
 		#if PRESELECT_PATCH
 		if (preselected) {
@@ -1517,10 +1662,14 @@ run(void)
 			preselected = 0;
 		}
 		#endif // PRESELECT_PATCH
-		if (XFilterEvent(&ev, win))
+		if (XFilterEvent(&ev, None))
 			continue;
 		switch(ev.type) {
 		#if MOUSE_SUPPORT_PATCH
+		#if INPUTMETHOD_PATCH
+			if (composing)
+				break;
+		#endif
 		case ButtonPress:
 			buttonpress(&ev);
 			break;
@@ -1756,7 +1905,12 @@ setup(void)
 		CWOverrideRedirect|CWBackPixel|CWBorderPixel|CWColormap|CWEventMask, &swa
 		#else
 		CopyFromParent, CopyFromParent, CopyFromParent,
-		CWOverrideRedirect | CWBackPixel | CWEventMask, &swa
+		CWOverrideRedirect | CWBackPixel
+		#if INPUTMETHOD_PATCH == 1
+		| CWEventMask
+		#endif
+		,
+		&swa
 		#endif // ALPHA_PATCH
 	);
 	#if BORDER_PATCH
@@ -1774,8 +1928,60 @@ setup(void)
 	if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
 		die("XOpenIM failed: could not open input device");
 
-	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
-	                XNClientWindow, win, XNFocusWindow, win, NULL);
+	#if INPUTMETHOD_PATCH
+	XVaNestedList preedit = NULL;
+	XICCallback start, done, draw, caret;
+	XIMStyle preeditstyle;
+	XIMStyle statusstyle;
+	XIMStyles *imstyles;
+
+	/* get styles supported by input method */
+	if (XGetIMValues(xim, XNQueryInputStyle, &imstyles, NULL) != NULL)
+		fputs("XGetIMValues: could not obtain input method values", stderr);
+
+	/* check whether input method support on-the-spot pre-editing */
+	preeditstyle = XIMPreeditNothing;
+	statusstyle = XIMStatusNothing;
+	for (i = 0; i < imstyles->count_styles; i++) {
+		if (imstyles->supported_styles[i] & XIMPreeditCallbacks) {
+			preeditstyle = XIMPreeditCallbacks;
+			break;
+		}
+	}
+
+	/* create callbacks for the input context */
+	start.client_data = NULL;
+	done.client_data = NULL;
+	draw.client_data = (XPointer)text;
+	caret.client_data = (XPointer)text;
+	start.callback = (XICProc)preeditstart;
+	done.callback = (XICProc)preeditdone;
+	draw.callback = (XICProc)preeditdraw;
+	caret.callback = (XICProc)preeditcaret;
+
+	/* create list of values for input context */
+	preedit = XVaCreateNestedList(0, XNPreeditStartCallback, &start, XNPreeditDoneCallback,
+				      &done, XNPreeditDrawCallback, &draw, XNPreeditCaretCallback,
+				      &caret, NULL);
+	if (preedit == NULL)
+		fputs("XVaCreateNestedList: could not create nested list", stderr);
+
+	xic = XCreateIC(xim, XNInputStyle, preeditstyle | statusstyle, XNPreeditAttributes, preedit,
+			XNClientWindow, win, XNFocusWindow, win, NULL);
+	XFree(preedit);
+
+	long eventmask;
+	/* get events the input method is interested in */
+	if (XGetICValues(xic, XNFilterEvents, &eventmask, NULL))
+		fputs("XGetICValues: could not obtain input context values", stderr);
+
+	XSelectInput(dpy, win,
+		     ExposureMask | KeyPressMask | VisibilityChangeMask | ButtonPressMask |
+			     PointerMotionMask | eventmask);
+	#else
+	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow,
+			win, XNFocusWindow, win, NULL);
+	#endif
 
 	#if MANAGED_PATCH
 	if (managed) {
@@ -2113,6 +2319,9 @@ main(int argc, char *argv[])
 	#else // !XRESOURCES_PATCH
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
+	if (!XSetLocaleModifiers(""))
+		fputs("warning: could not set locale modifiers", stderr);
+
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("cannot open display");
 	screen = DefaultScreen(dpy);
