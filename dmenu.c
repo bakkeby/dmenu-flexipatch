@@ -209,7 +209,8 @@ static void grabfocus(void);
 static void grabkeyboard(void);
 static void match(void);
 static void insert(const char *str, ssize_t n);
-static size_t nextrune(const char *text, size_t position, int inc);
+static size_t nextrunetext(const char *text, size_t position, int inc);
+static size_t nextrune(int inc);
 static void movewordedge(int dir);
 static void keypress(XKeyEvent *ev);
 static void paste(void);
@@ -919,7 +920,18 @@ insert(const char *str, ssize_t n)
 	#endif // REJECTNOMATCH_PATCH
 }
 
-static size_t nextrune(const char *text, size_t position, int inc)
+static size_t
+nextrune(int inc)
+{
+	ssize_t n;
+
+	/* return location of next utf8 rune in the given direction (+1 or -1) */
+	for (n = cursor + inc; n + inc >= 0 && (text[n] & 0xc0) == 0x80; n += inc)
+		;
+	return n;
+}
+
+static size_t nextrunetext(const char *text, size_t position, int inc)
 {
 	ssize_t n;
 
@@ -938,7 +950,7 @@ static size_t runebytes(const char *text, size_t n)
 
 	ret = 0;
 	while (n-- > 0)
-		ret += nextrune(text + ret, 0, 1);
+		ret += nextrunetext(text + ret, 0, 1);
 	return ret;
 }
 
@@ -950,7 +962,7 @@ static size_t runechars(const char *text, size_t n)
 
 	ret = i = 0;
 	while (i < n) {
-		i += nextrune(text + i, 0, 1);
+		i += nextrunetext(text + i, 0, 1);
 		ret++;
 	}
 	return ret;
@@ -961,15 +973,15 @@ static void
 movewordedge(int dir)
 {
 	if (dir < 0) { /* move cursor to the start of the word*/
-		while (cursor > 0 && strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
-			cursor = nextrune(text, cursor, -1);
-		while (cursor > 0 && !strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
-			cursor = nextrune(text, cursor, -1);
+		while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
+			cursor = nextrune(-1);
+		while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
+			cursor = nextrune(-1);
 	} else { /* move cursor to the end of the word */
 		while (text[cursor] && strchr(worddelimiters, text[cursor]))
-			cursor = nextrune(text, cursor, +1);
+			cursor = nextrune(+1);
 		while (text[cursor] && !strchr(worddelimiters, text[cursor]))
-			cursor = nextrune(text, cursor, +1);
+			cursor = nextrune(+1);
 	}
 }
 
@@ -1059,10 +1071,10 @@ keypress(XKeyEvent *ev)
 		#else
 		case XK_w: /* delete word */
 		#endif // FZFEXPECT_PATCH
-			while (cursor > 0 && strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
-				insert(NULL, nextrune(text, cursor, -1) - cursor);
-			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(text, cursor, -1)]))
-				insert(NULL, nextrune(text, cursor, -1) - cursor);
+			while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
+				insert(NULL, nextrune(-1) - cursor);
+			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
+				insert(NULL, nextrune(-1) - cursor);
 			break;
 		#if FZFEXPECT_PATCH || CTRL_V_TO_PASTE_PATCH
 		case XK_v:
@@ -1150,12 +1162,12 @@ insert:
 	case XK_KP_Delete:
 		if (text[cursor] == '\0')
 			return;
-		cursor = nextrune(text, cursor, +1);
+		cursor = nextrune(+1);
 		/* fallthrough */
 	case XK_BackSpace:
 		if (cursor == 0)
 			return;
-		insert(NULL, nextrune(text, cursor, -1) - cursor);
+		insert(NULL, nextrune(-1) - cursor);
 		break;
 	case XK_End:
 	case XK_KP_End:
@@ -1209,7 +1221,7 @@ insert:
 		}
 		#endif // GRIDNAV_PATCH
 		if (cursor > 0 && (!sel || !sel->left || lines > 0)) {
-			cursor = nextrune(text, cursor, -1);
+			cursor = nextrune(-1);
 			break;
 		}
 		if (lines > 0)
@@ -1337,7 +1349,7 @@ insert:
 		}
 		#endif // GRIDNAV_PATCH
 		if (text[cursor] != '\0') {
-			cursor = nextrune(text, cursor, +1);
+			cursor = nextrune(+1);
 			break;
 		}
 		if (lines > 0)
@@ -1423,10 +1435,10 @@ static void preeditcaret(XIC xic, XPointer clientdata, XPointer calldata)
 		return;
 	switch (pcaret->direction) {
 	case XIMForwardChar:
-		cursor = nextrune(text, cursor, +1);
+		cursor = nextrune(+1);
 		break;
 	case XIMBackwardChar:
-		cursor = nextrune(text, cursor, -1);
+		cursor = nextrune(-1);
 		break;
 	case XIMForwardWord:
 		movewordedge(+1);
