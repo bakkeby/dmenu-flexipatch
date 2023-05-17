@@ -2140,6 +2140,15 @@ main(int argc, char *argv[])
 		    parentwin);
 
 	#if ALPHA_PATCH
+	/* These need to be checked before we init the visuals. */
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-o")) {  /* opacity, pass -o 0 to disable alpha */
+			opacity = atoi(argv[++i]);
+		} else {
+			continue;
+		}
+		argv[i][0] = '\0'; // mark as used
+	}
 	xinitvisual();
 	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
 	#else
@@ -2148,7 +2157,10 @@ main(int argc, char *argv[])
 	readxresources();
 	#endif // XRESOURCES_PATCH
 
-	for (i = 1; i < argc; i++)
+	for (i = 1; i < argc; i++) {
+		if (argv[i][0] == '\0')
+			continue;
+
 		/* these options take no arguments */
 		if (!strcmp(argv[i], "-v")) {      /* prints version information */
 			puts("dmenu-"VERSION);
@@ -2317,8 +2329,10 @@ main(int argc, char *argv[])
 			insert(text, strlen(text));
 		}
 		#endif // INITIALTEXT_PATCH
-		else
+		else {
 			usage();
+		}
+	}
 
 	#if XRESOURCES_PATCH
 	#if PANGO_PATCH
