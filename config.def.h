@@ -5,6 +5,9 @@ static int topbar = 1;                      /* -b  option; if 0, dmenu appears a
 #if ALPHA_PATCH
 static int opacity = 1;                     /* -o  option; if 0, then alpha is disabled */
 #endif // ALPHA_PATCH
+#if CARET_WIDTH_PATCH
+static int caret_width = 2;                 /* -cw option; set default caret width */
+#endif // CARET_WIDTH_PATCH
 #if FUZZYMATCH_PATCH
 static int fuzzy = 1;                       /* -F  option; if 0, dmenu doesn't use fuzzy matching */
 #endif // FUZZYMATCH_PATCH

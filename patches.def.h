@@ -19,6 +19,12 @@
  */
 #define BORDER_PATCH 0
 
+/* By default the caret in dmenu has a width of 2 pixels. This patch makes that configurable
+ * as well as overridable via a command line option.
+ * https://github.com/DarkSamus669/dmenu-patches/blob/main/dmenu-caretwidth-5.2.diff
+ */
+#define CARET_WIDTH_PATCH 0
+
 /* This patch makes dmenu case-insensitive by default, replacing the
  * case-insensitive -i option with a case sensitive -s option.
  * http://tools.suckless.org/dmenu/patches/case-insensitive/

@@ -585,7 +585,11 @@ drawmenu(void)
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
 	if ((curpos += lrpad / 2 - 1) < w) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		#if LINE_HEIGHT_PATCH
+		#if CARET_WIDTH_PATCH && LINE_HEIGHT_PATCH
+		drw_rect(drw, x + curpos, 2 + (bh-fh)/2, caret_width, fh - 4, 1, 0);
+		#elif CARET_WIDTH_PATCH
+		drw_rect(drw, x + curpos, 2, caret_width, bh - 4, 1, 0);
+		#elif LINE_HEIGHT_PATCH
 		drw_rect(drw, x + curpos, 2 + (bh-fh)/2, 2, fh - 4, 1, 0);
 		#else
 		drw_rect(drw, x + curpos, 2, 2, bh - 4, 1, 0);
@@ -1846,6 +1850,9 @@ usage(void)
 		"1"
 		#endif // RESTRICT_RETURN_PATCH
 		"] "
+		#if CARET_WIDTH_PATCH
+		"[-cw caret_width] "
+		#endif // CARET_WIDTH_PATCH
 		#if MANAGED_PATCH
 		"[-wm] "
 		#endif // MANAGED_PATCH
@@ -2084,6 +2091,10 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-shf")) /* selected hi foreground color */
 			colors[SchemeSelHighlight][ColFg] = argv[++i];
 		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+		#if CARET_WIDTH_PATCH
+		else if (!strcmp(argv[i], "-cw"))  /* sets caret witdth */
+			caret_width = atoi(argv[++i]);
+		#endif // CARET_WIDTH_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
 		#if SEPARATOR_PATCH
