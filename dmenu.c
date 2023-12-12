@@ -1957,7 +1957,7 @@ main(int argc, char *argv[])
 			topbar = 0;
 		#if CENTER_PATCH
 		} else if (!strcmp(argv[i], "-c")) { /* toggles centering of dmenu window on screen */
-			center = !center;
+			center = 1;
 		#endif // CENTER_PATCH
 		#if !NON_BLOCKING_STDIN_PATCH
 		} else if (!strcmp(argv[i], "-f")) { /* grabs keyboard before reading stdin */
