@@ -2054,7 +2054,7 @@ main(int argc, char *argv[])
 			prompt = argv[++i];
 		else if (!strcmp(argv[i], "-fn"))  /* font or font set */
 			#if PANGO_PATCH
-			strcpy(font, argv[++i]);
+			font = argv[++i];
 			#else
 			fonts[0] = argv[++i];
 			#endif // PANGO_PATCH

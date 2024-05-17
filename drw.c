@@ -234,7 +234,7 @@ xfont_free(Fnt *font)
 
 #if PANGO_PATCH
 Fnt*
-drw_font_create(Drw* drw, const char font[])
+drw_font_create(Drw* drw, const char *font)
 {
 	Fnt *fnt = NULL;
 
