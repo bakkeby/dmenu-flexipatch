@@ -1875,6 +1875,9 @@ usage(void)
 		#if BORDER_PATCH
 		" [-bw width]"
 		#endif // BORDER_PATCH
+		#if CENTER_PATCH
+		" [-wi width]"
+		#endif // CENTER_PATCH
 		#if HIGHPRIORITY_PATCH
 		" [-hb color] [-hf color] [-hp items]"
 		#endif // HIGHPRIORITY_PATCH
@@ -2111,6 +2114,10 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-dy"))  /* dynamic command to run */
 			dynamic = argv[++i];
 		#endif // DYNAMIC_OPTIONS_PATCH
+		#if CENTER_PATCH
+		else if (!strcmp(argv[i], "-wi"))  /* window width */
+			min_width = atoi(argv[++i]);
+		#endif // CENTER_PATCH
 		#if BORDER_PATCH
 		else if (!strcmp(argv[i], "-bw"))  /* border width around dmenu */
 			border_width = atoi(argv[++i]);
