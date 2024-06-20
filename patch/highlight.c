@@ -1,8 +1,8 @@
 static void
 #if EMOJI_HIGHLIGHT_PATCH
-drawhighlights(struct item *item, char *output, int x, int y, int maxw)
+drawhighlights_normal(struct item *item, char *output, int x, int y, int maxw)
 #else
-drawhighlights(struct item *item, int x, int y, int maxw)
+drawhighlights_normal(struct item *item, int x, int y, int maxw)
 #endif // EMOJI_HIGHLIGHT_PATCH
 {
 	char restorechar, tokens[sizeof text], *highlight,  *token;
