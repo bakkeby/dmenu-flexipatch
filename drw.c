@@ -284,19 +284,23 @@ drw_fontset_free(Fnt *font)
 #endif // PANGO_PATCH
 
 void
-#if ALPHA_PATCH
-drw_clr_create(Drw *drw, Clr *dest, const char *clrname, unsigned int alpha)
-#else
 drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
-#endif // ALPHA_PATCH
 {
 	if (!drw || !dest || !clrname)
 		return;
 
 	#if ALPHA_PATCH
+	char color[8];
+	strncpy(color, clrname, 7);
+	color[7] = 0;
 	if (!XftColorAllocName(drw->dpy, drw->visual, drw->cmap,
-	                       clrname, dest))
-		die("error, cannot allocate color '%s'", clrname);
+	                       color, dest))
+		die("error, cannot allocate color '%s'", color);
+
+
+	unsigned short alpha = 0xff;
+	if (clrname[7])
+		alpha = (unsigned short) strtol(clrname + 7, NULL, 16);
 
 	dest->pixel = (dest->pixel & 0x00ffffffU) | (alpha << 24);
 	#else
@@ -310,11 +314,7 @@ drw_clr_create(Drw *drw, Clr *dest, const char *clrname)
 /* Wrapper to create color schemes. The caller has to call free(3) on the
  * returned color scheme when done using it. */
 Clr *
-#if ALPHA_PATCH
-drw_scm_create(Drw *drw, const char *clrnames[], const unsigned int alphas[], size_t clrcount)
-#else
 drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount)
-#endif // ALPHA_PATCH
 {
 	size_t i;
 	Clr *ret;
@@ -324,11 +324,7 @@ drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount)
 		return NULL;
 
 	for (i = 0; i < clrcount; i++)
-		#if ALPHA_PATCH
-		drw_clr_create(drw, &ret[i], clrnames[i], alphas[i]);
-		#else
 		drw_clr_create(drw, &ret[i], clrnames[i]);
-		#endif // ALPHA_PATCH
 	return ret;
 }
 
