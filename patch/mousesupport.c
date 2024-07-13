@@ -4,6 +4,9 @@ buttonpress(XEvent *e)
 	struct item *item;
 	XButtonPressedEvent *ev = &e->xbutton;
 	int x = 0, y = 0, h = bh, w;
+	#if GRID_PATCH
+	int i, cols;
+	#endif // GRID_PATCH
 
 	if (ev->window != win)
 		return;
@@ -66,8 +69,40 @@ buttonpress(XEvent *e)
 	if (ev->state & ~ControlMask)
 		return;
 	if (lines > 0) {
+		#if GRID_PATCH
+		cols = columns ? columns : 1;
+		for (i = 0, item = curr; item != next; item = item->right, i++) {
+			if (
+				(ev->y >= y + ((i % lines) + 1) * bh) && // line y start
+				(ev->y <= y + ((i % lines) + 2) * bh) && // line y end
+				(ev->x >= x + ((i / lines) * (w / cols))) && // column x start
+				(ev->x <= x + ((i / lines + 1) * (w / cols))) // column x end
+			) {
+				#if !MULTI_SELECTION_PATCH
+				puts(item->text);
+				#endif // MULTI_SELECTION_PATCH
+				if (!(ev->state & ControlMask)) {
+					#if MULTI_SELECTION_PATCH
+					sel = item;
+					selsel();
+					printsel(ev->state);
+					#endif // MULTI_SELECTION_PATCH
+					exit(0);
+				}
+				sel = item;
+				if (sel) {
+					#if MULTI_SELECTION_PATCH
+					selsel();
+					#else
+					sel->out = 1;
+					#endif // MULTI_SELECTION_PATCH
+					drawmenu();
+				}
+				return;
+			}
+		}
+		#else
 		/* vertical list: (ctrl)left-click on item */
-		w = mw - x;
 		for (item = curr; item != next; item = item->right) {
 			y += h;
 			if (ev->y >= y && ev->y <= (y + h)) {
@@ -94,6 +129,7 @@ buttonpress(XEvent *e)
 				return;
 			}
 		}
+		#endif // GRID_PATCH
 	} else if (matches) {
 		/* left-click on left arrow */
 		x += inputw;
@@ -157,3 +193,79 @@ buttonpress(XEvent *e)
 		}
 	}
 }
+
+#if MOTION_SUPPORT_PATCH
+static void
+motionevent(XButtonEvent *ev)
+{
+	struct item *item;
+	int x = 0, y = 0, w;
+	#if GRID_PATCH
+	int i, cols;
+	#endif // GRID_PATCH
+
+	if (ev->window != win || matches == 0)
+		return;
+
+	if (prompt && *prompt)
+		x += promptw;
+
+	if (lines > 0) {
+		/* input field */
+		w = mw - x;
+		#if GRID_PATCH
+		cols = columns ? columns : 1;
+		/* grid view or vertical list */
+		for (i = 0, item = curr; item != next; item = item->right, i++) {
+			if (
+				(ev->y >= y + ((i % lines) + 1) * bh) && // line y start
+				(ev->y <= y + ((i % lines) + 2) * bh) && // line y end
+				(ev->x >= x + ((i / lines) * (w / cols))) && // column x start
+				(ev->x <= x + ((i / lines + 1) * (w / cols))) // column x end
+			) {
+				sel = item;
+				calcoffsets();
+				drawmenu();
+				break;
+			}
+		}
+		#else
+		/* vertical list */
+		w = mw - x;
+		for (item = curr; item != next; item = item->right) {
+			y += bh;
+			if (ev->y >= y && ev->y <= (y + bh)) {
+				sel = item;
+				calcoffsets();
+				drawmenu();
+				break;
+			}
+		}
+		#endif // GRID_PATCH
+		return;
+	}
+
+	/* left-click on left arrow */
+	x += inputw;
+	#if SYMBOLS_PATCH
+	w = TEXTW(symbol_1);
+	#else
+	w = TEXTW("<");
+	#endif // SYMBOLS_PATCH
+	/* horizontal list */
+	for (item = curr; item != next; item = item->right) {
+		x += w;
+		#if SYMBOLS_PATCH
+		w = MIN(TEXTW(item->text), mw - x - TEXTW(symbol_2));
+		#else
+		w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
+		#endif // SYMBOLS_PATCH
+		if (ev->x >= x && ev->x <= x + w) {
+			sel = item;
+			calcoffsets();
+			drawmenu();
+			break;
+		}
+	}
+}
+#endif

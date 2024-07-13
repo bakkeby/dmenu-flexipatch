@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2024-07-16 - Added the mouse motion support patch
+
 2023-06-15 - Added the caret width patch
 
 2022-09-05 - Removed the json patch due to maintenance and compatibility reasons, added the

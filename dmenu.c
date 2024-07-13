@@ -1527,6 +1527,11 @@ run(void)
 		case ButtonPress:
 			buttonpress(&ev);
 			break;
+		#if MOTION_SUPPORT_PATCH
+		case MotionNotify:
+			motionevent(&ev.xbutton);
+			break;
+		#endif // MOTION_SUPPORT_PATCH
 		#endif // MOUSE_SUPPORT_PATCH
 		case DestroyNotify:
 			if (ev.xdestroywindow.window != win)
@@ -1749,6 +1754,9 @@ setup(void)
 	swa.event_mask = ExposureMask | KeyPressMask | VisibilityChangeMask
 		#if MOUSE_SUPPORT_PATCH
 		| ButtonPressMask
+		#if MOTION_SUPPORT_PATCH
+		| PointerMotionMask
+		#endif // MOTION_SUPPORT_PATCH
 		#endif // MOUSE_SUPPORT_PATCH
 	;
 	win = XCreateWindow(
