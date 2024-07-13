@@ -157,3 +157,39 @@ buttonpress(XEvent *e)
 		}
 	}
 }
+
+#if MOTION_SUPPORT_PATCH
+static void
+mousemove(XEvent *e)
+{
+	struct item *item;
+	XPointerMovedEvent *ev = &e->xmotion;
+	int x = 0, y = 0, h = bh, w;
+
+	if (lines > 0) {
+		w = mw - x;
+		for (item = curr; item != next; item = item->right) {
+			y += h;
+			if (ev->y >= y && ev->y <= (y + h)) {
+				sel = item;
+				calcoffsets();
+				drawmenu();
+				return;
+			}
+		}
+	} else if (matches) {
+		x += inputw + promptw;
+		w = TEXTW("<");
+		for (item = curr; item != next; item = item->right) {
+			x += w;
+			w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
+			if (ev->x >= x && ev->x <= x + w) {
+				sel = item;
+				calcoffsets();
+				drawmenu();
+				return;
+			}
+		}
+	}
+}
+#endif
