@@ -1529,7 +1529,7 @@ run(void)
 			break;
 		#if MOTION_SUPPORT_PATCH
 		case MotionNotify:
-			mousemove(&ev);
+			motionevent(&ev.xbutton);
 			break;
 		#endif // MOTION_SUPPORT_PATCH
 		#endif // MOUSE_SUPPORT_PATCH

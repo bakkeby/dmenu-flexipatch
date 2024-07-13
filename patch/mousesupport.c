@@ -160,36 +160,25 @@ buttonpress(XEvent *e)
 
 #if MOTION_SUPPORT_PATCH
 static void
-mousemove(XEvent *e)
+motionevent(XButtonEvent *ev)
 {
-	struct item *item;
-	XPointerMovedEvent *ev = &e->xmotion;
-	int x = 0, y = 0, h = bh, w;
+	struct item *it;
+	int xy, ev_xy;
 
-	if (lines > 0) {
-		w = mw - x;
-		for (item = curr; item != next; item = item->right) {
-			y += h;
-			if (ev->y >= y && ev->y <= (y + h)) {
-				sel = item;
-				calcoffsets();
-				drawmenu();
-				return;
-			}
+	if (ev->window != win || matches == 0)
+		return;
+
+	xy = lines > 0 ? bh : inputw + promptw + TEXTW("<");
+	ev_xy = lines > 0 ? ev->y : ev->x;
+	for (it = curr; it && it != next; it = it->right) {
+		int wh = lines > 0 ? bh : textw_clamp(it->text, mw - xy - TEXTW(">"));
+		if (ev_xy >= xy && ev_xy < (xy + wh)) {
+			sel = it;
+			calcoffsets();
+			drawmenu();
+			break;
 		}
-	} else if (matches) {
-		x += inputw + promptw;
-		w = TEXTW("<");
-		for (item = curr; item != next; item = item->right) {
-			x += w;
-			w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
-			if (ev->x >= x && ev->x <= x + w) {
-				sel = item;
-				calcoffsets();
-				drawmenu();
-				return;
-			}
-		}
+		xy += wh;
 	}
 }
 #endif
