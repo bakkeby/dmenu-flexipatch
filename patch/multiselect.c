@@ -32,7 +32,7 @@ printsel(unsigned int state)
 }
 
 static void
-selsel()
+selsel(void)
 {
 	if (!sel)
 		return;

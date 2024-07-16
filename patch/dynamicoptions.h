@@ -1,2 +1,2 @@
-static void refreshoptions();
+static void refreshoptions(void);
 static void readstream(FILE* stream);

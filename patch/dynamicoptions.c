@@ -1,5 +1,5 @@
 static void
-refreshoptions()
+refreshoptions(void)
 {
 	int dynlen = strlen(dynamic);
 	char* cmd= malloc(dynlen + strlen(text) + 2);
