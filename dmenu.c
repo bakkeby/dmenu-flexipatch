@@ -1935,6 +1935,25 @@ main(int argc, char *argv[])
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("cannot open display");
+
+	/* These need to be checked before we init the visuals and read X resources. */
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-v")) { /* prints version information */
+			puts("dmenu-"VERSION);
+			exit(0);
+		} else if (!strcmp(argv[i], "-w")) {
+			argv[i][0] = '\0';
+			embed = strdup(argv[++i]);
+		#if ALPHA_PATCH
+		} else if (!strcmp(argv[i], "-o")) {  /* opacity, pass -o 0 to disable alpha */
+			opacity = atoi(argv[++i]);
+		#endif // ALPHA_PATCH
+		} else {
+			continue;
+		}
+		argv[i][0] = '\0'; // mark as used
+	}
+
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 	if (!embed || !(parentwin = strtol(embed, NULL, 0)))
@@ -1944,15 +1963,6 @@ main(int argc, char *argv[])
 		    parentwin);
 
 	#if ALPHA_PATCH
-	/* These need to be checked before we init the visuals. */
-	for (i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-o")) {  /* opacity, pass -o 0 to disable alpha */
-			opacity = atoi(argv[++i]);
-		} else {
-			continue;
-		}
-		argv[i][0] = '\0'; // mark as used
-	}
 	xinitvisual();
 	drw = drw_create(dpy, screen, root, wa.width, wa.height, visual, depth, cmap);
 	#else
@@ -2062,7 +2072,7 @@ main(int argc, char *argv[])
 		#endif // XYW_PATCH
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);
-		#if ALPHA_PATCH
+		#if ALPHA_PATCH && !XRESOURCES_PATCH
 		else if (!strcmp(argv[i], "-o"))  /* opacity, pass -o 0 to disable alpha */
 			opacity = atoi(argv[++i]);
 		#endif // ALPHA_PATCH
@@ -2110,8 +2120,10 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-cw"))  /* sets caret witdth */
 			caret_width = atoi(argv[++i]);
 		#endif // CARET_WIDTH_PATCH
+		#if !XRESOURCES_PATCH
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
+		#endif // XRESOURCES_PATCH
 		#if SEPARATOR_PATCH
 		else if (!strcmp(argv[i], "-d") || /* field separator */
 				(separator_greedy = !strcmp(argv[i], "-D"))) {
