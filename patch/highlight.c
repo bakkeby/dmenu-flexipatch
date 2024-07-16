@@ -6,12 +6,10 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 #endif // EMOJI_HIGHLIGHT_PATCH
 {
 	char restorechar, tokens[sizeof text], *highlight,  *token;
-	int indentx, highlightlen;
+	int indent, highlightlen;
 
 	#if FUZZYMATCH_PATCH
-	char c;
-	int i, indent;
-	int utf8charlen;
+	int i;
 	#endif // FUZZYMATCH_PATCH
 
 	#if EMOJI_HIGHLIGHT_PATCH
@@ -39,22 +37,22 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 	#if FUZZYMATCH_PATCH
 	if (fuzzy) {
 		for (i = 0, highlight = itemtext; *highlight && text[i];) {
-			utf8charlen = utf8len(highlight);
+			highlightlen = utf8len(highlight);
 			#if FUZZYMATCH_PATCH
-			if (!fstrncmp(&(*highlight), &text[i], utf8charlen))
+			if (!fstrncmp(&(*highlight), &text[i], highlightlen))
 			#else
 			if (*highlight == text[i])
 			#endif // FUZZYMATCH_PATCH
 			{
 				/* get indentation */
-				c = *highlight;
+				restorechar = *highlight;
 				*highlight = '\0';
 				indent = TEXTW(itemtext) - lrpad;
-				*highlight = c;
+				*highlight = restorechar;
 
 				/* highlight character */
-				c = highlight[utf8charlen];
-				highlight[utf8charlen] = '\0';
+				restorechar = highlight[highlightlen];
+				highlight[highlightlen] = '\0';
 				drw_text(
 					drw,
 					x + indent + (lrpad / 2),
@@ -65,8 +63,8 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 					, True
 					#endif // PANGO_PATCH
 				);
-				highlight[utf8charlen] = c;
-				i += utf8charlen;
+				highlight[highlightlen] = restorechar;
+				i += highlightlen;
 			}
 			highlight++;
 		}
@@ -82,18 +80,18 @@ drawhighlights(struct item *item, int x, int y, int maxw)
 			highlightlen = highlight - itemtext;
 			restorechar = *highlight;
 			itemtext[highlightlen] = '\0';
-			indentx = TEXTW(itemtext);
+			indent = TEXTW(itemtext);
 			itemtext[highlightlen] = restorechar;
 
 			// Move highlight str end, draw highlight, & restore
 			restorechar = highlight[strlen(token)];
 			highlight[strlen(token)] = '\0';
-			if (indentx - (lrpad / 2) - 1 < maxw)
+			if (indent - (lrpad / 2) - 1 < maxw)
 				drw_text(
 					drw,
-					x + indentx - (lrpad / 2) - 1,
+					x + indent - (lrpad / 2) - 1,
 					y,
-					MIN(maxw - indentx, TEXTW(highlight) - lrpad),
+					MIN(maxw - indent, TEXTW(highlight) - lrpad),
 					bh, 0, highlight, 0
 					#if PANGO_PATCH
 					, True
