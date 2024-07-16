@@ -1,9 +1,7 @@
 #if CENTER_PATCH
 #include "center.c"
 #endif
-#if FUZZYHIGHLIGHT_PATCH
-#include "fuzzyhighlight.c"
-#elif HIGHLIGHT_PATCH
+#if HIGHLIGHT_PATCH
 #include "highlight.c"
 #endif
 #if FUZZYMATCH_PATCH

@@ -55,10 +55,10 @@ enum {
 	#if MORECOLOR_PATCH
 	SchemeMid,
 	#endif // MORECOLOR_PATCH
-	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if HIGHLIGHT_PATCH
 	SchemeNormHighlight,
 	SchemeSelHighlight,
-	#endif // HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#endif // HIGHLIGHT_PATCH
 	#if HIGHPRIORITY_PATCH
 	SchemeHp,
 	#endif // HIGHPRIORITY_PATCH
@@ -330,11 +330,11 @@ drawitem(struct item *item, int x, int y, int w)
 			case 'p':
 				drw_setscheme(drw, scheme[SchemePurple]);
 				break;
-			#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+			#if HIGHLIGHT_PATCH
 			case 'h':
 				drw_setscheme(drw, scheme[SchemeNormHighlight]);
 				break;
-			#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+			#endif // HIGHLIGHT_PATCH
 			case 's':
 				drw_setscheme(drw, scheme[SchemeSel]);
 				break;
@@ -366,11 +366,11 @@ drawitem(struct item *item, int x, int y, int w)
 			case 'p':
 				drw_setscheme(drw, scheme[SchemePurple]);
 				break;
-			#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+			#if HIGHLIGHT_PATCH
 			case 'h':
 				drw_setscheme(drw, scheme[SchemeNormHighlight]);
 				break;
-			#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+			#endif // HIGHLIGHT_PATCH
 			case 's':
 				drw_setscheme(drw, scheme[SchemeSel]);
 				break;
@@ -471,13 +471,13 @@ drawitem(struct item *item, int x, int y, int w)
 		, True
 		#endif // PANGO_PATCH
 		);
-	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if HIGHLIGHT_PATCH
 	#if EMOJI_HIGHLIGHT_PATCH
 	drawhighlights(item, output + iscomment, x + ((iscomment == 6) ? temppadding : 0), y, w);
 	#else
 	drawhighlights(item, x, y, w);
 	#endif // EMOJI_HIGHLIGHT_PATCH
-	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+	#endif // HIGHLIGHT_PATCH
 	return r;
 }
 
@@ -1383,7 +1383,7 @@ paste(void)
 
 #if ALPHA_PATCH
 static void
-xinitvisual()
+xinitvisual(void)
 {
 	XVisualInfo *infos;
 	XRenderPictFormat *fmt;
@@ -1912,9 +1912,9 @@ usage(void)
 		#if XYW_PATCH
 		" [-X xoffset] [-Y yoffset] [-W width]" // (arguments made upper case due to conflicts)
 		#endif // XYW_PATCH
-		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+		#if HIGHLIGHT_PATCH
 		"\n             [-nhb color] [-nhf color] [-shb color] [-shf color]" // highlight colors
-		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+		#endif // HIGHLIGHT_PATCH
 		#if SEPARATOR_PATCH
 		"\n             [-d separator] [-D separator]"
 		#endif // SEPARATOR_PATCH
@@ -2096,7 +2096,7 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-hp"))
 			hpitems = tokenize(argv[++i], ",", &hplength);
  		#endif // HIGHPRIORITY_PATCH
-		#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+		#if HIGHLIGHT_PATCH
 		else if (!strcmp(argv[i], "-nhb")) /* normal hi background color */
 			colors[SchemeNormHighlight][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-nhf")) /* normal hi foreground color */
@@ -2105,7 +2105,7 @@ main(int argc, char *argv[])
 			colors[SchemeSelHighlight][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-shf")) /* selected hi foreground color */
 			colors[SchemeSelHighlight][ColFg] = argv[++i];
-		#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+		#endif // HIGHLIGHT_PATCH
 		#if CARET_WIDTH_PATCH
 		else if (!strcmp(argv[i], "-cw"))  /* sets caret witdth */
 			caret_width = atoi(argv[++i]);

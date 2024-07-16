@@ -9,7 +9,7 @@
 #include "drw.h"
 #include "util.h"
 
-#if !PANGO_PATCH
+#if !PANGO_PATCH || HIGHLIGHT_PATCH
 #define UTF_INVALID 0xFFFD
 #define UTF_SIZ     4
 
@@ -61,6 +61,15 @@ utf8decode(const char *c, long *u, size_t clen)
 
 	return len;
 }
+
+#if HIGHLIGHT_PATCH
+size_t
+utf8len(const char *c)
+{
+	long utf8codepoint = 0;
+	return utf8decode(c, &utf8codepoint, UTF_SIZ);
+}
+#endif // HIGHLIGHT_PATCH
 #endif // PANGO_PATCH
 
 Drw *

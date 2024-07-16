@@ -68,6 +68,10 @@ unsigned int drw_fontset_getwidth_clamp(Drw *drw, const char *text, unsigned int
 void drw_font_getexts(Fnt *font, const char *text, unsigned int len, unsigned int *w, unsigned int *h);
 #endif // PANGO_PATCH
 
+#if HIGHLIGHT_PATCH
+size_t utf8len(const char *c);
+#endif // HIGHLIGHT_PATCH
+
 /* Colorscheme abstraction */
 #if ALPHA_PATCH
 void drw_clr_create(Drw *drw, Clr *dest, const char *clrname, unsigned int alpha);

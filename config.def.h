@@ -67,10 +67,10 @@ static const unsigned int alphas[][3]      = {
 	#if MORECOLOR_PATCH
 	[SchemeMid] = { OPAQUE, baralpha, borderalpha },
 	#endif // MORECOLOR_PATCH
-	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if HIGHLIGHT_PATCH
 	[SchemeSelHighlight] = { OPAQUE, baralpha, borderalpha },
 	[SchemeNormHighlight] = { OPAQUE, baralpha, borderalpha },
-	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+	#endif // HIGHLIGHT_PATCH
 	#if HIGHPRIORITY_PATCH
 	[SchemeHp] = { OPAQUE, baralpha, borderalpha },
 	#endif // HIGHPRIORITY_PATCH
@@ -100,10 +100,10 @@ char *colors[][2] = {
 	#if MORECOLOR_PATCH
 	[SchemeMid]  = { "#eeeeee", "#770000" },
 	#endif // MORECOLOR_PATCH
-	#if HIGHLIGHT_PATCH || FUZZYHIGHLIGHT_PATCH
+	#if HIGHLIGHT_PATCH
 	[SchemeSelHighlight]  = { "#ffc978", "#005577" },
 	[SchemeNormHighlight] = { "#ffc978", "#222222" },
-	#endif // HIGHLIGHT_PATCH | FUZZYHIGHLIGHT_PATCH
+	#endif // HIGHLIGHT_PATCH
 	#if HIGHPRIORITY_PATCH
 	[SchemeHp]   = { "#bbbbbb", "#333333" },
 	#endif // HIGHPRIORITY_PATCH
