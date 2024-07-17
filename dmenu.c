@@ -1519,8 +1519,15 @@ run(void)
 			preselected = 0;
 		}
 		#endif // PRESELECT_PATCH
+		#if INPUTMETHOD_PATCH
+		if (XFilterEvent(&ev, None))
+			continue;
+		if (composing)
+			continue;
+		#else
 		if (XFilterEvent(&ev, win))
 			continue;
+		#endif // INPUTMETHOD_PATCH
 		switch(ev.type) {
 		#if MOUSE_SUPPORT_PATCH
 		case ButtonPress:
@@ -1787,13 +1794,16 @@ setup(void)
 			(unsigned char *) &dock, 1);
 	#endif // WMTYPE_PATCH
 
-
 	/* input methods */
 	if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
 		die("XOpenIM failed: could not open input device");
 
+	#if INPUTMETHOD_PATCH
+	init_input_method(xim);
+	#else
 	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
 	                XNClientWindow, win, XNFocusWindow, win, NULL);
+	#endif // INPUTMETHOD_PATCH
 
 	#if MANAGED_PATCH
 	if (managed) {
@@ -1932,6 +1942,10 @@ main(int argc, char *argv[])
 	#if XRESOURCES_PATCH
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
+	#if INPUTMETHOD_PATCH
+	if (!XSetLocaleModifiers(""))
+		fputs("warning: could not set locale modifiers", stderr);
+	#endif // INPUTMETHOD_PATCH
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("cannot open display");
 
@@ -2164,6 +2178,10 @@ main(int argc, char *argv[])
 	#else // !XRESOURCES_PATCH
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
+	#if INPUTMETHOD_PATCH
+	if (!XSetLocaleModifiers(""))
+		fputs("warning: could not set locale modifiers", stderr);
+	#endif // INPUTMETHOD_PATCH
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("cannot open display");
 	screen = DefaultScreen(dpy);
