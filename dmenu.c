@@ -178,15 +178,6 @@ static Clr *scheme[SchemeLast];
 
 #include "config.h"
 
-#if CASEINSENSITIVE_PATCH
-static char * cistrstr(const char *s, const char *sub);
-static int (*fstrncmp)(const char *, const char *, size_t) = strncasecmp;
-static char *(*fstrstr)(const char *, const char *) = cistrstr;
-#else
-static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
-static char *(*fstrstr)(const char *, const char *) = strstr;
-#endif // CASEINSENSITIVE_PATCH
-
 static unsigned int
 textw_clamp(const char *str, unsigned int n)
 {
@@ -215,6 +206,14 @@ static void readstdin(void);
 static void run(void);
 static void setup(void);
 static void usage(void);
+
+#if CASEINSENSITIVE_PATCH
+static int (*fstrncmp)(const char *, const char *, size_t) = strncasecmp;
+static char *(*fstrstr)(const char *, const char *) = cistrstr;
+#else
+static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
+static char *(*fstrstr)(const char *, const char *) = strstr;
+#endif // CASEINSENSITIVE_PATCH
 
 #include "patch/include.c"
 
