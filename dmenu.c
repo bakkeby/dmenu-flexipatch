@@ -269,6 +269,9 @@ cleanup(void)
 	size_t i;
 
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	#if INPUTMETHOD_PATCH
+	XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+	#endif // INPUTMETHOD_PATCH
 	for (i = 0; i < SchemeLast; i++)
 		free(scheme[i]);
 	for (i = 0; items && items[i].text; ++i)
@@ -1505,7 +1508,9 @@ run(void)
 	#if PRESELECT_PATCH
 	int i;
 	#endif // PRESELECT_PATCH
-
+	#if INPUTMETHOD_PATCH
+	grabfocus();
+	#endif // INPUTMETHOD_PATCH
 	while (!XNextEvent(dpy, &ev)) {
 		#if PRESELECT_PATCH
 		if (preselected) {
