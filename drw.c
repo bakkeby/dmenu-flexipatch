@@ -443,7 +443,8 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 	XftResult result;
 	int charexists = 0, overflow = 0;
 	/* keep track of a couple codepoints for which we have no match. */
-	static unsigned int nomatches[128], ellipsis_width;
+	static unsigned int nomatches[128], ellipsis_width, invalid_width;
+	static const char invalid[] = "�";
 	const char *ellipsis = "...";
 
 	if (!drw || (render && (!drw->scheme || !w)) || !text || !drw->fonts)
@@ -468,6 +469,10 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 	usedfont = drw->fonts;
 	if (!ellipsis_width && render)
 		ellipsis_width = drw_fontset_getwidth(drw, ellipsis);
+	if (!invalid_width) {
+		invalid_width = -1; /* stop infinite recursion */
+		invalid_width = drw_fontset_getwidth(drw, invalid);
+	}
 	while (1) {
 		ew = ellipsis_len = utf8err = utf8strlen = 0;
 		utf8str = text;
@@ -495,9 +500,9 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 						else
 							utf8strlen = ellipsis_len;
 					} else if (curfont == usedfont) {
- 						utf8strlen += utf8charlen;
  						text += utf8charlen;
-						ew += tmpw;
+						utf8strlen += utf8err ? 0 : utf8charlen;
+						ew += utf8err ? 0 : tmpw;
  					} else {
  						nextfont = curfont;
  					}
@@ -505,7 +510,7 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 				}
 			}
 
-			if (overflow || !charexists || nextfont)
+			if (overflow || !charexists || nextfont || utf8err)
 				break;
 			else
 				charexists = 0;
@@ -519,6 +524,12 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
  			}
 			x += ew;
 			w -= ew;
+		}
+		if (utf8err && (!render || invalid_width < w)) {
+			if (render)
+				drw_text(drw, x, y, w, h, 0, invalid, invert);
+			x += invalid_width;
+			w -= invalid_width;
 		}
 		if (render && overflow && ellipsis_w)
 			drw_text(drw, ellipsis_x, y, ellipsis_w, h, 0, ellipsis, invert);
