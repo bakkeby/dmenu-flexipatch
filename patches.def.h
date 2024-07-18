@@ -108,8 +108,10 @@
  */
 #define INITIALTEXT_PATCH 0
 
-/* Adds support for input methods (fctix, ibus, etc.)
-*/
+/* Adds support for input methods (fctix, ibus, etc.) allowing the user to change the
+ * keyboard layout while dmenu is open.
+ * https://github.com/bakkeby/dmenu-flexipatch/pull/22
+ */
 #define INPUTMETHOD_PATCH 0
 
 /* This patch adds a flag which will cause dmenu to select an item immediately if there

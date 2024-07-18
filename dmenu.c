@@ -1508,9 +1508,6 @@ run(void)
 	#if PRESELECT_PATCH
 	int i;
 	#endif // PRESELECT_PATCH
-	#if INPUTMETHOD_PATCH
-	grabfocus();
-	#endif // INPUTMETHOD_PATCH
 	while (!XNextEvent(dpy, &ev)) {
 		#if PRESELECT_PATCH
 		if (preselected) {
@@ -1830,8 +1827,13 @@ setup(void)
 				XSelectInput(dpy, dws[i], FocusChangeMask);
 			XFree(dws);
 		}
+		#if !INPUTMETHOD_PATCH
 		grabfocus();
+		#endif // INPUTMETHOD_PATCH
 	}
+	#if INPUTMETHOD_PATCH
+	grabfocus();
+	#endif // INPUTMETHOD_PATCH
 	drw_resize(drw, mw, mh);
 	drawmenu();
 }
