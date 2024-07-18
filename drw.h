@@ -69,7 +69,7 @@ void drw_font_getexts(Fnt *font, const char *text, unsigned int len, unsigned in
 #endif // PANGO_PATCH
 
 #if HIGHLIGHT_PATCH
-size_t utf8len(const char *c);
+int utf8len(const char *c);
 #endif // HIGHLIGHT_PATCH
 
 /* Colorscheme abstraction */
