@@ -13,6 +13,9 @@
 #if HIGHPRIORITY_PATCH
 #include "highpriority.c"
 #endif
+#if INPUTMETHOD_PATCH
+#include "inputmethod.c"
+#endif
 #if DYNAMIC_OPTIONS_PATCH
 #include "dynamicoptions.c"
 #endif

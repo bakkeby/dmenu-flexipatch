@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2024-07-17 - Added the input method patch
+
 2024-07-16 - Added the mouse motion support patch
 
 2023-06-15 - Added the caret width patch
@@ -137,6 +139,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
    - [initialtext](https://tools.suckless.org/dmenu/patches/initialtext/)
       - adds an option to provide preselected text
+
+   - input-method
+      - adds support for input methods (fctix, ibus, etc.)
 
    - [instant](https://tools.suckless.org/dmenu/patches/instant/)
       - adds a flag that will cause dmenu to select an item immediately if there is only one
