@@ -647,10 +647,18 @@ drawmenu(void)
 	} else if (matches) {
 		/* draw horizontal list */
 		x += inputw;
+		#if SYMBOLS_PATCH
+		w = TEXTW(symbol_1);
+		#else
 		w = TEXTW("<");
+		#endif // SYMBOLS_PATCH
 		if (curr->left) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
+			#if SYMBOLS_PATCH
+			drw_text(drw, x, 0, w, bh, lrpad / 2, symbol_1, 0
+			#else
 			drw_text(drw, x, 0, w, bh, lrpad / 2, "<", 0
+			#endif // SYMBOLS_PATCH
 				#if PANGO_PATCH
 				, True
 				#endif // PANGO_PATCH
