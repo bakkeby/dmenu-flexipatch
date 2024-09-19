@@ -25,6 +25,7 @@ drw_text_align(Drw *drw, int x, int y, unsigned int w, unsigned int h, const cha
 	FcPattern *match;
 	XftResult result;
 	int charexists = 0;
+	int utf8err = 0;
 	int i, n;
 
 	if (!drw || (render && !drw->scheme) || !text || !drw->fonts || textlen <= 0
@@ -56,14 +57,14 @@ drw_text_align(Drw *drw, int x, int y, unsigned int w, unsigned int h, const cha
 
 		while ((align == AlignL && i < textlen) || (align == AlignR && i > 0)) {
 			if (align == AlignL) {
-				utf8charlen = utf8decode(text + i, &utf8codepoint, MIN(textlen - i, UTF_SIZ));
+				utf8charlen = utf8decode(text + i, &utf8codepoint, &utf8err);
 				if (!utf8charlen) {
 					textlen = i;
 					break;
 				}
 			} else {
 				n = utf8nextchar(text, textlen, i, -1);
-				utf8charlen = utf8decode(text + n, &utf8codepoint, MIN(textlen - n, UTF_SIZ));
+				utf8charlen = utf8decode(text + n, &utf8codepoint, &utf8err);
 				if (!utf8charlen) {
 					textlen -= i;
 					text += i;
