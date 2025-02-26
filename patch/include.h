@@ -7,8 +7,14 @@
 #if INPUTMETHOD_PATCH
 #include "inputmethod.h"
 #endif
+#if MOUSE_SUPPORT_PATCH
+#include "mousesupport.h"
+#endif
 #if MULTI_SELECTION_PATCH
 #include "multiselect.h"
+#endif
+#if NAVHISTORY_PATCH
+#include "navhistory.h"
 #endif
 #if HIGHPRIORITY_PATCH
 #include "highpriority.h"

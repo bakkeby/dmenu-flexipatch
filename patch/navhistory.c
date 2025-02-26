@@ -2,7 +2,7 @@ static char *histfile;
 static char **history;
 static size_t histsz, histpos;
 
-static void
+void
 loadhistory(void)
 {
 	FILE *fp = NULL;
@@ -48,7 +48,7 @@ loadhistory(void)
 	}
 }
 
-static void
+void
 navhistory(int dir)
 {
 	static char def[BUFSIZ];
@@ -88,7 +88,7 @@ navhistory(int dir)
 	match();
 }
 
-static void
+void
 savehistory(char *input)
 {
 	unsigned int i;

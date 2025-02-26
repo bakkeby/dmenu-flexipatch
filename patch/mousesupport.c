@@ -1,4 +1,4 @@
-static void
+void
 buttonpress(XEvent *e)
 {
 	struct item *item;
@@ -78,26 +78,7 @@ buttonpress(XEvent *e)
 				(ev->x >= x + ((i / lines) * (w / cols))) && // column x start
 				(ev->x <= x + ((i / lines + 1) * (w / cols))) // column x end
 			) {
-				#if !MULTI_SELECTION_PATCH
-				puts(item->text);
-				#endif // MULTI_SELECTION_PATCH
-				if (!(ev->state & ControlMask)) {
-					#if MULTI_SELECTION_PATCH
-					sel = item;
-					selsel();
-					printsel(ev->state);
-					#endif // MULTI_SELECTION_PATCH
-					exit(0);
-				}
-				sel = item;
-				if (sel) {
-					#if MULTI_SELECTION_PATCH
-					selsel();
-					#else
-					sel->out = 1;
-					#endif // MULTI_SELECTION_PATCH
-					drawmenu();
-				}
+				clickitem(item, ev);
 				return;
 			}
 		}
@@ -106,26 +87,7 @@ buttonpress(XEvent *e)
 		for (item = curr; item != next; item = item->right) {
 			y += h;
 			if (ev->y >= y && ev->y <= (y + h)) {
-				#if !MULTI_SELECTION_PATCH
-				puts(item->text);
-				#endif // MULTI_SELECTION_PATCH
-				if (!(ev->state & ControlMask)) {
-					#if MULTI_SELECTION_PATCH
-					sel = item;
-					selsel();
-					printsel(ev->state);
-					#endif // MULTI_SELECTION_PATCH
-					exit(0);
-				}
-				sel = item;
-				if (sel) {
-					#if MULTI_SELECTION_PATCH
-					selsel();
-					#else
-					sel->out = 1;
-					#endif // MULTI_SELECTION_PATCH
-					drawmenu();
-				}
+				clickitem(item, ev);
 				return;
 			}
 		}
@@ -155,26 +117,7 @@ buttonpress(XEvent *e)
 			w = MIN(TEXTW(item->text), mw - x - TEXTW(">"));
 			#endif // SYMBOLS_PATCH
 			if (ev->x >= x && ev->x <= x + w) {
-				#if !MULTI_SELECTION_PATCH
-				puts(item->text);
-				#endif // MULTI_SELECTION_PATCH
-				if (!(ev->state & ControlMask)) {
-					#if MULTI_SELECTION_PATCH
-					sel = item;
-					selsel();
-					printsel(ev->state);
-					#endif // MULTI_SELECTION_PATCH
-					exit(0);
-				}
-				sel = item;
-				if (sel) {
-					#if MULTI_SELECTION_PATCH
-					selsel();
-					#else
-					sel->out = 1;
-					#endif // MULTI_SELECTION_PATCH
-					drawmenu();
-				}
+				clickitem(item, ev);
 				return;
 			}
 		}
@@ -194,8 +137,82 @@ buttonpress(XEvent *e)
 	}
 }
 
-#if MOTION_SUPPORT_PATCH
 static void
+clickitem(struct item *item, XButtonEvent *ev)
+{
+	#if RESTRICT_RETURN_PATCH
+	if (restrict_return && (ev->state & (ShiftMask | ControlMask)))
+		return;
+	#endif // RESTRICT_RETURN_PATCH
+
+	#if !MULTI_SELECTION_PATCH
+	#if PIPEOUT_PATCH
+	if (item && !(ev->state & ShiftMask))
+	{
+		if (item->text[0] == startpipe[0]) {
+			strncpy(item->text + strlen(item->text),pipeout,8);
+			puts(item->text+1);
+		}
+		#if PRINTINDEX_PATCH
+		if (print_index) {
+			printf("%d\n", item->index);
+		} else {
+		#if SEPARATOR_PATCH
+			puts(item->text_output);
+		#else
+			puts(item->text);
+		#endif // SEPARATOR_PATCH
+		}
+		#else
+		puts(item->text);
+		#endif // PRINTINDEX_PATCH
+	} else {
+		if (text[0] == startpipe[0]) {
+			strncpy(text + strlen(text),pipeout,8);
+			puts(text+1);
+		}
+		puts(text);
+	}
+	#elif PRINTINDEX_PATCH
+	if (print_index) {
+		printf("%d\n", item->index);
+	} else {
+		#if SEPARATOR_PATCH
+		puts(item->text_output);
+		#else
+		puts(item->text);
+		#endif // SEPARATOR_PATCH
+	}
+	#elif SEPARATOR_PATCH
+	puts(item->text_output);
+	#else
+	puts(item->text);
+	#endif // PIPEOUT_PATCH | PRINTINDEX_PATCH
+	#endif // MULTI_SELECTION_PATCH
+
+	sel = item;
+	if (!(ev->state & ControlMask)) {
+		#if NAVHISTORY_PATCH
+		savehistory(item->text);
+		#endif // NAVHISTORY_PATCH
+		#if MULTI_SELECTION_PATCH
+		selsel();
+		printsel(ev->state);
+		#endif // MULTI_SELECTION_PATCH
+		cleanup();
+		exit(0);
+	}
+
+	#if MULTI_SELECTION_PATCH
+	selsel();
+	#else
+	sel->out = 1;
+	#endif // MULTI_SELECTION_PATCH
+	drawmenu();
+}
+
+#if MOTION_SUPPORT_PATCH
+void
 motionevent(XButtonEvent *ev)
 {
 	struct item *item;

@@ -16,16 +16,32 @@ printsel(unsigned int state)
 			if (print_index)
 				printf("%d\n", selid[i]);
 			else
-			#endif // PRINTINDEX_PATCH
+			#if SEPARATOR_PATCH
+				puts(items[selid[i]].text_output);
+			#else
+				puts(items[selid[i]].text);
+			#endif // SEPARATOR_PATCH
+			#elif SEPARATOR_PATCH
+			puts(items[selid[i]].text_output);
+			#else
 			puts(items[selid[i]].text);
+			#endif // PRINTINDEX_PATCH | SEPARATOR_PATCH
 		}
 	if (sel && !(state & ShiftMask)) {
 		#if PRINTINDEX_PATCH
 		if (print_index)
 			printf("%d\n", sel->index);
 		else
-		#endif // PRINTINDEX_PATCH
+		#if SEPARATOR_PATCH
+			puts(sel->text_output);
+		#else
+			puts(sel->text);
+		#endif // SEPARATOR_PATCH
+		#elif SEPARATOR_PATCH
+		puts(sel->text_output);
+		#else
 		puts(sel->text);
+		#endif // PRINTINDEX_PATCH | SEPARATOR_PATCH
 	} else
 		puts(text);
 
