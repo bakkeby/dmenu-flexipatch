@@ -268,7 +268,7 @@ cleanup(void)
 {
 	size_t i;
 
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	XUngrabKeyboard(dpy, CurrentTime);
 	#if INPUTMETHOD_PATCH
 	XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	#endif // INPUTMETHOD_PATCH
