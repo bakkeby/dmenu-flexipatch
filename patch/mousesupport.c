@@ -8,8 +8,14 @@ buttonpress(XEvent *e)
 	int i, cols;
 	#endif // GRID_PATCH
 
-	if (ev->window != win)
+	if (ev->window != win) {
+		/* automatically close dmenu if the user clicks outside of dmenu, but
+		 * ignore the scroll wheel and buttons above that */
+		if (ev->button <= Button3) {
+			exit(1);
+		}
 		return;
+	}
 
 	/* right-click: exit */
 	if (ev->button == Button3)

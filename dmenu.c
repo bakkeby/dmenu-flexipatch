@@ -751,8 +751,14 @@ grabkeyboard(void)
 	/* try to grab keyboard, we may have to wait for another process to ungrab */
 	for (i = 0; i < 1000; i++) {
 		if (XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync,
-		                  GrabModeAsync, CurrentTime) == GrabSuccess)
+		                  GrabModeAsync, CurrentTime) == GrabSuccess) {
+			#if MOUSE_SUPPORT_PATCH
+			/* one off attempt at grabbing the mouse pointer to avoid interactions
+			 * with other windows while dmenu is active */
+			XGrabPointer(dpy, DefaultRootWindow(dpy), True, ButtonPressMask, GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+			#endif // MOUSE_SUPPORT_PATCH
 			return;
+		}
 		nanosleep(&ts, NULL);
 	}
 	die("cannot grab keyboard");
