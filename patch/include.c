@@ -28,6 +28,9 @@
 #if NAVHISTORY_PATCH
 #include "navhistory.c"
 #endif
+#if VI_MODE_PATCH
+#include "vi_mode.c"
+#endif
 #if NON_BLOCKING_STDIN_PATCH
 #include "nonblockingstdin.c"
 #endif

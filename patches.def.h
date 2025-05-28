@@ -19,6 +19,13 @@
  */
 #define BORDER_PATCH 0
 
+/* The caret scheme patch, a.k.a. colored caret patch, adds the option to change the color
+ * of the caret via the SchemeCaret color scheme.
+ *
+ * https://tools.suckless.org/dmenu/patches/colored-caret/
+ */
+#define CARET_SCHEME_PATCH 0
+
 /* By default the caret in dmenu has a width of 2 pixels. This patch makes that configurable
  * as well as overridable via a command line option.
  * https://github.com/DarkSamus669/dmenu-patches/blob/main/dmenu-caretwidth-5.2.diff
@@ -343,6 +350,19 @@
  * https://tools.suckless.org/dmenu/patches/vertfull/
  */
 #define VERTFULL_PATCH 0
+
+/* This patch adds basic vi mode capabilities to dmenu.
+ *   - movements inside typed text with [h|l|w|b|e|0|$]
+ *   - movements through list with [j|k|g|G|C-d|C-u]
+ *   - standard insertions with [a|A|i|I]
+ *   - paste after|before cursor with [p|P], use ctrl to use clipboard
+ *   - delete from cursor to eol with D
+ *   - delete the character under cursor with x
+ *   - Enter and Tab will work like normal
+ *
+ * https://tools.suckless.org/dmenu/patches/vi-mode/
+ */
+#define VI_MODE_PATCH 0
 
 /* Adds extended window manager hints such as _NET_WM_WINDOW_TYPE and _NET_WM_WINDOW_TYPE_DOCK.
  * https://github.com/Baitinq/dmenu/blob/master/patches/dmenu-wm_type.diff

@@ -85,6 +85,18 @@ readxresources(void)
 		if (XrmGetResource(xdb, "dmenu.redforeground", "*", &type, &xval))
 			colors[SchemeRed][ColFg] = strdup(xval.addr);
 		#endif // EMOJI_HIGHLIGHT_PATCH
+		#if VI_MODE_PATCH
+		if (XrmGetResource(xdb, "dmenu.cursorbackground", "*", &type, &xval))
+			colors[SchemeCursor][ColBg] = strdup(xval.addr);
+		if (XrmGetResource(xdb, "dmenu.cursorforeground", "*", &type, &xval))
+			colors[SchemeCursor][ColFg] = strdup(xval.addr);
+		#endif // VI_MODE_PATCH
+		#if CARET_SCHEME_PATCH
+		if (XrmGetResource(xdb, "dmenu.caretbackground", "*", &type, &xval))
+			colors[SchemeCaret][ColBg] = strdup(xval.addr);
+		if (XrmGetResource(xdb, "dmenu.caretforeground", "*", &type, &xval))
+			colors[SchemeCaret][ColFg] = strdup(xval.addr);
+		#endif // CARET_SCHEME_PATCH
 		XrmDestroyDatabase(xdb);
 	}
 }

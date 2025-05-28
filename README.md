@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2025-05-28 - Added the colored caret and vi mode patches
+
 2024-07-17 - Added the input method patch
 
 2024-07-16 - Added the mouse motion support patch
@@ -99,6 +101,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
         library when color glyphs are used
       - enabling this will crash dmenu on encountering such glyphs unless you also have an updated
         Xft library that can handle them
+
+   - [colored caret](https://tools.suckless.org/dmenu/patches/colored-caret/)
+      - adds the `SchemeCaret` colour scheme allowing customised styling of the caret
 
    - [dynamic_options](https://tools.suckless.org/dmenu/patches/dynamicoptions/)
       - adds a flag (`-dy`) which makes dmenu run the command given to it whenever input is changed
@@ -260,6 +265,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
    - [vertfull](https://tools.suckless.org/dmenu/patches/vertfull/)
       - prevents dmenu from indenting items at the same level as the prompt length
+
+   - [vi mode](https://tools.suckless.org/dmenu/patches/vi-mode/)
+      - adds basic vi mode capabilities to dmenu
 
    - [wmtype](https://github.com/Baitinq/dmenu/blob/master/patches/dmenu-wm_type.diff)
       - adds extended window manager hints such as \_NET_WM_WINDOW_TYPE and \_NET_WM_WINDOW_TYPE_DOCK

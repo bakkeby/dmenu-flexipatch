@@ -70,6 +70,12 @@ enum {
 	SchemePurple,
 	SchemeRed,
 	#endif // EMOJI_HIGHLIGHT_PATCH
+	#if VI_MODE_PATCH
+	SchemeCursor,
+	#endif // VI_MODE_PATCH
+	#if CARET_SCHEME_PATCH
+	SchemeCaret,
+	#endif // CARET_SCHEME_PATCH
 	SchemeLast,
 }; /* color schemes */
 
@@ -551,6 +557,16 @@ drawmenu(void)
 	drw_text_align(drw, x, 0, curpos, bh, text, cursor, AlignR);
 	drw_text_align(drw, x + curpos, 0, w - curpos, bh, text + cursor, strlen(text) - cursor, AlignL);
 	#endif // PASSWORD_PATCH
+
+	#if VI_MODE_PATCH
+	if (using_vi_mode && text[0] != '\0') {
+		drw_setscheme(drw, scheme[SchemeCursor]);
+		char vi_char[] = {text[cursor], '\0'};
+		drw_text(drw, x + curpos, 0, TEXTW(vi_char) - lrpad, bh, 0, vi_char, 0);
+	} else if (using_vi_mode) {
+		drw_rect(drw, x + curpos, 2, lrpad / 2, bh - 4, 1, 0);
+	} else
+	#endif // VI_MODE_PATCH
 	#if LINE_HEIGHT_PATCH
 	drw_rect(drw, x + curpos - 1, 2 + (bh-fh)/2, 2, fh - 4, 1, 0);
 	#else
@@ -589,8 +605,24 @@ drawmenu(void)
 	#endif // PASSWORD_PATCH
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
-	if ((curpos += lrpad / 2 - 1) < w) {
+	curpos += lrpad / 2 - 1;
+
+	#if VI_MODE_PATCH
+	if (using_vi_mode && text[0] != '\0') {
+		drw_setscheme(drw, scheme[SchemeCursor]);
+		char vi_char[] = {text[cursor], '\0'};
+		drw_text(drw, x + curpos, 0, TEXTW(vi_char) - lrpad, bh, 0, vi_char, 0);
+	} else if (using_vi_mode) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
+		drw_rect(drw, x + curpos, 2, lrpad / 2, bh - 4, 1, 0);
+	} else
+	#endif // VI_MODE_PATCH
+	if (curpos < w) {
+		#if CARET_SCHEME_PATCH
+		drw_setscheme(drw, scheme[SchemeCaret]);
+		#else
+		drw_setscheme(drw, scheme[SchemeNorm]);
+		#endif // CARET_SCHEME_PATCH
 		#if CARET_WIDTH_PATCH && LINE_HEIGHT_PATCH
 		drw_rect(drw, x + curpos, 2 + (bh-fh)/2, caret_width, fh - 4, 1, 0);
 		#elif CARET_WIDTH_PATCH
@@ -992,6 +1024,22 @@ keypress(XKeyEvent *ev)
 	case XLookupBoth: /* a KeySym and a string are returned: use keysym */
 		break;
 	}
+
+	#if VI_MODE_PATCH
+	if (using_vi_mode) {
+		vi_keypress(ksym, ev);
+		return;
+	}
+
+	if (vi_mode &&
+			   (ksym == global_esc.ksym &&
+				(ev->state & global_esc.state) == global_esc.state)) {
+		using_vi_mode = 1;
+		if (cursor)
+			cursor = nextrune(-1);
+		goto draw;
+	}
+	#endif // VI_MODE_PATCH
 
 	if (ev->state & ControlMask) {
 		switch(ksym) {
@@ -1395,6 +1443,11 @@ draw:
 		fflush(stdout);
 	}
 	#endif // INCREMENTAL_PATCH
+	#if VI_MODE_PATCH
+	if (using_vi_mode && text[cursor] == '\0')
+		--cursor;
+	#endif // VI_MODE_PATCH
+
 	drawmenu();
 }
 
@@ -1917,6 +1970,9 @@ usage(void)
 		#if CARET_WIDTH_PATCH
 		"[-cw caret_width] "
 		#endif // CARET_WIDTH_PATCH
+		#if VI_MODE_PATCH
+		"[-vi] "
+		#endif // VI_MODE_PATCH
 		#if MANAGED_PATCH
 		"[-wm] "
 		#endif // MANAGED_PATCH
@@ -2055,6 +2111,13 @@ main(int argc, char *argv[])
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
 		#endif // CASEINSENSITIVE_PATCH
+		#if VI_MODE_PATCH
+		} else if (!strcmp(argv[i], "-vi")) {
+			vi_mode = 1;
+			using_vi_mode = start_mode;
+			global_esc.ksym = XK_Escape;
+			global_esc.state = 0;
+		#endif // VI_MODE_PATCH
 		#if MANAGED_PATCH
 		} else if (!strcmp(argv[i], "-wm")) { /* display as managed wm window */
 			managed = 1;

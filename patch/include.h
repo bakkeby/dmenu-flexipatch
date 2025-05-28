@@ -16,6 +16,9 @@
 #if NAVHISTORY_PATCH
 #include "navhistory.h"
 #endif
+#if VI_MODE_PATCH
+#include "vi_mode.h"
+#endif
 #if HIGHPRIORITY_PATCH
 #include "highpriority.h"
 #endif
