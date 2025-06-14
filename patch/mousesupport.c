@@ -72,7 +72,7 @@ buttonpress(XEvent *e)
 	}
 	if (ev->button != Button1)
 		return;
-	if (ev->state & ~ControlMask)
+	if (ev->state & ShiftMask)
 		return;
 	if (lines > 0) {
 		#if GRID_PATCH
