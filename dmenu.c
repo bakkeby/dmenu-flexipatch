@@ -279,7 +279,7 @@ cleanup(void)
 	XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 	#endif // INPUTMETHOD_PATCH
 	for (i = 0; i < SchemeLast; i++)
-		free(scheme[i]);
+		drw_scm_free(drw, scheme[i], 2);
 	for (i = 0; items && items[i].text; ++i) {
 		#if SEPARATOR_PATCH
 		free(separator_reverse ? items[i].text_output : items[i].text);

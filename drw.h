@@ -80,6 +80,8 @@ Clr *drw_scm_create(Drw *drw, const char *clrnames[], const unsigned int alphas[
 void drw_clr_create(Drw *drw, Clr *dest, const char *clrname);
 Clr *drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount);
 #endif // ALPHA_PATCH
+void drw_clr_free(Drw *drw, Clr *c);
+void drw_scm_free(Drw *drw, Clr *scm, size_t clrcount);
 
 /* Cursor abstraction */
 Cur *drw_cur_create(Drw *drw, int shape);
