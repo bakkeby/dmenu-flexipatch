@@ -646,11 +646,14 @@ drawmenu(void)
 	#endif // BORDER_PATCH
 	#endif // NUMBERS_PATCH
 	if (lines > 0) {
+		#if DYNAMIC_HEIGHT_PATCH || GRID_PATCH
+		int i = 0;
+		#endif // DYNAMIC_HEIGHT_PATCH | GRID_PATCH
+
 		#if GRID_PATCH
 		/* draw grid */
-		int i = 0;
-		for (item = curr; item != next; item = item->right, i++)
-			if (columns)
+		for (item = curr; item != next; item = item->right, i++) {
+			if (columns) {
 				#if VERTFULL_PATCH
 				drawitem(
 					item,
@@ -666,20 +669,32 @@ drawmenu(void)
 					(mw - x) / columns
 				);
 				#endif // VERTFULL_PATCH
-			else
+			} else {
 				#if VERTFULL_PATCH
 				drawitem(item, 0, y += bh, mw);
 				#else
 				drawitem(item, x, y += bh, mw - x);
 				#endif // VERTFULL_PATCH
+				#if DYNAMIC_HEIGHT_PATCH
+				XResizeWindow(dpy, win, mw, (i + 1) * bh);
+				#endif // DYNAMIC_HEIGHT_PATCH
+			}
+		}
 		#else
 		/* draw vertical list */
-		for (item = curr; item != next; item = item->right)
+		for (item = curr; item != next; item = item->right) {
+			#if DYNAMIC_HEIGHT_PATCH
+			i++;
+			#endif // DYNAMIC_HEIGHT_PATCH
 			#if VERTFULL_PATCH
 			drawitem(item, 0, y += bh, mw);
 			#else
 			drawitem(item, x, y += bh, mw - x);
 			#endif // VERTFULL_PATCH
+		}
+		#if DYNAMIC_HEIGHT_PATCH
+		XResizeWindow(dpy, win, mw, (i + 1) * bh);
+		#endif // DYNAMIC_HEIGHT_PATCH
 		#endif // GRID_PATCH
 	} else if (matches) {
 		/* draw horizontal list */

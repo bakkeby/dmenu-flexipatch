@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2025-10-16 - Added the dynamic height patch
+
 2025-05-28 - Added the colored caret and vi mode patches
 
 2024-07-17 - Added the input method patch
@@ -104,6 +106,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
    - [colored caret](https://tools.suckless.org/dmenu/patches/colored-caret/)
       - adds the `SchemeCaret` colour scheme allowing customised styling of the caret
+
+   - [dynamic height](https://gist.github.com/mircodz/1d9b88db958089bb08adbf45eb53b66f)
+      - adjusts the height of the bar depending on how many items are drawn in the list presentation
 
    - [dynamic_options](https://tools.suckless.org/dmenu/patches/dynamicoptions/)
       - adds a flag (`-dy`) which makes dmenu run the command given to it whenever input is changed

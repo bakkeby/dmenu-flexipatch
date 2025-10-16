@@ -48,6 +48,13 @@
  */
 #define CTRL_V_TO_PASTE_PATCH 0
 
+/* This patch dyamically changes the size of the dmenu window based on how many items are
+ * drawn in a vertical view. For this to work set a higher maximum of lines, e.g. -l 500.
+ * This feature does not apply when presenting items in a grid view.
+ * https://gist.github.com/mircodz/1d9b88db958089bb08adbf45eb53b66f
+ */
+#define DYNAMIC_HEIGHT_PATCH 0
+
 /* This patch adds a flag (-dy) which makes dmenu run the command given to it whenever input
  * is changed with the current input as the last argument and update the option list according
  * to the output of that command.
