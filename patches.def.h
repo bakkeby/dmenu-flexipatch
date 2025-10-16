@@ -296,6 +296,12 @@
  */
 #define PRINTINPUTTEXT_PATCH 0
 
+/* This patch adds a flag (-q) which makes dmenu not show any items if the search string is
+ * empty.
+ * https://github.com/baskerville/dmenu_qxyw/blob/master/dmenu_qxyw-hg.diff
+ */
+#define QUIET_PATCH 0
+
 /* This patch adds a new flag to dmenu with which text input will be rejected if it would
  * result in no matching item.
  * https://tools.suckless.org/dmenu/patches/reject-no-match/

@@ -28,7 +28,7 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
-2025-10-16 - Added the dynamic height patch
+2025-10-16 - Added the dynamic height and quiet patches
 
 2025-05-28 - Added the colored caret and vi mode patches
 
@@ -234,6 +234,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
       - this patch adds a flag `-t` which makes Return key ignore selection and print the input
         text to stdout
       - the flag basically swaps the functions of Return and Shift+Return hotkeys
+
+   - [quiet](https://github.com/baskerville/dmenu_qxyw/blob/master/dmenu_qxyw-hg.diff)
+      - adds a flag (-q) which makes dmenu not show any items if the search string is empty
 
    - [rejectnomatch](https://tools.suckless.org/dmenu/patches/reject-no-match/)
       - adds a new flag to dmenu with which text input will be rejected if it would result in no

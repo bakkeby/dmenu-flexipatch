@@ -25,6 +25,9 @@ static int min_width = 500;                 /* minimum width when centered */
 static const int vertpad = 10;              /* vertical padding of bar */
 static const int sidepad = 10;              /* horizontal padding of bar */
 #endif // BARPADDING_PATCH
+#if QUIET_PATCH
+static int quiet = 0;                       /* -q  option; if 1, dmenu will not show any items if the search string is empty */
+#endif // QUIET_PATCH
 #if RESTRICT_RETURN_PATCH
 static int restrict_return = 0;             /* -1 option; if 1, disables shift-return and ctrl-return */
 #endif // RESTRICT_RETURN_PATCH

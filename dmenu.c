@@ -645,6 +645,17 @@ drawmenu(void)
 	rpad += border_width;
 	#endif // BORDER_PATCH
 	#endif // NUMBERS_PATCH
+
+	#if QUIET_PATCH
+	if (quiet && strlen(text) == 0) {
+		#if DYNAMIC_HEIGHT_PATCH
+		if (lines > 0)
+			XResizeWindow(dpy, win, mw, bh);
+		#endif // DYNAMIC_HEIGHT_PATCH
+		goto skip_item_listing;
+	}
+	#endif // QUIET_PATCH
+
 	if (lines > 0) {
 		#if DYNAMIC_HEIGHT_PATCH || GRID_PATCH
 		int i = 0;
@@ -750,6 +761,11 @@ drawmenu(void)
 			);
 		}
 	}
+
+	#if QUIET_PATCH
+skip_item_listing:
+	#endif // QUIET_PATCH
+
 	#if NUMBERS_PATCH
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	#if PANGO_PATCH
@@ -1949,6 +1965,9 @@ usage(void)
 		#if !NON_BLOCKING_STDIN_PATCH
 		"f"
 		#endif // NON_BLOCKING_STDIN_PATCH
+		#if QUIET_PATCH
+		"q"
+		#endif // QUIET_PATCH
 		#if INCREMENTAL_PATCH
 		"r"
 		#endif // INCREMENTAL_PATCH
@@ -2117,6 +2136,10 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-r")) { /* incremental */
 			incremental = !incremental;
 		#endif // INCREMENTAL_PATCH
+		#if QUIET_PATCH
+		} else if (!strcmp(argv[i], "-q")) { /* quiet, don't list items if search is empty */
+			quiet = !quiet;
+		#endif // QUIET_PATCH
 		#if CASEINSENSITIVE_PATCH
 		} else if (!strcmp(argv[i], "-s")) { /* case-sensitive item matching */
 			fstrncmp = strncmp;
