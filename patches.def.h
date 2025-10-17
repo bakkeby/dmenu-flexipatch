@@ -50,7 +50,6 @@
 
 /* This patch dyamically changes the size of the dmenu window based on how many items are
  * drawn in a vertical view. For this to work set a higher maximum of lines, e.g. -l 500.
- * This feature does not apply when presenting items in a grid view.
  * https://gist.github.com/mircodz/1d9b88db958089bb08adbf45eb53b66f
  */
 #define DYNAMIC_HEIGHT_PATCH 0

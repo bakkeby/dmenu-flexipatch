@@ -686,11 +686,16 @@ drawmenu(void)
 				#else
 				drawitem(item, x, y += bh, mw - x);
 				#endif // VERTFULL_PATCH
-				#if DYNAMIC_HEIGHT_PATCH
-				XResizeWindow(dpy, win, mw, (i + 1) * bh);
-				#endif // DYNAMIC_HEIGHT_PATCH
 			}
 		}
+		#if DYNAMIC_HEIGHT_PATCH
+		if (columns) {
+			XResizeWindow(dpy, win, mw, (MIN(i, lines) + 1) * bh);
+		} else {
+			XResizeWindow(dpy, win, mw, (i + 1) * bh);
+		}
+		#endif // DYNAMIC_HEIGHT_PATCH
+
 		#else
 		/* draw vertical list */
 		for (item = curr; item != next; item = item->right) {
