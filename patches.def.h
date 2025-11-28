@@ -13,6 +13,19 @@
  */
 #define BARPADDING_PATCH 0
 
+/* This patch adds proper support for Right-To-Left languages, such as Hebrew,
+ * Arabic, and Farsi.
+ *
+ * This is an edited version of this patch by http://github.com/nimaaskarian to
+ * render the prompt as bidi as well as the options
+ *
+ * Texts combining both RTL and LTR languages are displayed correctly. This is
+ * achieved using the GNU FriBiDi library, which is an additional dependency for
+ * this patch.
+ * https://tools.suckless.org/dmenu/patches/bidi/
+ */
+#define BIDI_PATCH 0
+
 /* This patch adds a border around the dmenu window. It is intended to be used with the center
  * or xyw patches, to make the menu stand out from similarly coloured windows.
  * http://tools.suckless.org/dmenu/patches/border/

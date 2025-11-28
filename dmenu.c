@@ -17,6 +17,10 @@
 #include <X11/Xft/Xft.h>
 
 #include "patches.h"
+#if BIDI_PATCH
+#include <fribidi.h>
+#endif //BIDI_PATCH
+
 /* Patch incompatibility overrides */
 #if MULTI_SELECTION_PATCH
 #undef NON_BLOCKING_STDIN_PATCH
@@ -107,6 +111,9 @@ struct item {
 };
 
 static char text[BUFSIZ] = "";
+#if BIDI_PATCH
+static char fribidi_text[BUFSIZ] = "";
+#endif //BIDI_PATCH
 #if PIPEOUT_PATCH
 static char pipeout[8] = " | dmenu";
 #endif // PIPEOUT_PATCH
@@ -312,15 +319,43 @@ cistrstr(const char *s, const char *sub)
 	return NULL;
 }
 
+#if BIDI_PATCH
+static void
+apply_fribidi(char *str)
+{
+  FriBidiStrIndex len = strlen(str);
+  FriBidiChar logical[BUFSIZ];
+  FriBidiChar visual[BUFSIZ];
+  FriBidiParType base = FRIBIDI_PAR_ON;
+  FriBidiCharSet charset;
+  fribidi_boolean result;
+
+  fribidi_text[0] = 0;
+  if (len>0)
+  {
+    charset = fribidi_parse_charset("UTF-8");
+    len = fribidi_charset_to_unicode(charset, str, len, logical);
+    result = fribidi_log2vis(logical, len, &base, visual, NULL, NULL, NULL);
+    len = fribidi_unicode_to_charset(charset, visual, len, fribidi_text);
+  }
+}
+#endif //BIDI_PATCH
+
 static int
 drawitem(struct item *item, int x, int y, int w)
 {
 	int r;
+  #if BIDI_PATCH
+  apply_fribidi(item->text);
+  char * text = fribidi_text;
+  #else
 	#if TSV_PATCH && !SEPARATOR_PATCH
 	char *text = item->stext;
 	#else
 	char *text = item->text;
 	#endif // TSV_PATCH
+  #endif //BIDI_PATCH
+
 
 	#if EMOJI_HIGHLIGHT_PATCH
 	int iscomment = 0;
@@ -521,11 +556,20 @@ drawmenu(void)
 		#if !PLAIN_PROMPT_PATCH
 		drw_setscheme(drw, scheme[SchemeSel]);
 		#endif // PLAIN_PROMPT_PATCH
+    #if BIDI_PATCH
+    apply_fribidi(prompt);
+		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, fribidi_text, 0
+			#if PANGO_PATCH
+			, True
+			#endif // PANGO_PATCH
+		);
+    #else
 		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0
 			#if PANGO_PATCH
 			, True
 			#endif // PANGO_PATCH
 		);
+    #endif // BIDI_PATCH
 	}
 	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
@@ -597,11 +641,20 @@ drawmenu(void)
 		);
 	}
 	#else
+  #if BIDI_PATCH
+  apply_fribidi(text);
+	drw_text(drw, x, 0, w, bh, lrpad / 2, fribidi_text, 0
+		#if PANGO_PATCH
+		, False
+		#endif // PANGO_PATCH
+	);
+  #else
 	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0
 		#if PANGO_PATCH
 		, False
 		#endif // PANGO_PATCH
 	);
+  #endif //BIDI_PATCH
 	#endif // PASSWORD_PATCH
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
