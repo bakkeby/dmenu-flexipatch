@@ -12,6 +12,10 @@ X11LIB = /usr/X11R6/lib
 XINERAMALIBS  = -lXinerama
 XINERAMAFLAGS = -DXINERAMA
 
+# Uncomment for bidi patch / BIDI_PATCH
+#BIDILIBS = `pkg-config --libs fribidi`
+#BIDIINC = `pkg-config --cflags fribidi`
+
 # freetype
 FREETYPELIBS = -lfontconfig -lXft
 FREETYPEINC = /usr/include/freetype2
@@ -30,8 +34,8 @@ XRENDER = -lXrender
 #PANGOLIB = `pkg-config --libs xft pango pangoxft`
 
 # includes and libs
-INCS = -I$(X11INC) -I$(FREETYPEINC) ${PANGOINC}
-LIBS = -L$(X11LIB) -lX11 $(XINERAMALIBS) $(FREETYPELIBS) -lm $(XRENDER) ${PANGOLIB}
+INCS = -I$(X11INC) -I$(FREETYPEINC) ${PANGOINC} ${BIDIINC}
+LIBS = -L$(X11LIB) -lX11 $(XINERAMALIBS) $(FREETYPELIBS) -lm $(XRENDER) ${PANGOLIB} ${BIDILIBS} 
 
 # flags
 CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_POSIX_C_SOURCE=200809L -DVERSION=\"$(VERSION)\" $(XINERAMAFLAGS) $(EXTRAFLAGS)
