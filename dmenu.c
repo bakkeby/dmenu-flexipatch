@@ -346,8 +346,13 @@ drawitem(struct item *item, int x, int y, int w)
 {
 	int r;
   #if BIDI_PATCH
+	#if TSV_PATCH && !SEPARATOR_PATCH
+  apply_fribidi(item->stext);
+  char * text = fribidi_text;
+  #else
   apply_fribidi(item->text);
   char * text = fribidi_text;
+  #endif // TSV_PATCH
   #else
 	#if TSV_PATCH && !SEPARATOR_PATCH
 	char *text = item->stext;
