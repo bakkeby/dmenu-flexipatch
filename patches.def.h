@@ -16,7 +16,7 @@
 /* This patch adds proper support for Right-To-Left languages, such as Hebrew,
  * Arabic, and Farsi.
  *
- * This is an edited version of this patch by http://github.com/nimaaskarian to
+ * This is an edited version of this patch by https://github.com/nimaaskarian to
  * render the prompt as bidi as well as the options
  *
  * Texts combining both RTL and LTR languages are displayed correctly. This is
@@ -388,6 +388,15 @@
  * https://tools.suckless.org/dmenu/patches/vi-mode/
  */
 #define VI_MODE_PATCH 0
+
+/* Depends on VI_MODE_PATCH, some improvements on the vi mode patch. Adds a
+ * required number argument after -vi option, 0 means disabled vi by default,
+ * non zero number means enabled vi by default; allowing you to set the starting
+ * mode in the runtime.
+ *
+ * This patch is made by https://github.com/nimaaskarian
+ */
+#define VI_MODE_RUNTIME_STARTING_MODE_PATCH 0
 
 /* Adds extended window manager hints such as _NET_WM_WINDOW_TYPE and _NET_WM_WINDOW_TYPE_DOCK.
  * https://github.com/Baitinq/dmenu/blob/master/patches/dmenu-wm_type.diff

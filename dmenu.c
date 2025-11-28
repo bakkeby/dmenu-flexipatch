@@ -2214,7 +2214,13 @@ main(int argc, char *argv[])
 		#endif // CASEINSENSITIVE_PATCH
 		#if VI_MODE_PATCH
 		} else if (!strcmp(argv[i], "-vi")) {
-			vi_mode = 1;
+      #if VI_MODE_RUNTIME_STARTING_MODE_PATCH
+      int next_arg_num = atoi(argv[++i]);
+      if (next_arg_num) {
+        start_mode = vi_mode;
+        i++;
+      }
+      #endif VI_MODE_RUNTIME_STARTING_MODE_PATCH
 			using_vi_mode = start_mode;
 			global_esc.ksym = XK_Escape;
 			global_esc.state = 0;
