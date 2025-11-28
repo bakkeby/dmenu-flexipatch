@@ -2218,7 +2218,6 @@ main(int argc, char *argv[])
       int next_arg_num = atoi(argv[++i]);
       if (next_arg_num) {
         start_mode = vi_mode;
-        i++;
       }
       #endif VI_MODE_RUNTIME_STARTING_MODE_PATCH
 			using_vi_mode = start_mode;
