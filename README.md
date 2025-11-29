@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2025-11-29 - Added the bidi patch
+
 2025-10-16 - Added the dynamic height and quiet patches
 
 2025-05-28 - Added the colored caret and vi mode patches
@@ -84,6 +86,9 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
    - [barpadding](https://github.com/bakkeby/patches/wiki/barpadding)
       - adds padding for dmenu in similar fashion to the [barpadding](https://dwm.suckless.org/patches/barpadding/)
         patch for dwm
+
+   - [bidi](https://tools.suckless.org/dmenu/patches/bidi/)
+      - adds support for Right-To-Left (RTL) languages, such as Hebrew, Arabic, and Farsi
 
    - [border](http://tools.suckless.org/dmenu/patches/border/)
       - adds a border around the dmenu window

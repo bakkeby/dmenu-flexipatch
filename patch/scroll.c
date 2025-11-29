@@ -46,6 +46,11 @@ drw_text_align(Drw *drw, int x, int y, unsigned int w, unsigned int h, const cha
 		#endif // ALPHA_PATCH
 	}
 
+	#if BIDI_PATCH
+	apply_fribidi(text);
+	text = fribidi_text;
+	#endif // BIDI_PATCH
+
 	usedfont = drw->fonts;
 	i = align == AlignL ? 0 : textlen;
 	x = align == AlignL ? x : x + w;
