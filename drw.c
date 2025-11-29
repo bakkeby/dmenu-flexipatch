@@ -512,16 +512,17 @@ drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lp
 		w -= lpad;
 	}
 
+	if (!ellipsis_width && render)
+		ellipsis_width = drw_fontset_getwidth(drw, ellipsis);
+	if (!invalid_width && render)
+		invalid_width = drw_fontset_getwidth(drw, invalid);
+
 	#if BIDI_PATCH
 	apply_fribidi(text);
 	text = fribidi_text;
 	#endif // BIDI_PATCH
 
 	usedfont = drw->fonts;
-	if (!ellipsis_width && render)
-		ellipsis_width = drw_fontset_getwidth(drw, ellipsis);
-	if (!invalid_width && render)
-		invalid_width = drw_fontset_getwidth(drw, invalid);
 	while (1) {
 		ew = ellipsis_len = utf8err = utf8strlen = 0;
 		utf8str = text;
