@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cachedir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
+cache="$cachedir/dmenu_run_desktop"
+
+[ ! -e "$cachedir" ] && mkdir -p "$cachedir"
+
+dirs=""
+IFS=:
+for dir in "${XDG_DATA_DIRS:-"/usr/local/share:/usr/share"}"; do
+	dirs="${dirs}:${dir}/applications"
+done;
+
+if stest -dqr -n "$cache" $PATH; then
+	stest -fl $dirs | grep -v 'mimeinfo.cache' | sed 's/\.[^./]*$//' | sort -u | tee "$cache"
+else
+	cat "$cache"
+fi
