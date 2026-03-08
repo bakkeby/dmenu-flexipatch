@@ -1031,6 +1031,9 @@ insert(const char *str, ssize_t n)
 static size_t
 nextrune(int inc)
 {
+	/* return 0 if text is empty */
+	if (text[0] == '\0')
+		return 0;
 	ssize_t n;
 
 	/* return location of next utf8 rune in the given direction (+1 or -1) */
