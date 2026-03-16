@@ -28,6 +28,8 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
 ### Changelog:
 
+2026-01-03 - Added the desktoponly patch (requires setting the desktoponly variable to "true" on the Makefile)
+
 2025-11-29 - Added the bidi patch
 
 2025-10-16 - Added the dynamic height and quiet patches
@@ -111,6 +113,12 @@ Browsing patches? There is a [map of patches](https://coggle.it/diagram/YjT2DD6j
 
    - [colored caret](https://tools.suckless.org/dmenu/patches/colored-caret/)
       - adds the `SchemeCaret` colour scheme allowing customised styling of the caret
+
+   - [desktoponly](https://tools.suckless.org/dmenu/patches/desktoponly/)
+      - allows dmenu to use only desktop files from /usr/share/applications
+         - requires changing the Makefile variable desktoponly to "true"
+         - requires gtk-launch to be present (part of gtk3 on some distros)
+         - requires xargs (part of findutils on some distros)
 
    - [dynamic height](https://gist.github.com/mircodz/1d9b88db958089bb08adbf45eb53b66f)
       - adjusts the height of the bar depending on how many items are drawn in the list presentation
