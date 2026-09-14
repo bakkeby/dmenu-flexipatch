@@ -733,7 +733,7 @@ drawmenu(void)
 		XResizeWindow(dpy, win, mw, (i + 1) * bh);
 		#endif // DYNAMIC_HEIGHT_PATCH
 		#endif // GRID_PATCH
-	} else if (matches) {
+	} else if (matches && curr) {
 		/* draw horizontal list */
 		x += inputw;
 		#if SYMBOLS_PATCH
