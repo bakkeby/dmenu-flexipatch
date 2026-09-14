@@ -21,8 +21,10 @@ buttonpress(XEvent *e)
 	if (ev->button == Button3)
 		exit(1);
 
+	#if !VERTFULL_PATCH
 	if (prompt && *prompt)
 		x += promptw;
+	#endif // VERTFULL_PATCH
 
 	/* input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
@@ -185,8 +187,10 @@ motionevent(XButtonEvent *ev)
 	if (ev->window != win || matches == 0)
 		return;
 
+	#if !VERTFULL_PATCH
 	if (prompt && *prompt)
 		x += promptw;
+	#endif // VERTFULL_PATCH
 
 	if (lines > 0) {
 		/* input field */
