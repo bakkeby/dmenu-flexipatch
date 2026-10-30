@@ -1955,8 +1955,9 @@ setup(void)
 	#if INPUTMETHOD_PATCH
 	init_input_method(xim);
 	#else
-	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
-	                XNClientWindow, win, XNFocusWindow, win, NULL);
+	if ((xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+	                     XNClientWindow, win, XNFocusWindow, win, NULL)) == NULL)cd
+		die("XCreateIC failed: could not obtain input context");
 	#endif // INPUTMETHOD_PATCH
 
 	#if MANAGED_PATCH
