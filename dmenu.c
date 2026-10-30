@@ -1601,9 +1601,8 @@ readstdin(void)
 			if (!(items = realloc(items, itemsiz * sizeof(*items))))
 				die("cannot realloc %zu bytes:", itemsiz * sizeof(*items));
 		}
-		if (line[len - 1] == '\n')
+		if (len > 0 && line[len - 1] == '\n')
 			line[len - 1] = '\0';
-
 		if (!(items[i].text = strdup(line)))
 			die("strdup:");
 		#if SEPARATOR_PATCH
