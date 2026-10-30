@@ -13,7 +13,7 @@ readxresources(void)
 
 		if (XrmGetResource(xdb, "dmenu.font", "*", &type, &xval))
 			#if PANGO_PATCH
-			strcpy(font, xval.addr);
+			font = strdup(xval.addr);
 			#else
 			fonts[0] = strdup(xval.addr);
 			#endif // PANGO_PATCH
